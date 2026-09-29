@@ -16,11 +16,15 @@ To make it permanent for your user (so MCP clients launched from anywhere inheri
 [Environment]::SetEnvironmentVariable("UV_PROJECT_ENVIRONMENT", "$env:LOCALAPPDATA\uc4-mcp\.venv", "User")
 ```
 
-Run tests from the repo root (this also collects the EDA tests in `analysis/uc4_eda/`):
+Run tests from the repo root. Keep the `app/tests` path: without it pytest also collects `analysis/uc4_eda/`, whose test modules share basenames with ours.
 
 ```powershell
-uv run --project app pytest -q
+uv run --project app pytest -q app/tests
 ```
+
+## Data
+
+The tests and server read `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case*.zip`, which is git-ignored (data clearance is still open), so copy it there after cloning. Exactly one archive may match; otherwise, or to use a copy elsewhere, set `UC4_ZIP` to its full path.
 
 ## Connect OpenCode (stdio)
 

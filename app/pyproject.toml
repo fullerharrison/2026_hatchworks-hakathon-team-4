@@ -19,6 +19,11 @@ uc4-mcp = "uc4_mcp.server:main"
 requires = ["uv_build>=0.8.22,<0.9.0"]
 build-backend = "uv_build"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# analysis/uc4_eda/ has test modules with the same basenames and no __init__.py.
+addopts = "--import-mode=importlib"
+
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
