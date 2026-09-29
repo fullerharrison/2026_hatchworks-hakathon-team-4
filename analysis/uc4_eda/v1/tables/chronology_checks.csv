@@ -1,0 +1,13 @@
+stage,rule,checked,violations,share,not_checkable,example
+Germplasm,Parent line created after its offspring,226,118,0.522,0,SYN-MZ-2022-00001
+Germplasm,Material harvested before it was created,150,39,0.26,0,SYN-MZ-2021-00004
+Trials,Trial began before its entry's seed was harvested,720,265,0.368,0,SYN-TR-0003
+Field treatments,Operation more than a year from its trial's start,216,103,0.477,0,7EF5AAA3-E11B-308C-0000-000000000003
+Field treatments,Trial's first harvest dated before its first planting,16,7,0.438,56,SYN-TR-0007
+Field treatments,Completed trial still has planned operations,25,15,0.6,0,515759EC-ECE3-E30C-0000-000000000003
+Field treatments,Operation type recorded in more than one unit,5,5,1.0,0,FERTILISER_APPLICATION
+Field observations,Field observation dated before its trial began,720,87,0.121,0,2DF9E057-8ECD-BD65-0000-000000000006
+Field observations,Field observation in a trial still marked PLANNED,720,330,0.458,0,2DF9E057-8ECD-BD65-0000-000000000001
+Lab,Lab result dated before the material's harvest,360,133,0.369,0,2F35E9C7-D583-C07A-0000-000000000001
+Record keeping,Event dated after the data was extracted,1530,69,0.045,0,line created SYN-MZ-2026-00031
+Record keeping,Record last changed before it was created or observed,798,46,0.058,0,line SYN-MZ-2026-00031

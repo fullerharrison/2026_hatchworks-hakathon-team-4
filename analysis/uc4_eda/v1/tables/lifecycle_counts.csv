@@ -1,0 +1,10 @@
+stage,n,unit,detail
+crop,1,crop,"Maize (SYN-MZ IDs, flint/dent kernels)"
+crossing,113,crosses with parents,Self / Dihap / Cross
+germplasm,150,lines,"Generations F1, F2, BC1, S1, DH"
+stage,4,stages,DEV → S1 → S2 → S3
+trials,72,trials,"6 locations, 2024 to 2026, 2 to 4 reps"
+operations,216,operations,"Planting, fertiliser, irrigation, inspection, harvest"
+observations,720,field observations,"5 traits, 10 lines per trial"
+lab,360,lab results,"4 unnamed traits, 134 lines"
+decision,150,decisions,Hold 58 / Discard 57 / Advance 35

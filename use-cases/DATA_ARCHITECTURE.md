@@ -1,0 +1,73 @@
+# Data architecture: all four use cases
+
+Each use case has a data-architecture page with two layers:
+
+- **Part A, for a novice:** a plain-language story, a "where the data goes" diagram and a "what connects to what" diagram, without column names.
+- **Part B, for an expert:** an entity-relationship model with real columns and measured join rates, the proposed pipeline, the headline interaction as a sequence diagram, and a record lifecycle.
+- **Part C, evidence:** every number in the diagrams, with its source column and measured value.
+
+| Use case | Page | Data backbone | Biggest data gap |
+| --- | --- | --- | --- |
+| UC1 Plant Capacity | [uc1/DATA_ARCHITECTURE.md](uc1/DATA_ARCHITECTURE.md) | `PO Number` links schedules → logs → pass/fail, in two separate LSV and SSV clusters | No line capacity, customer orders or changeover rules |
+| UC2 Market Intelligence | [uc2/DATA_ARCHITECTURE.md](uc2/DATA_ARCHITECTURE.md) | Market ↔ Sales on Species + Year (236 of 236) + segment **description** | No monthly demand history; units unconfirmed |
+| UC3 Data Integrity | [uc3/DATA_ARCHITECTURE.md](uc3/DATA_ARCHITECTURE.md) | One 545-row account table with 3 unique ID columns | No required-field policy or owner directory |
+| UC4 R&D Unification | [uc4/DATA_ARCHITECTURE.md](uc4/DATA_ARCHITECTURE.md) | v2 archive: `TRIAL_GUID` + `MATERIAL_GUID`, zero orphans; one SME verdict per trial | Verdicts come without thresholds (inferred rule reproduces 72/72); no line-level field values; lab dictionary |
+
+## Legend
+
+Every diagram uses the same colours.
+
+```mermaid
+flowchart LR
+    A["Supplied: in the archive, measured"]:::supplied
+    B["Proposed: our design, not yet built"]:::proposed
+    C["Missing: must be supplied or made synthetic"]:::missing
+    D["Human decision"]:::human
+    A --> B
+    C -.-> B
+    B --> D
+    classDef supplied fill:#d9f2d9,stroke:#2e7d32,color:#000
+    classDef proposed fill:#fff4cc,stroke:#b8860b,color:#000
+    classDef missing fill:#eeeeee,stroke:#888888,stroke-dasharray: 5 5,color:#000
+    classDef human fill:#dbe9ff,stroke:#1f5fbf,color:#000
+```
+
+A solid arrow is a join or flow that was measured. A dashed arrow is an input or join that does not yet exist or does not work without extra mapping.
+
+## One pattern shared by all four
+
+All four MVPs have the same shape. Deterministic rules make the decision, a language model only puts recorded reasons into words, and a person approves. The use cases differ in what the engine does and in which inputs are missing.
+
+```mermaid
+flowchart LR
+    S["Offline snapshot of supplied files"]:::supplied
+    G["Synthetic stand-ins, labelled"]:::missing
+    V["Normalise and validate"]:::proposed
+    E["Deterministic engine: UC1 ranker, UC2 calculator, UC3 rule scanner, UC4 scorer"]:::proposed
+    X["LLM explains reason codes only"]:::proposed
+    H["Human approves or overrides"]:::human
+    A[("Append-only audit log")]:::proposed
+    S --> V
+    G -.-> V
+    V --> E --> X --> H --> A
+    classDef supplied fill:#d9f2d9,stroke:#2e7d32,color:#000
+    classDef proposed fill:#fff4cc,stroke:#b8860b,color:#000
+    classDef missing fill:#eeeeee,stroke:#888888,stroke-dasharray: 5 5,color:#000
+    classDef human fill:#dbe9ff,stroke:#1f5fbf,color:#000
+```
+
+## New findings from this pass
+
+These pages add evidence that was not in [VERIFICATION.md](VERIFICATION.md). All of it was measured on 2026-09-29 by opening the zips in memory, read-only.
+
+| UC | Finding | Why it matters |
+| --- | --- | --- |
+| UC1 | LSV and SSV share no PO numbers. 99.5% of LSV log POs appear in an LSV schedule. Pass/fail grain is PO + Lot + Size Fraction. SSV has no test log. | There are two planning domains. A failed test blocks a fraction. The failed-test demo is LSV-only. |
+| UC1 | SAP `WorkCenter` codes (`LSVLN1`, `SSVLN5` …) map to schedule tabs; `Equipment ID` does not. | Build the line crosswalk from WorkCenter. |
+| UC2 | Micro-segment codes do not join between market and sales (0 shared); descriptions do (393 of 393). | Join on the description, or aggregate to species. |
+| UC2 | Market, sales and grower files each cover a single geography value (Spain). | "One geography" = Spain. `Spain Geo` is not needed for the MVP. |
+| UC4 | The SME's v2 archive (2026-09-29) scores each **trial** PASS/HOLD/FAIL. Fixed thresholds reproduce all 72 verdicts; one criterion (resistant %) is missing from the rationale text. | Score trials with a versioned engine and show every value against its threshold. Use the supplied verdicts as the regression baseline. |
+| UC4 | v2 observations hold links, not values; trial genomics aggregates match the linked lines in 0 of 72 trials. | Line-level evidence cannot prove a trial verdict. Flag the gap instead of hiding it. |
+| UC4 | 144 of 216 operations fall outside their trial's start year; all 114 planned operations are already past. | Show operations as context with a date-inconsistency flag. |
+
+The first-pass UC4 findings (one trait per material, 29 of 216 operations sharing an observation, replication labels) described the kickoff archive, which v2 supersedes.

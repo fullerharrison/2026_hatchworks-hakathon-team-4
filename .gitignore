@@ -1,0 +1,6 @@
+# Data clearance is still an open SME question: keep the source archives out of git.
+get_started/*.zip
+.venv/
+app/logs/
+__pycache__/
+.superpowers/
