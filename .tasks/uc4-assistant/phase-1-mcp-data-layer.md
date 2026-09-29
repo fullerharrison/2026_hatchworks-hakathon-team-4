@@ -140,13 +140,20 @@ Expected counts come from `analysis/uc4_eda/tables/chronology_checks.csv` and `g
 
 ## Steps (test first; commit after each)
 
-Run tests with `uv run --project app pytest -q` from the repo root.
+Run tests with `uv run --project app pytest -q app/tests` from the repo root. The path matters: without it pytest also collects `analysis/uc4_eda/`, whose `test_rules.py` and `test_lifecycle.py` share basenames with ours (no `__init__.py`, so collection fails with "import file mismatch"). The EDA suite keeps its own command.
 
 0. **Repo and environment (15 min).** `git init` at the repo root. `.gitignore`: `get_started/*.zip` (data clearance is still an open SME question), `.venv/`, `app/logs/`, `__pycache__/`. Set `UV_PROJECT_ENVIRONMENT` to a path outside OneDrive and note it in `app/README.md`. First commit: existing docs and EDA.
 1. **Scaffold and client spike (30 min).** `uv init --package --name uc4-mcp app`; add `mcp[cli]>=2.2,<3`, `pandas`, dev `pytest`. A throwaway `ping` tool on `MCPServer`; `tests/test_smoke.py` calls it via `mcp.Client(server)`. Connect OpenCode to it over stdio once, to prove protocol compatibility with an `mcp` 2.x server now rather than at step 8. Record the working client config.
-2. **Sources (45 min).** Port `member_stem`, `load_tables`, constants and `lab_trait_label`; rewrite `find_zip` (env var `UC4_ZIP`, then repo-root lookup). Add `_source_file`, `_line_no`, `ROW_KEYS`. Tests: row counts; each `row_id` unique and non-null; `_line_no` of first row = 2; every observation `GID` and operations/lab/genomics `MATERIAL_GUID` in germplasm; every trial GUID in recommendations; zip file unchanged (mtime + size before and after).
+2. **Sources (45 min).** Port `member_stem`, `load_tables`, constants and `lab_trait_label`; rewrite `find_zip` (env var `UC4_ZIP`, then repo-root lookup). Add `_source_file`, `_line_no`, `ROW_KEYS`. Adopted from the step 2 review (2026-09-29):
+   - **Keys as strings.** `load_tables` reads each `ROW_KEYS` column with `dtype=str` (observation `ID` otherwise loads as `int64`) and adds `_row_id` (str), so later steps read one column.
+   - **Test scope.** `app/pyproject.toml` gets `[tool.pytest.ini_options] testpaths = ["tests"]`, `addopts = "--import-mode=importlib"`; run with `app/tests` (see above).
+   - **`find_zip`.** `UC4_ZIP` wins; otherwise walk up from the current directory, then from `__file__`, to the first directory containing `get_started/`. More than one glob match without `UC4_ZIP` raises (no silent `sorted()[-1]`). Not found raises `FileNotFoundError` naming `UC4_ZIP`.
+   - **Loader hardening.** Two CSV members with the same `member_stem` raise.
+   - **`conftest.py`.** Session-scoped `tables` fixture; a missing zip fails with the `find_zip` message (the zip is git-ignored, so fresh clones need it).
+
+   Tests: row counts; each `row_id` unique, non-null and a `str`; `_line_no` of first row = 2 and of last row = rows + 1; every observation `GID` and operations/lab/genomics `MATERIAL_GUID` in germplasm; every trial GUID in recommendations and vice versa; every observation `ATTACHED_TO_FIELD_ENTITY_ID` and operations `TRIAL_GUID` in trial; no string cell contains U+FFFD; `UC4_ZIP` overrides lookup; missing zip and ambiguous glob raise; duplicate member stems raise; zip unchanged (SHA-256 taken *before* the test itself calls `load_tables`, not after the session fixture).
 3. **Rules and lifecycle (60 min).** Port `Rule`, `SYNTH_V1`, `criteria_flags`, `apply_rule`, `rationale_flags`, `threshold_intervals`, `trial_material_links`, `genomics_reconciliation` with `test_rules.py`; port `lifecycle.py` with `test_lifecycle.py`. Add `explain(row) -> Recommendation` without flags. Tests: 72/72; the three worked examples (exact values, `passed`/`triggered` per criterion); a row with `DISEASE_SCORE = NaN` is HOLD, never PASS, with no knockout triggered; `threshold_intervals()` equals `rule_intervals.csv`; `chronology_checks()` equals `chronology_checks.csv` counts.
-4. **Models (30 min).** Dataclasses, envelope and `to_json_safe()`. Tests: frozen; `numpy.int64`, `numpy.float64`, `NaN`, `NaT` convert to `int`, `float`, `None`, `None`; `json.dumps(..., allow_nan=False)` succeeds.
+4. **Models (30 min).** Dataclasses, envelope and `to_json_safe()`. Tests: frozen; `numpy.int64`, `numpy.float64`, `NaN`, `NaT` convert to `int`, `float`, `None`, `None`; `json.dumps(..., allow_nan=False)` succeeds. **Open (step 2 review):** `row_id` alone is ambiguous: `recommendations` and `trial` both key on `TRIAL_GUID`. Make `evidence_row_ids` (on `Recommendation` and `Flag`) source-qualified, `"<source_file>#<row_id>"`, and have step 6's "every EvidenceRow resolves back" test cover these references too.
 5. **Checks (45 min).** One function per flag returning `dict[key, list[Flag]]`, built on the ported lifecycle helpers. Tests assert each expected count in the table above.
 6. **Store (60 min).** `EvidenceStore.from_zip()` builds indexes once. `resolve_trial/line(query) -> Resolution`; `trial_view`, `line_view`, `recommendation`, `query_trials`, `baseline`. Tests: resolution cases from the tool table (exact ID, exact GUID, case-insensitive, `"0037"` listed once, ID fragment → many, `"003"` not matching GUIDs, none); `trial_view` for every trial has 10 lines and 3 ops; every `EvidenceRow` resolves back to a real row (`source_file` + `row_id` found in its table); lab rows never carry a `trial_guid`; `json.dumps(to_json_safe(...), allow_nan=False)` succeeds for all 72 trial views, 72 recommendations and 150 line views; `query_trials` counts equal the tool table.
 7. **Server (45 min).** `MCPServer` tools as thin wrappers over the store (no logic in `server.py`), each with the docstring content above. Logging goes to `app/logs/uc4_mcp.log`, never stdout. Tests: `mcp.Client(server)` in-process lists the 8 tools and 2 resources and calls each with the acceptance inputs; every response has the envelope shape.
@@ -157,7 +164,7 @@ Estimated total: about 6.5 hours.
 
 ## Exit criteria
 
-- [ ] `uv run --project app pytest -q` passes, including the ported 72/72 test.
+- [ ] `uv run --project app pytest -q app/tests` passes, including the ported 72/72 test.
 - [ ] `baseline_check` returns 72 matched, 0 mismatches.
 - [ ] `score_trial` for 0003, 0037 and 0001 returns the verdict, every criterion with value, threshold and bracket, and source row IDs.
 - [ ] `find_trial "SYN-TR-003"` returns 10 candidates, not a guess.
