@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UC4 breeder assistant</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <h1>UC4 breeder assistant</h1>
+  <p class="rule-note">Recommendations use the <strong>SYNTH_V1 (inferred)</strong> rules. They are
+    proposals: the <strong>breeder decides</strong>.</p>
+  <div class="controls">
+    <label for="trial-search">Trial</label>
+    <input id="trial-search" type="search" list="trial-list" autocomplete="off"
+           placeholder="SYN-TR-0037" aria-describedby="candidates">
+    <datalist id="trial-list"></datalist>
+    <label for="user-alias">Your alias</label>
+    <input id="user-alias" type="text" maxlength="60" autocomplete="off" placeholder="demo alias">
+  </div>
+  <div id="candidates" aria-live="polite"></div>
+</header>
+
+<main>
+  <section id="banner" class="banner" aria-live="polite" aria-label="Recommendation"></section>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="h-criteria">
+      <h2 id="h-criteria">Why this verdict</h2>
+      <div class="scroll"><table id="criteria"></table></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-rationale">
+      <h2 id="h-rationale">Supplied rationale</h2>
+      <div id="rationale"></div>
+      <h3>Aggregates</h3>
+      <div id="aggregates"></div>
+    </section>
+  </div>
+
+  <section class="card" aria-labelledby="h-flags">
+    <h2 id="h-flags">Flags</h2>
+    <div id="flags"></div>
+  </section>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="h-lines">
+      <h2 id="h-lines">Lines in this trial</h2>
+      <div class="scroll"><table id="lines"></table></div>
+      <div id="line-panel" class="panel" aria-live="polite"></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-ops">
+      <h2 id="h-ops">Operations</h2>
+      <div class="scroll"><table id="operations"></table></div>
+    </section>
+  </div>
+
+  <section class="card" aria-labelledby="h-decide">
+    <h2 id="h-decide">Record your decision</h2>
+    <form id="decision-form">
+      <fieldset>
+        <legend>Decision</legend>
+        <label class="radio"><input type="radio" name="decision" value="PASS"> ● PASS</label>
+        <label class="radio"><input type="radio" name="decision" value="HOLD"> ▲ HOLD</label>
+        <label class="radio"><input type="radio" name="decision" value="FAIL"> ■ FAIL</label>
+      </fieldset>
+      <label for="decision-line">About line (optional)</label>
+      <select id="decision-line" name="material_guid"><option value="">No specific line</option>
+      </select>
+      <label for="decision-reason">Reason (5 to 1000 characters)</label>
+      <textarea id="decision-reason" name="reason" rows="3" minlength="5" maxlength="1000"
+                required></textarea>
+      <button type="submit">Record decision</button>
+      <p id="decision-error" class="error" role="alert"></p>
+    </form>
+    <h3>Decision history</h3>
+    <div id="history"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-ask">
+    <h2 id="h-ask">Ask a question</h2>
+    <form id="ask-form">
+      <label for="ask-question">Question about the data</label>
+      <input id="ask-question" type="text" maxlength="2000" autocomplete="off" required
+             placeholder="Why is this trial on hold?">
+      <button type="submit">Ask</button>
+    </form>
+    <div id="answer" aria-live="polite"></div>
+  </section>
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>

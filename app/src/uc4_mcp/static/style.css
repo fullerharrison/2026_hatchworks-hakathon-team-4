@@ -1,0 +1,85 @@
+:root {
+  --text: #1a1a1a;
+  --muted: #4a4a4a;
+  --bg: #f6f7f5;
+  --card: #ffffff;
+  --line: #c9ccc6;
+  --green-bg: #d8f0dc; --green-fg: #0d3d14; --green-bd: #1b7a2b;
+  --amber-bg: #ffe9a8; --amber-fg: #4a3300; --amber-bd: #b07800;
+  --red-bg: #fbd5d5; --red-fg: #6b0d0d; --red-bd: #b31d1d;
+  --focus: #0b5cad;
+  font-size: 18px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 0 1rem 3rem; background: var(--bg); color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.45;
+}
+header.top, main { max-width: 72rem; margin: 0 auto; }
+h1 { font-size: 1.5rem; margin: 1rem 0 .25rem; }
+h2 { font-size: 1.15rem; margin: 0 0 .6rem; }
+h3 { font-size: 1rem; margin: 1rem 0 .4rem; }
+.rule-note { margin: 0 0 .75rem; color: var(--muted); }
+.controls { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+label { font-weight: 600; }
+input, select, textarea, button { font: inherit; }
+input[type="search"], input[type="text"], select, textarea {
+  padding: .4rem .6rem; border: 1px solid #6b6f68; border-radius: 6px; background: #fff;
+  color: var(--text); max-width: 100%;
+}
+#trial-search { width: 16rem; }
+textarea, #ask-question { width: 100%; display: block; margin: .25rem 0 .75rem; }
+select { display: block; margin: .25rem 0 .75rem; }
+button {
+  padding: .45rem .9rem; border: 1px solid #0b3f78; border-radius: 6px; background: #0b5cad;
+  color: #fff; cursor: pointer;
+}
+button:disabled { opacity: .6; cursor: progress; }
+button.link { background: none; color: var(--focus); border: none; padding: 0;
+  text-decoration: underline; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+#candidates { margin: .5rem 0; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+  padding: 1rem; margin: 1rem 0; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid var(--line);
+  vertical-align: top; }
+th { background: #eef0ec; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: #f1f6fb; }
+tr.cited td, .cited { background: #fff3b0 !important; outline: 2px solid var(--amber-bd); }
+.banner { border-left: 1rem solid var(--line); border-radius: 8px; padding: .8rem 1rem;
+  margin: 1rem 0; background: var(--card); }
+.banner.green { background: var(--green-bg); color: var(--green-fg); border-color: var(--green-bd); }
+.banner.amber { background: var(--amber-bg); color: var(--amber-fg); border-color: var(--amber-bd); }
+.banner.red { background: var(--red-bg); color: var(--red-fg); border-color: var(--red-bd); }
+.banner .verdict { font-size: 2rem; font-weight: 700; margin: 0; }
+.banner p { margin: .25rem 0; }
+.badge { display: inline-block; padding: 0 .45rem; border-radius: 999px; font-size: .8rem;
+  font-weight: 700; border: 1px solid currentColor; margin-left: .35rem; }
+.badge.override { background: var(--amber-bg); color: var(--amber-fg); }
+.ok { color: var(--green-fg); font-weight: 600; }
+.bad { color: var(--red-fg); font-weight: 600; }
+.warn { background: var(--amber-bg); color: var(--amber-fg); border-left: 5px solid var(--amber-bd);
+  padding: .4rem .6rem; border-radius: 4px; margin: .5rem 0; }
+.info { background: #e6eef7; color: #0f2f52; border-left: 5px solid #0b5cad;
+  padding: .4rem .6rem; border-radius: 4px; margin: .5rem 0; }
+.error { color: var(--red-fg); font-weight: 600; min-height: 1.4em; margin: .5rem 0 0; }
+.muted { color: var(--muted); }
+.src { font-size: .8rem; color: var(--muted); }
+.src-detail[hidden] { display: none; }
+.src-detail { font-size: .78rem; color: var(--muted); word-break: break-all; }
+fieldset { border: 1px solid var(--line); border-radius: 6px; margin: 0 0 .75rem; }
+.radio { margin-right: 1.25rem; font-weight: 600; }
+.panel:not(:empty) { margin-top: 1rem; padding: .75rem; border: 1px dashed var(--line);
+  border-radius: 6px; }
+.hist-item { border-bottom: 1px solid var(--line); padding: .5rem 0; }
+details summary { cursor: pointer; }
+ol.cites { margin: .5rem 0; padding-left: 1.5rem; }
+.answer-text { white-space: pre-wrap; }
+@media (max-width: 700px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  #trial-search { width: 100%; }
+}

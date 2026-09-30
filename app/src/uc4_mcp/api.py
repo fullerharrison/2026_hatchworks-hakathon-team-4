@@ -8,11 +8,13 @@ the append-only decision log.
 from __future__ import annotations
 
 from collections.abc import Callable
+from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from mcp.server.mcpserver import MCPServer
 from pydantic import BaseModel, Field, StringConstraints
 
@@ -25,6 +27,7 @@ from uc4_mcp.models import to_json_safe
 from uc4_mcp.server import _default_store
 from uc4_mcp.store import EvidenceStore
 
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 LOCAL_ORIGINS = r"http://(localhost|127\.0\.0\.1)(:\d+)?"
 
 
@@ -136,5 +139,11 @@ def create_app(make_model: Callable[[], ChatModel], server: MCPServer | None = N
         if res.status != "ok":
             return JSONResponse(to_json_safe(get_store().find_trial(trial)), status_code=404)
         return JSONResponse(decisions_json(str(res.guid)))
+
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+    @app.get("/", include_in_schema=False)
+    def screen() -> FileResponse:
+        return FileResponse(STATIC_DIR / "index.html")
 
     return app
