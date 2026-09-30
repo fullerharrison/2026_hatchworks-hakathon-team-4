@@ -221,7 +221,7 @@ Status 2026-09-29, after step 9. "Manual" means confirmed by hand in the MCP Ins
 - [x] The stdio subprocess test passes, and OpenCode has connected to the server (step 8).
 - [x] Every tool docstring states grain, units, "inferred" and an example input (as made testable in step 7: `test_descriptions_state_grain_inference_and_an_example`).
 - [x] No tool writes to disk except the log; the zip is unchanged (`test_zip_unchanged_by_loading`).
-- [ ] `app/README.md` lets a teammate connect OpenCode to the server in under 5 minutes. Open: needs a teammate to try it.
+- [ ] `app/README.md` lets a teammate connect OpenCode to the server in under 5 minutes. Open: needs a teammate to try it. Claude dry run 2026-09-29 from a clean clone outside OneDrive, fresh venv, following the README literally: `opencode mcp list` → `uc4 connected` in 0.4 min (warm uv cache) and 0.3 min (empty uv cache, 121 MB downloaded). The README does not say where to get the git-ignored zip.
 
 ## Hand-off to Phases 2 and 3
 
