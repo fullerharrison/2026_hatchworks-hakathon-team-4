@@ -17,7 +17,9 @@ from pathlib import Path
 import pandas as pd
 
 ZIP_ENV = "UC4_ZIP"
-ZIP_GLOB = "RE__Hatchworks_Hackathon_-_4th_Use_Case*.zip"
+# Pinned to v2 (2026-09-29). The 2026-09-30 v3 archive changes the observation
+# schema and GUID namespaces; the app moves to it in its own migration.
+ZIP_NAME = "RE__Hatchworks_Hackathon_-_4th_Use_Case.zip"
 
 # Table key -> member stem. Members may carry a " 1" download suffix.
 FILES: dict[str, str] = {
@@ -106,7 +108,8 @@ def find_zip(starts: Sequence[Path] | None = None) -> Path:
 
     ``$UC4_ZIP`` wins. Otherwise walk up from each start (default: the current
     directory, then this package) to the first directory holding ``get_started/``
-    and take the single archive matching ``ZIP_GLOB`` there.
+    and take ``ZIP_NAME`` there. The name is exact so a newer SME drop in the
+    same folder never switches the app's data without a code change.
 
     Args:
         starts: Directories to walk up from; for tests.
@@ -115,8 +118,7 @@ def find_zip(starts: Sequence[Path] | None = None) -> Path:
         Path to the archive.
 
     Raises:
-        FileNotFoundError: If ``$UC4_ZIP`` is not a file, no archive is found, or
-            more than one matches (never guesses between copies).
+        FileNotFoundError: If ``$UC4_ZIP`` is not a file or no archive is found.
     """
     env = os.environ.get(ZIP_ENV)
     if env:
@@ -131,18 +133,13 @@ def find_zip(starts: Sequence[Path] | None = None) -> Path:
             f"No get_started/ folder above {[str(s) for s in starts]}; "
             f"set {ZIP_ENV} to the archive path"
         )
-    matches = sorted(folder.glob(ZIP_GLOB))
-    if not matches:
+    target = folder / ZIP_NAME
+    if not target.is_file():
         raise FileNotFoundError(
-            f"No archive matching {ZIP_GLOB!r} in {folder}; "
+            f"No archive {ZIP_NAME!r} in {folder}; "
             f"put it there (it is git-ignored) or set {ZIP_ENV}"
         )
-    if len(matches) > 1:
-        raise FileNotFoundError(
-            f"{len(matches)} archives match {ZIP_GLOB!r} in {folder}: "
-            f"{[m.name for m in matches]}; set {ZIP_ENV} to choose one"
-        )
-    return matches[0]
+    return target
 
 
 def _find_get_started(starts: Iterable[Path]) -> Path | None:

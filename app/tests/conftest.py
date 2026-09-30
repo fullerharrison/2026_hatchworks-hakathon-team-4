@@ -11,7 +11,7 @@ from uc4_mcp.store import EvidenceStore
 
 @pytest.fixture(scope="session")
 def zip_path() -> Path:
-    """The v2 archive; fails with find_zip's message (names UC4_ZIP) when absent."""
+    """The pinned v2 archive; fails with find_zip's message (names UC4_ZIP) when absent."""
     try:
         return find_zip()
     except FileNotFoundError as e:

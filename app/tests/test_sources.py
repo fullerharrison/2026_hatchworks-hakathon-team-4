@@ -13,7 +13,7 @@ from uc4_mcp.sources import (
     ROW_KEYS,
     SOURCES,
     ZIP_ENV,
-    ZIP_GLOB,
+    ZIP_NAME,
     find_zip,
     lab_trait_label,
     load_tables,
@@ -146,10 +146,6 @@ def test_lab_trait_label() -> None:
 # --- locating the archive ---------------------------------------------------
 
 
-def _archive_name(suffix: str = "") -> str:
-    return ZIP_GLOB.replace("*", suffix)
-
-
 def test_env_var_overrides_lookup(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     target = tmp_path / "anywhere.zip"
     target.write_bytes(b"")
@@ -170,7 +166,7 @@ def test_lookup_walks_up_to_get_started(
 ) -> None:
     monkeypatch.delenv(ZIP_ENV, raising=False)
     (tmp_path / "get_started").mkdir()
-    target = tmp_path / "get_started" / _archive_name()
+    target = tmp_path / "get_started" / ZIP_NAME
     target.write_bytes(b"")
     deep = tmp_path / "app" / "src"
     deep.mkdir(parents=True)
@@ -186,10 +182,13 @@ def test_lookup_without_archive_raises_naming_env_var(
         find_zip([tmp_path])
 
 
-def test_ambiguous_archives_raise(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_newer_archive_alongside_is_ignored(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.delenv(ZIP_ENV, raising=False)
-    (tmp_path / "get_started").mkdir()
-    for suffix in ("", " (1)"):
-        (tmp_path / "get_started" / _archive_name(suffix)).write_bytes(b"")
-    with pytest.raises(FileNotFoundError, match="2 archives"):
-        find_zip([tmp_path])
+    folder = tmp_path / "get_started"
+    folder.mkdir()
+    target = folder / ZIP_NAME
+    target.write_bytes(b"")
+    (folder / ZIP_NAME.replace(".zip", "_09-30-2026.zip")).write_bytes(b"")
+    assert find_zip([tmp_path]) == target
