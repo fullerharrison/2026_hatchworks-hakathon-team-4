@@ -234,6 +234,84 @@ def findings(tables: dict[str, pd.DataFrame], mat: pd.DataFrame,
     ]
 
 
+def meeting_briefing(tables: dict[str, pd.DataFrame],
+                     stages: dict[str, dict[str, object]]) -> str:
+    """Introduce the synthetic archive for newcomers and expose its audit trail."""
+    trials = tables["trial_level"].set_index("TRIAL_ID")
+    counts = trials["TRIAL_RECOMMENDATION"].value_counts()
+    checks = tables["chronology_checks"].set_index("rule")
+    gbv = checks.loc["Trial GBV mean differs from its observation-linked materials"]
+    resistant = checks.loc["Trial resistant % differs from its observation-linked materials"]
+    operations = checks.loc["Operation dated outside its trial's start year"]
+    links = checks.loc["Operation's trial + material not linked in observations"]
+    hidden = checks.loc["Rationale reports all four criteria met, yet not PASS"]
+    match = checks.loc["Supplied recommendation differs from the inferred rule"]
+    passing = trials.loc["SYN-TR-0003"]
+    holding = trials.loc["SYN-TR-0037"]
+    failing = trials.loc["SYN-TR-0001"]
+    return f"""<section id="overview"><div class="section-head">
+  <span class="eyebrow">Start here · plain language</span><h2>What is in this data?</h2>
+  <p>This is a synthetic snapshot, not results from live breeding systems. A <b>line</b> is a
+  candidate plant material; a <b>trial</b> tests a group of lines at one site. The supplied
+  PASS / HOLD / FAIL label describes a <b>trial</b>, not a final decision about any line.</p></div>
+  <ul class="findings">
+  <li><b>What we have.</b> Seven files describe {stages['germplasm']['n']} lines,
+  {stages['trials']['n']} trials, {stages['observations']['n']} trial-line links,
+  {stages['genomics']['n']} genomic records, {stages['lab']['n']} lab results and
+  {stages['operations']['n']} field operations. Each trial has one of
+  {counts.get('PASS', 0)} PASS, {counts.get('HOLD', 0)} HOLD or {counts.get('FAIL', 0)} FAIL
+  recommendations. <a href="#sources">Explore the sources</a>.</li>
+  <li><b>What a verdict means.</b> {passing.name} is PASS (yield {passing['YIELD_T_HA']:g} t/ha,
+  disease {passing['DISEASE_SCORE']:g}); {holding.name} is HOLD despite favourable wording.
+  Its trial record reports {holding['RESISTANT_MATERIAL_PCT']:g}% resistant materials, below
+  the reconstructed PASS target; this share does not reconcile to the linked lines.
+  {failing.name} is FAIL with disease {failing['DISEASE_SCORE']:g}. The cut-points used to
+  explain these labels are <b>inferred from the outcomes</b>, not a supplied scoring policy.
+  <a href="#rule">See the rule</a>.</li>
+  <li><b>What we cannot conclude.</b> The files give no yield or disease measurement for an
+  individual line, no names or units for the lab traits, and no reliable trial chronology.
+  The trial's genomic summary also does not match the lines linked to it. We cannot use a
+  trial verdict as a line advancement decision. <a href="#expert">Review the evidence limits</a>.</li>
+  </ul></section>
+  <section id="expert"><div class="section-head">
+  <span class="eyebrow">For technical readers · evidence audit</span>
+  <h2>What can be joined, reproduced and trusted?</h2>
+  <p>The counts below are checks on the supplied synthetic records. A reconstructed rule
+  matching the records does not establish the SME's intended thresholds or make the
+  underlying joins valid.</p></div>
+  <ul class="findings">
+  <li><b>Grain and provenance.</b> The {stages['observations']['n']} observation rows link
+  trial and material IDs but contain no field-trait values. Yield, moisture, disease, height
+  and flowering occur once per trial in the recommendation file; lab results join to material
+  IDs but have no trial key, trait dictionary, units or dates.
+  <a href="#sources">Source keys and counts</a>; <a href="#lab">lab detail</a>.</li>
+  <li><b>Rule fit is not rule authority.</b> A fixed-threshold reconstruction agrees with
+  {int(match['checked'] - match['violations'])}/{int(match['checked'])} supplied trial verdicts.
+  {int(hidden['violations'])}/{int(hidden['checked'])} rationales stating all four named
+  criteria are met still have a HOLD verdict: resistant-material share is omitted from the
+  text. <a href="#thresholds">Inspect the observed threshold brackets</a> and
+  <a href="tables/rule_intervals.csv">their source table</a>.</li>
+  <li><b>Recorded links do not reproduce genomic summaries.</b> Trial GBV differs from the
+  observation-linked lines in {int(gbv['violations'])}/{int(gbv['checked'])} trials; resistant
+  share differs in {int(resistant['violations'])}/{int(resistant['checked'])}. An ID-ordered
+  block of ten lines reproduces the supplied aggregates, but no file records that mapping;
+  it is not a verified join. {int(links['violations'])}/{int(links['checked'])} operation
+  trial-material pairs also lack an observation link.
+  <a href="#reconciliation">See reconciliation</a> and
+  <a href="tables/genomics_reconciliation.csv">trial-by-trial results</a>.</li>
+  <li><b>Dates are not a season record.</b>
+{int(operations['violations'])}/{int(operations['checked'])} operations are outside the
+linked trial's start year. The
+  operation dates and undated measurements cannot establish a reliable sequence or duration.
+  <a href="#checks">Review all consistency checks</a> and
+  <a href="tables/chronology_checks.csv">their denominators</a>.</li>
+  </ul>
+  <p class="note"><b>Questions for the UC4 expert:</b> What are the authoritative cut-points
+  and bounds? Which lines produced the trial aggregates? What do the four lab traits mean?
+  Is the intended crop maize? Until confirmed, none of these assumptions is a source fact.</p>
+  </section>"""
+
+
 def phase_table(pm: pd.DataFrame) -> pd.DataFrame:
     """One row per phase: the evidence columns with their fill, and the gap."""
     def evidence(g: pd.DataFrame) -> str:
@@ -345,7 +423,8 @@ def write_report(path: Path, figs: list[Path], tables: dict[str, pd.DataFrame],
   <span><b>{facts["years"]}</b></span>
   <span><b>{len(tables["trial_level"])}</b> trial verdicts</span>
   <span>synthetic, read-only</span></div>
-  <nav class="toc"><a href="#plant-lifecycle">Season</a><a href="#sources">Sources</a>
+  <nav class="toc"><a href="#overview">Overview</a><a href="#expert">Evidence audit</a>
+  <a href="#plant-lifecycle">Season</a><a href="#sources">Sources</a>
   <a href="#rule">Rule</a><a href="#genomics">Genomics</a>
   <a href="#reconciliation">Reconciliation</a><a href="#lab">Lab</a><a href="#operations">Operations</a>
   <a href="#thresholds">Thresholds</a><a href="#checks">Checks</a><a href="#appendix">Appendix</a></nav>
@@ -354,6 +433,7 @@ def write_report(path: Path, figs: list[Path], tables: dict[str, pd.DataFrame],
 version, not thresholds. The cut-points on this page are the simplest fixed values that
 reproduce every outcome. Confirm them with the UC4 expert before presenting them as the rule.
 The v1 (kickoff) profile is kept in <code>v1/report_v1.html</code>.</p>
+{meeting_briefing(tables, stages)}
 <section><h2>Key findings</h2><ul class="findings">{items}</ul></section>
 {plant_lifecycle_section(fig, tables)}
 <section id="sources"><div class="section-head"><h2>The sources in this data</h2>
@@ -401,7 +481,8 @@ supplied unit.</p></div>
 </section>
 <footer>Generated by analysis/uc4_eda/uc4_eda.py from the v2 UC4 archive in get_started/.
 The data is synthetic. The thresholds are inferred from the SYNTH_V1 outcomes; nothing here is a
-confirmed Syngenta scoring rule or a real breeding result.</footer>
+confirmed Syngenta scoring rule or a real breeding result. Row-level CSV links require the
+adjacent tables/ folder when sharing this HTML on its own.</footer>
 </main>"""
     path.write_text(html, encoding="utf-8")
     return path

@@ -15,7 +15,7 @@ This workspace holds the source materials and working documentation for the Sept
 - [Build task and phase plans](.tasks/uc4-assistant/task.md): five phases to the demo, each with a checkable exit criterion; [Phase 1](.tasks/uc4-assistant/phase-1-mcp-data-layer.md) is the read-only MCP data-unification layer.
 - [Shared prompt log](team/PROMPT_LOG.md): log every AI prompt we keep; it is our GenDD evidence.
 - [SME answers](team/SME_ANSWERS.md): on 2026-09-29 the UC4 expert sent a v2 data archive with a pass/hold/fail verdict per trial; our inferred threshold rule reproduces all 72.
-- [UC4 data profile](analysis/uc4_eda/report.html): the v2 data, the inferred scoring rule and consistency checks. Regenerate with `analysis/uc4_eda/uc4_eda.py`. The kickoff (v1) profile is kept in [`analysis/uc4_eda/v1/`](analysis/uc4_eda/v1/report_v1.html).
+- [UC4 data briefing](analysis/uc4_eda/report.html): start with the plain-language overview, then use the expert evidence audit, inferred scoring rule and consistency checks. Regenerate with `analysis/uc4_eda/uc4_eda.py`. The kickoff (v1) profile is kept in [`analysis/uc4_eda/v1/`](analysis/uc4_eda/v1/report_v1.html).
 
 ## Use cases
 
