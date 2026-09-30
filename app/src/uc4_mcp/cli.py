@@ -3,6 +3,7 @@
     uc4-ask ask "Why is SYN-TR-0037 amber?" [--json]
     uc4-ask chat                              follow-up questions keep the conversation
     uc4-ask serve [--host 127.0.0.1] [--port 8766]   POST /ask, GET /health
+    uc4-ask eval [--cases PATH] [--out DIR]   run the supported questions
     uc4-ask ping                           check the Portkey route supports tool calls
 """
 
@@ -12,6 +13,8 @@ import argparse
 import json
 import logging
 import sys
+from datetime import date
+from pathlib import Path
 from typing import Any
 
 import anyio
@@ -22,6 +25,8 @@ from mcp.server.mcpserver import MCPServer
 from uc4_mcp.agent import AGENT_LOG, Answer, ask, load_agent_settings
 from uc4_mcp.api import create_app
 from uc4_mcp.bridge import open_bridge
+from uc4_mcp.evals import (CASES_PATH, RESULTS_DIR, CaseResult, load_cases, report,
+                           result_stem, run_cases)
 from uc4_mcp.llm import ChatModel, LLMError, PortkeyChat, load_settings, ping
 from uc4_mcp.models import to_json_safe
 from uc4_mcp.server import configure_logging
@@ -107,6 +112,25 @@ def cmd_serve(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _eval(cases_path: Path, model: ChatModel) -> list[CaseResult]:
+    async with open_bridge(server) as bridge:
+        return await run_cases(load_cases(cases_path), model, bridge, load_agent_settings())
+
+
+def cmd_eval(args: argparse.Namespace) -> int:
+    model = make_model()
+    results = anyio.run(_eval, args.cases, model)
+    today = date.today()
+    name = result_stem(model.model, today)
+    md, js = args.out / f"{name}.md", args.out / f"{name}.json"
+    args.out.mkdir(parents=True, exist_ok=True)
+    md.write_text(report(results, model.model, today), encoding="utf-8")
+    js.write_text(json.dumps(to_json_safe(results), indent=2), encoding="utf-8")
+    passed = sum(r.passed for r in results)
+    print(f"passed {passed} of {len(results)}; report {md}")
+    return 0 if passed == len(results) else 1
+
+
 def cmd_ping(args: argparse.Namespace) -> int:
     report = anyio.run(ping, make_model())
     print(report)
@@ -127,6 +151,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--port", type=int, default=8766)
     p.set_defaults(func=cmd_serve)
+    p = sub.add_parser("eval", help="run the supported questions against the model")
+    p.add_argument("--cases", type=Path, default=CASES_PATH)
+    p.add_argument("--out", type=Path, default=RESULTS_DIR)
+    p.set_defaults(func=cmd_eval)
     sub.add_parser("ping", help="one tool-call round trip").set_defaults(func=cmd_ping)
     return parser
 
