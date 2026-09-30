@@ -122,3 +122,15 @@ uv run --project app uc4-ask chat
 
 Each question is logged as one JSON line (question, tools, status, tokens, seconds) in
 `app/logs/uc4_agent.log`; tool calls also go to `app/logs/uc4_mcp.log`.
+
+### HTTP (Phase 3 screen, n8n)
+
+```powershell
+uv run --project app uc4-ask serve            # http://127.0.0.1:8766
+```
+
+`POST /ask` with `{"question": "...", "history": [{"role": "user"|"assistant", "content": "..."}]}`
+returns the answer JSON (`status`: answered | clarify | unverified | error; `text`;
+`citations`; `candidates`; `tool_calls` with each envelope; `usage`; `disclaimer`), always
+HTTP 200. 503 means the model is not configured; `GET /health` says why. CORS allows
+`localhost` pages only. For n8n in Docker use `--host 0.0.0.0` (no authentication).

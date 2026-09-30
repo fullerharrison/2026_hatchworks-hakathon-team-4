@@ -2,7 +2,8 @@
 
     uc4-ask ask "Why is SYN-TR-0037 amber?" [--json]
     uc4-ask chat                              follow-up questions keep the conversation
-    uc4-ask ping                              check the Portkey route supports tool calls
+    uc4-ask serve [--host 127.0.0.1] [--port 8766]   POST /ask, GET /health
+    uc4-ask ping                           check the Portkey route supports tool calls
 """
 
 from __future__ import annotations
@@ -14,10 +15,12 @@ import sys
 from typing import Any
 
 import anyio
+import uvicorn
 from anyio import to_thread
 from mcp.server.mcpserver import MCPServer
 
 from uc4_mcp.agent import AGENT_LOG, Answer, ask, load_agent_settings
+from uc4_mcp.api import create_app
 from uc4_mcp.bridge import open_bridge
 from uc4_mcp.llm import ChatModel, LLMError, PortkeyChat, load_settings, ping
 from uc4_mcp.models import to_json_safe
@@ -98,6 +101,12 @@ def cmd_chat(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_serve(args: argparse.Namespace) -> int:
+    uvicorn.run(create_app(make_model, server, load_agent_settings()),
+                host=args.host, port=args.port, log_level="warning")
+    return 0
+
+
 def cmd_ping(args: argparse.Namespace) -> int:
     report = anyio.run(ping, make_model())
     print(report)
@@ -114,6 +123,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_ask)
     sub.add_parser("chat", help="interactive; empty line or EOF quits"
                    ).set_defaults(func=cmd_chat)
+    p = sub.add_parser("serve", help="HTTP API: POST /ask, GET /health")
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=8766)
+    p.set_defaults(func=cmd_serve)
     sub.add_parser("ping", help="one tool-call round trip").set_defaults(func=cmd_ping)
     return parser
 
