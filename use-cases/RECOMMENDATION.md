@@ -34,9 +34,8 @@ Every fact below links to its source: the [participant handbook][hb], the [use-c
 | **Safe to show on screen?** | Permissions unclear. | Sales figures must stay synthetic. | No: names, phones, emails and addresses must be masked. | **Yes:** already synthetic. |
 | **What AI adds** | Little; scheduling is maths. | Little; it is a calculator. | Some: explaining each problem found. | **A lot:** answers plain-English questions with cited evidence. |
 | **Is the brief final?** | Yes | Yes | **No, marked "provisional"** | Yes |
-| **Evidence** | [Data check][ver-uc1] | [Data check][ver-uc2] | [Data check][ver-uc3] | [Data check][ver-uc4] |
 
-**Why UC3 is still a good fallback:** it has real problems to find, for example 276 accounts with no email and 6 likely duplicate accounts. It is the simplest build. Its weaknesses are the "provisional" brief, the personal data that must be masked, and several category columns that hold only one value, which leaves few rules to test. [Data check][ver-uc3]
+**Why UC3 is still a good fallback:** it has real problems to find, for example 276 accounts with no email and 6 likely duplicate accounts. It is the simplest build. Its weaknesses are the "provisional" brief, the personal data that must be masked, and several category columns that hold only one value, which leaves few rules to test.
 
 ## Why UC4, with evidence
 
@@ -56,7 +55,7 @@ Every fact below links to its source: the [participant handbook][hb], the [use-c
 - The verdict file gives outcomes, not the numbers behind them. Our thresholds are **inferred** until the expert confirms them. [SME answer][sme]
 - Verdicts are per **trial**, while the brief's breeder decides on **lines**. Ask how one maps to the other. [UC4 guide][uc4]
 - The trial numbers cannot be traced to specific lines: the files hold no line-level field values, and the trial's genomics figures do not match the lines linked to it. [UC4 guide][uc4]
-- The kickoff files' past decisions and "missing lab" cases are gone in v2. [Data check][ver-uc4]
+- The kickoff files' past decisions and "missing lab" cases are gone in v2.
 - The brief says fragmentation roughly doubles the breeding cycle. That describes the problem; our prototype cannot claim to fix it. Measure time and accuracy instead.
 
 ## AI inside the product
@@ -134,7 +133,6 @@ The tools below are the ones every teammate can use all week: **OpenCode**, **Gi
 [hb4]: ../get_started/2026_Participant_Handbook.pdf#page=4
 [brief]: ../get_started/2026_Use_Case_Briefs.pdf
 [brief5]: ../get_started/2026_Use_Case_Briefs.pdf#page=5
-[ver-uc4]: VERIFICATION.md#uc4-rd-data-source-unification
 [uc4]: uc4/README.md
 [sme]: ../team/SME_ANSWERS.md
 [sme-followups]: ../team/SME_ANSWERS.md#follow-up-questions-to-send

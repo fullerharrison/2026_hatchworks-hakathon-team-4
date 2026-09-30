@@ -288,6 +288,6 @@ Method: the v2 zip was opened in memory with `zipfile` + `pandas.read_csv` (read
 | Lab coverage | lab | 150 lines, 2-3 rows each; 4 traits × 90 rows; no dates |
 | Genomics QC | `QC_STATUS_LID` | PASS 150 |
 
-The kickoff (v1) archive evidence is superseded; its profile remains in [`analysis/uc4_eda/v1/`](../../analysis/uc4_eda/v1/report_v1.html) and its verdicts in [VERIFICATION.md](../VERIFICATION.md#uc4-rd-data-source-unification).
+The kickoff (v1) archive evidence is superseded; its profile remains in [`analysis/uc4_eda/v1/`](../../analysis/uc4_eda/v1/report_v1.html).
 
 [sme]: ../../team/SME_ANSWERS.md

@@ -58,7 +58,7 @@ flowchart LR
 
 ## New findings from this pass
 
-These pages add evidence that was not in [VERIFICATION.md](VERIFICATION.md). All of it was measured on 2026-09-29 by opening the zips in memory, read-only.
+All of this evidence was measured on 2026-09-29 by opening the zips in memory, read-only.
 
 | UC | Finding | Why it matters |
 | --- | --- | --- |

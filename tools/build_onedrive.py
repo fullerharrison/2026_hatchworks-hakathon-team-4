@@ -41,7 +41,6 @@ LINK_MAP = {
     "ROLES.md": "01_Team/Roles_and_Contracts.docx",
     "PROMPT_LOG.md": "06_AI_Prompt_Log/Prompt_Log.xlsx",
     "RECOMMENDATION.md": "04_Analysis/Team_Recommendation.docx",
-    "VERIFICATION.md": "04_Analysis/Use_Case_Verification.docx",
     "DATA_ARCHITECTURE.md": "04_Analysis/UC4_Data_Architecture.md",
     "README.md": "04_Analysis/UC4_Guide.docx",
     "v1": "04_Analysis/v1_superseded",
@@ -147,7 +146,6 @@ def build_analysis() -> None:
     copy(ROOT / "use-cases/uc4/DATA_ARCHITECTURE.md", "04_Analysis/UC4_Data_Architecture.md")
     convert_doc(ROOT / "use-cases/uc4/README.md", "04_Analysis/UC4_Guide.docx")
     convert_doc(ROOT / "use-cases/RECOMMENDATION.md", "04_Analysis/Team_Recommendation.docx")
-    convert_doc(ROOT / "use-cases/VERIFICATION.md", "04_Analysis/Use_Case_Verification.docx")
     note("04_Analysis", "UC4_Data_Profile.html: open it from your synced OneDrive folder in a browser (onedrive.com downloads it rather than displaying it).\n"
          "UC4_Data_Architecture.md holds Mermaid diagrams; they render on GitHub/GitLab or at https://mermaid.live.\n"
          "eda_code regenerates the profile: uv run --no-project --with pandas --with matplotlib python uc4_eda.py\n"
