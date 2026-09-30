@@ -146,6 +146,8 @@ class PortkeyChat:
                 model=s.model, messages=messages, **extra)
         except openai.OpenAIError as e:
             raise LLMError(f"LLM gateway error: {e}") from e
+        if not getattr(r, "choices", None):
+            raise LLMError("LLM gateway returned no choices")
         message = r.choices[0].message
         calls = tuple(ToolRequest(c.id, c.function.name, _arguments(c.function.arguments))
                       for c in message.tool_calls or ())

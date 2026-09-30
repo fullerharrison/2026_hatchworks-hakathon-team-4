@@ -81,6 +81,7 @@ class Answer:
     model: str
     citations: tuple[Citation, ...] = ()
     ungrounded: tuple[str, ...] = ()
+    problems: tuple[str, ...] = ()  # why an unverified answer failed the evidence check
     candidates: tuple[dict[str, Any], ...] = ()
     tool_calls: tuple[ToolTrace, ...] = ()
     usage: Usage = Usage()
@@ -115,7 +116,11 @@ async def ask(question: str, *, model: ChatModel, bridge: ToolBridge,
         An ``Answer``. Model and tool failures come back as status "error", not exceptions.
     """
     started = time.monotonic()
-    answer = await _run(question.strip(), model, bridge, history, settings)
+    try:
+        answer = await _run(question.strip(), model, bridge, history, settings)
+    except Exception:  # last-resort boundary between the model/tool stack and the breeder
+        logger.exception("ask failed")
+        answer = Answer("error", "Internal error; see app/logs/uc4_agent.log", model.model)
     _log(question, answer, time.monotonic() - started)
     return answer
 
@@ -141,10 +146,13 @@ async def _run(question: str, model: ChatModel, bridge: ToolBridge,
                                    candidates=tuple(ambiguous.result["candidates"]))
             continue
         text = completion.text or ""
+        if not text.strip():
+            return turn.answer("error", "The model returned an empty answer.")
         grounding = check(text, question, turn.traces)
         if grounding.ok or repairs >= settings.repair_rounds:
             return turn.answer("answered" if grounding.ok else "unverified", text,
-                               citations=grounding.citations, ungrounded=grounding.ungrounded)
+                               citations=grounding.citations, ungrounded=grounding.ungrounded,
+                               problems=_problems(grounding))
         repairs += 1
         turn.messages += [{"role": "assistant", "content": text},
                           {"role": "user", "content": _repair_prompt(grounding)}]
@@ -183,9 +191,24 @@ def _repair_prompt(g: Grounding) -> str:
     missing = [c.ref for c in g.citations if not c.found]
     if missing:
         problems.append("these citations match no tool result: " + ", ".join(missing))
+    if g.uncited:
+        problems.append("the answer cites no tool result; cite the rows or [tool:<name>] "
+                        "results you used")
+    if g.verdicts:
+        problems.append("these verdict or colour words are not in the results you cited: "
+                        + ", ".join(g.verdicts))
     return ("Your answer failed the evidence check: " + "; ".join(problems) + ". Rewrite it "
             "using only values that appear in tool results, cite each one, and drop any "
             "number you calculated. Call a tool if you need a value.")
+
+
+def _problems(g: Grounding) -> tuple[str, ...]:
+    """Human-readable evidence-check failures, shown next to an unverified answer."""
+    out = [f"number {n} not in cited results" for n in g.ungrounded]
+    out += [f"citation {c.ref} not found" for c in g.citations if not c.found]
+    out += ["no citation"] * g.uncited
+    out += [f"verdict {v} not in cited results" for v in g.verdicts]
+    return tuple(out)
 
 
 def _log(question: str, answer: Answer, seconds: float) -> None:

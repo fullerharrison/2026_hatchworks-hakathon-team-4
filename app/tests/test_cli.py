@@ -4,6 +4,7 @@ import builtins
 import json
 import logging
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 from fakes import REF_0037, FakeChat, call, say
@@ -41,8 +42,10 @@ def test_render_numbers_citations_and_lists_sources() -> None:
 
 
 def test_render_warns_when_unverified() -> None:
-    out = cli.render(Answer("unverified", "20 points short.", "m", ungrounded=("20",)))
-    assert "Warning" in out and "20" in out
+    problems = ("number 20 not in cited results", "no citation")
+    out = cli.render(Answer("unverified", "20 points short.", "m", ungrounded=("20",),
+                            problems=problems))
+    assert "Warning: number 20 not in cited results; no citation" in out
 
 
 def test_ask_prints_the_rendered_answer(use: None, monkeypatch: pytest.MonkeyPatch,
@@ -93,5 +96,38 @@ def test_chat_keeps_history(use: None, monkeypatch: pytest.MonkeyPatch,
 
 
 def test_quiet_sdk_logging() -> None:
-    cli.quiet_sdk_logging()
-    assert logging.getLogger("mcp.server.mcpserver").getEffectiveLevel() >= logging.WARNING
+    names = ("mcp", "openai", "httpx2", "httpx")
+    before = {n: logging.getLogger(n).level for n in names}
+    try:
+        for n in names:
+            logging.getLogger(n).setLevel(logging.INFO)
+        cli.quiet_sdk_logging()
+        assert all(logging.getLogger(n).level == logging.WARNING for n in names)
+        assert logging.getLogger("mcp.server.mcpserver").getEffectiveLevel() >= logging.WARNING
+    finally:
+        for n, level in before.items():
+            logging.getLogger(n).setLevel(level)
+
+
+def test_ctrl_c_exits_130_quietly(use: None, monkeypatch: pytest.MonkeyPatch) -> None:
+    def interrupt(args: object) -> int:
+        raise KeyboardInterrupt
+    monkeypatch.setattr(cli, "cmd_ping", interrupt)
+    assert run(["ping"]) == 130
+
+
+def test_eval_writes_md_and_json_reports(use: None, monkeypatch: pytest.MonkeyPatch,
+                                         tmp_path: Path) -> None:
+    all_cases = json.loads(cli.CASES_PATH.read_text(encoding="utf-8"))
+    keep = {"q01-hold-explained", "q04-ambiguous-trial"}
+    cases = tmp_path / "questions.json"
+    cases.write_text(json.dumps([c for c in all_cases if c["id"] in keep]), encoding="utf-8")
+    chat = FakeChat([call("score_trial", query="SYN-TR-0037"), say(GOOD),
+                     call("find_trial", query="SYN-TR-003")])
+    monkeypatch.setattr(cli, "make_model", lambda: chat)
+    out = tmp_path / "out"
+    assert run(["eval", "--cases", str(cases), "--out", str(out)]) == 0
+    md, js = list(out.glob("*.md")), list(out.glob("*.json"))
+    assert len(md) == 1 and len(js) == 1
+    assert len(json.loads(js[0].read_text(encoding="utf-8"))) == 2
+    assert "passed 2 of 2" in md[0].read_text(encoding="utf-8")

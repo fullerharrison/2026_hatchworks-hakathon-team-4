@@ -68,6 +68,36 @@ def test_calculated_number_gets_one_repair(store: EvidenceStore) -> None:
     assert repair["role"] == "user" and "20" in repair["content"]
 
 
+def test_uncited_answer_is_repaired(store: EvidenceStore) -> None:
+    chat = FakeChat([call("score_trial", query="SYN-TR-0037"),
+                     say("SYN-TR-0037 is HOLD (amber)."), say(GOOD)])
+    a = run_ask(store, chat, "Why is SYN-TR-0037 amber?")
+    assert a.status == "answered" and "cites no tool result" in chat.seen[2][-1]["content"]
+
+
+def test_unsupported_verdict_is_repaired_then_unverified(store: EvidenceStore) -> None:
+    bad = f"SYN-TR-0037 is green [{REF_0037}]."
+    chat = FakeChat([call("score_trial", query="SYN-TR-0037"), say(bad), say(bad)])
+    a = run_ask(store, chat, "Is SYN-TR-0037 fine?")
+    repair = chat.seen[2][-1]["content"]
+    assert "verdict or colour words" in repair and "green" in repair
+    assert a.status == "unverified" and a.problems == ("verdict green not in cited results",)
+
+
+def test_an_exception_becomes_an_error_answer(store: EvidenceStore,
+                                              caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.INFO, logger="uc4_agent")
+    a = run_ask(store, FakeChat([RuntimeError("boom")]), "Why?")
+    assert a.status == "error" and "uc4_agent.log" in a.text
+    lines = [r for r in caplog.records if r.name == "uc4_agent" and r.levelno == logging.INFO]
+    assert len(lines) == 1 and json.loads(lines[0].getMessage())["status"] == "error"
+
+
+def test_empty_model_reply_is_an_error(store: EvidenceStore) -> None:
+    a = run_ask(store, FakeChat([say("")]), "Why?")
+    assert a.status == "error" and "empty" in a.text
+
+
 def test_still_ungrounded_after_repair_is_unverified(store: EvidenceStore) -> None:
     bad = f"SYN-TR-0037 is 20 points short [{REF_0037}]."
     chat = FakeChat([call("score_trial", query="SYN-TR-0037"), say(bad), say(bad)])

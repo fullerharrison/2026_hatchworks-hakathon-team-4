@@ -17,7 +17,7 @@ def trace(name: str, result: Any, status: str = "ok") -> ToolTrace:
 SCORE = trace("score_trial", {
     "trial_id": "SYN-TR-0037", "reason": "HOLD: resistant lines 30% < 50% (inferred threshold)",
     "criteria": [{"field": "YIELD_T_HA", "value": 10.79, "threshold": 9.0}],
-    "evidence_row_ids": [REF]})
+    "verdict": "HOLD", "colour": "amber", "evidence_row_ids": [REF]})
 QUERY = trace("query_trials", [{"trial_id": f"SYN-TR-{i:04d}", "verdict": "FAIL"}
                                for i in range(1, 17)])
 
@@ -101,3 +101,27 @@ def test_real_tool_outputs_carry_refs(store: EvidenceStore) -> None:
     assert g.ok
     view = to_json_safe(store.get_trial("SYN-TR-0037"))
     assert len(refs_in(view)) > 10 and all("#" in r for r in refs_in(view))
+
+
+def test_answer_with_data_but_no_citation_is_uncited() -> None:
+    g = check("SYN-TR-0037 is HOLD.", "", [SCORE])
+    assert g.uncited and not g.ok
+
+
+def test_verdict_not_in_cited_result_is_flagged() -> None:
+    g = check(f"SYN-TR-0037 is PASS [{REF}].", "", [SCORE])
+    assert g.verdicts == ("PASS",) and not g.ok
+    assert check(f"SYN-TR-0037 is GREEN [{REF}].", "", [SCORE]).verdicts == ("GREEN",)
+
+
+def test_supported_verdict_and_colour_are_ok() -> None:
+    assert check(f"HOLD (amber) [{REF}]", "", [SCORE]).ok
+
+
+def test_colour_words_need_word_boundaries() -> None:
+    assert check(f"It is inferred and required [{REF}].", "", [SCORE]).ok
+
+
+def test_out_of_scope_answer_without_ok_traces_is_ok() -> None:
+    assert check("I can only answer questions about the UC4 trial data.", "", []).ok
+    assert check("Nothing found.", "", [trace("find_trial", None, status="none")]).ok

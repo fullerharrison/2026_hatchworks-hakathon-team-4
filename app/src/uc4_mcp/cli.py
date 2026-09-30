@@ -42,7 +42,8 @@ def make_model() -> ChatModel:
 
 def quiet_sdk_logging() -> None:
     """The MCP SDK logs rejected tool calls at INFO to the console; the agent logs them."""
-    logging.getLogger("mcp").setLevel(logging.WARNING)
+    for name in ("mcp", "openai", "httpx2", "httpx"):
+        logging.getLogger(name).setLevel(logging.WARNING)
 
 
 def configure_cli_logging() -> None:
@@ -62,8 +63,7 @@ def render(answer: Answer) -> str:
         lines += [f"  [{i}] {c.ref}" + ("" if c.found else "  (not in the tool results)")
                   for i, c in enumerate(answer.citations, 1)]
     if answer.status == "unverified":
-        lines += ["", "Warning: not found in the cited tool results: "
-                  + ", ".join(answer.ungrounded)]
+        lines += ["", "Warning: " + "; ".join(answer.problems)]
     return "\n".join([*lines, "", answer.disclaimer])
 
 
@@ -168,4 +168,6 @@ def main(argv: list[str] | None = None) -> None:
     except LLMError as e:
         sys.stderr.write(f"{e}\n")
         code = 2
+    except KeyboardInterrupt:
+        code = 130
     raise SystemExit(code)

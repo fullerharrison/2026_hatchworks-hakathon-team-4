@@ -67,6 +67,13 @@ def chat_with(handler: Any, **overrides: Any) -> PortkeyChat:
         transport=httpx2.MockTransport(handler)))
 
 
+def test_empty_choices_is_an_llm_error() -> None:
+    body = {**response({"content": "x"}), "choices": []}
+    chat = chat_with(lambda request: httpx2.Response(200, json=body))
+    with pytest.raises(LLMError, match="no choices"):
+        anyio.run(chat.complete, [{"role": "user", "content": "hi"}], [])
+
+
 def tool_call_message(arguments: str) -> dict[str, Any]:
     return {"content": None, "tool_calls": [{"id": "c1", "type": "function", "function": {
         "name": "echo", "arguments": arguments}}]}

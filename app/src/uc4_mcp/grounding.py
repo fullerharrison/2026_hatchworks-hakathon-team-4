@@ -1,5 +1,6 @@
-"""Checks an answer against the tool results it cites: every citation resolves, and every
-number appears in a cited result (or in the question).
+"""Checks an answer against the tool results it cites: it cites at least one result, every
+citation resolves, and every number and verdict or colour word appears in a cited result
+(numbers may also come from the question).
 
 Citations are ``[<source_file>#<row_id>]`` (a row, as in ``evidence_row_ids``) or
 ``[tool:<name>]`` (a whole result, for tools without row ids such as ``query_trials``).
@@ -7,6 +8,7 @@ Citations are ``[<source_file>#<row_id>]`` (a row, as in ``evidence_row_ids``) o
 
 from __future__ import annotations
 
+import json
 import re
 from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass
@@ -21,6 +23,9 @@ NOT_QUANTITIES = re.compile(
     r"|[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}"
     r"|\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}(?::\d{2})?)?"
     r"|SYNTH_V\d+", re.IGNORECASE)
+# Verdicts are upper-case codes; colours are matched in any case ("Amber", "RED").
+VERDICT_WORDS = re.compile(r"\b(?:PASS|HOLD|FAIL)\b")
+COLOUR_WORDS = re.compile(r"\b(?:green|amber|red)\b", re.IGNORECASE)
 # Units may be glued on ("25kg"); the lookbehind still skips identifiers like Q3 or H2O.
 NUMBER = re.compile(r"(?<![\w.])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)")
 
@@ -35,10 +40,13 @@ class Citation:
 class Grounding:
     citations: tuple[Citation, ...]
     ungrounded: tuple[str, ...]  # answer numbers in no cited result and not in the question
+    uncited: bool = False  # a tool returned data, yet the answer cites none of it
+    verdicts: tuple[str, ...] = ()  # verdict/colour words in no cited result
 
     @property
     def ok(self) -> bool:
-        return not self.ungrounded and all(c.found for c in self.citations)
+        return (not self.ungrounded and not self.uncited and not self.verdicts
+                and all(c.found for c in self.citations))
 
 
 def quantities(text: str) -> list[str]:
@@ -106,6 +114,19 @@ def _matches(token: str, pool: Iterable[float]) -> bool:
     return any(abs(v - value) <= tolerance + 1e-9 for v in pool)
 
 
+def _unsupported_verdicts(answer: str, cited: Sequence[ToolTrace]) -> tuple[str, ...]:
+    """Verdict and colour words in ``answer`` (citations excluded) that no cited result has."""
+    text = CITATION.sub(" ", answer)
+    blobs = [json.dumps(t.result, default=str) for t in cited]
+    words: list[str] = []
+    for pattern in (VERDICT_WORDS, COLOUR_WORDS):
+        for word in pattern.findall(text):
+            found = re.compile(rf"\b{word}\b", pattern.flags)
+            if not any(found.search(b) for b in blobs):
+                words.append(word)
+    return tuple(dict.fromkeys(words))
+
+
 def check(answer: str, question: str, traces: Sequence[ToolTrace]) -> Grounding:
     """Ground ``answer`` in the traces it cites; numbers from the question are allowed."""
     citations: list[Citation] = []
@@ -118,4 +139,6 @@ def check(answer: str, question: str, traces: Sequence[ToolTrace]) -> Grounding:
     for t in cited:
         pool |= numbers_in(t.result)
     ungrounded = tuple(dict.fromkeys(n for n in quantities(answer) if not _matches(n, pool)))
-    return Grounding(tuple(citations), ungrounded)
+    uncited = not any(c.found for c in citations) and any(t.status == "ok" for t in traces)
+    verdicts = _unsupported_verdicts(answer, cited)
+    return Grounding(tuple(citations), ungrounded, uncited, verdicts)
