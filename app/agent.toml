@@ -6,7 +6,6 @@
 base_url = "https://api.portkey.ai/v1"
 # Set in Task 1 step 8 to a Model Catalog id, "@<provider-slug>/<model>" (e.g. "@openai-prod/gpt-4o").
 model = ""
-temperature = 0
 max_tokens = 800
 timeout_s = 60
 
