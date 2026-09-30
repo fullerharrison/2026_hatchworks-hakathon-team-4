@@ -4,3 +4,8 @@ get_started/*.zip
 app/logs/
 __pycache__/
 .superpowers/
+notes.md
+.env
+
+# Breeder decisions (Phase 3 override log): personal records, like the data.
+app/data/

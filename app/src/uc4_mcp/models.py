@@ -169,6 +169,28 @@ class LineView:
     note: str
 
 
+DECISIONS = ("PASS", "HOLD", "FAIL")
+
+
+@dataclass(frozen=True)
+class OverrideRecord:
+    """A breeder's decision on a trial; ``recommendation`` is the engine output as shown.
+
+    Verdicts are per trial; ``material_guid`` only annotates which line prompted it.
+    """
+
+    decision_id: str
+    trial_guid: str
+    trial_id: str
+    material_guid: str | None
+    recommendation: dict[str, Any]  # to_json_safe(Recommendation), copied at decision time
+    decision: str  # one of DECISIONS
+    overrides: bool  # decision differs from recommendation["verdict"]
+    reason: str
+    user: str  # demo alias, not authenticated
+    timestamp: str  # UTC ISO, set by the server
+
+
 def ok(result: Any, message: str = "") -> dict[str, Any]:
     """Envelope for a single resolved result."""
     return {"status": "ok", "result": result, "message": message}
