@@ -1,0 +1,15 @@
+# Question agent settings (committed: task.md exit criterion "model and settings committed").
+# Secrets never go here: PORTKEY_API_KEY and friends come from the environment.
+# UC4_LLM_BASE_URL and UC4_LLM_MODEL override the values below.
+
+[llm]
+base_url = "https://api.portkey.ai/v1"
+# Set in Task 1 step 8 to a model id the team's Portkey workspace exposes.
+model = ""
+temperature = 0
+max_tokens = 800
+timeout_s = 60
+
+[agent]
+max_rounds = 6      # model calls per question, tool rounds and the repair round included
+repair_rounds = 1   # rewrites allowed when an answer fails the evidence check
