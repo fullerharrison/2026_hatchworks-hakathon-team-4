@@ -21,7 +21,8 @@ NOT_QUANTITIES = re.compile(
     r"|[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}"
     r"|\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}(?::\d{2})?)?"
     r"|SYNTH_V\d+", re.IGNORECASE)
-NUMBER = re.compile(r"(?<![\w.])\d+(?:\.\d+)?(?!\w)")
+# Units may be glued on ("25kg"); the lookbehind still skips identifiers like Q3 or H2O.
+NUMBER = re.compile(r"(?<![\w.])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)")
 
 
 @dataclass(frozen=True)
@@ -41,8 +42,12 @@ class Grounding:
 
 
 def quantities(text: str) -> list[str]:
-    """Number tokens in ``text``, ignoring citations, IDs, GUIDs, dates and rule names."""
-    return NUMBER.findall(NOT_QUANTITIES.sub(" ", CITATION.sub(" ", text)))
+    """Number tokens in ``text`` with thousands separators removed ("1,500" -> "1500").
+
+    Citations, IDs, GUIDs, dates and rule names are ignored.
+    """
+    found = NUMBER.findall(NOT_QUANTITIES.sub(" ", CITATION.sub(" ", text)))
+    return [token.replace(",", "") for token in found]
 
 
 def _walk(obj: Any) -> Iterator[Any]:

@@ -78,6 +78,21 @@ def test_numbers_in_walks_values_strings_and_lengths() -> None:
     assert 37.0 not in numbers_in(SCORE.result)  # from the ID SYN-TR-0037
 
 
+def test_unit_glued_numbers_are_checked() -> None:
+    assert check(f"Invented 12kg [{REF}].", "", [SCORE]).ungrounded == ("12",)
+    assert check(f"Yield 10.79t [{REF}].", "", [SCORE]).ok
+    assert quantities("25kg, 45cm, 12t/ha, Q3, H2O") == ["25", "45", "12"]
+
+
+def test_thousands_separators_are_one_number() -> None:
+    assert quantities("1,500 and 10,000.5 and 30,50") == ["1500", "10000.5", "30", "50"]
+    big = trace("query_trials", {"total": 10000})
+    assert check(f"Total 10,000 [{REF}] [tool:query_trials].", "", [SCORE, big]).ok
+    parts = trace("query_trials", {"a": 1, "b": 500})
+    g = check(f"1,500 kg [{REF}] [tool:query_trials].", "", [SCORE, parts])
+    assert g.ungrounded == ("1500",)
+
+
 def test_real_tool_outputs_carry_refs(store: EvidenceStore) -> None:
     score = to_json_safe(store.score_trial("SYN-TR-0037"))
     ref = score["result"]["evidence_row_ids"][0]
