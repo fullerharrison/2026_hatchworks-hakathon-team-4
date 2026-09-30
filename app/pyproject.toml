@@ -23,6 +23,8 @@ build-backend = "uv_build"
 testpaths = ["tests"]
 # analysis/uc4_eda/ has test modules with the same basenames and no __init__.py.
 addopts = "--import-mode=importlib"
+# Lets test_checks reuse test_lifecycle's synthetic tables.
+pythonpath = ["tests"]
 
 [dependency-groups]
 dev = [

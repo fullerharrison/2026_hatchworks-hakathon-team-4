@@ -7,7 +7,9 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from uc4_mcp.lifecycle import before, chronology_checks, snapshot_date, stage_counts
+from uc4_mcp.lifecycle import (before, chronology_checks, operation_checks, snapshot_date,
+                               stage_counts)
+from uc4_mcp.sources import ROW_KEYS
 
 Tables = dict[str, pd.DataFrame]
 EDA_TABLES = Path(__file__).resolve().parents[2] / "analysis" / "uc4_eda" / "tables"
@@ -15,16 +17,26 @@ ALL_MET = ("yield meets threshold; moisture meets threshold; disease score accep
            "genomic value favourable")
 
 
+def with_provenance(t: Tables) -> Tables:
+    """Add the columns ``sources.load_tables`` adds, so rows can be cited."""
+    return {k: df.assign(_source_file=f"{k}.csv", _line_no=range(2, len(df) + 2),
+                         _row_id=df[ROW_KEYS[k]].astype(str))
+            for k, df in t.items()}
+
+
 def synthetic_tables() -> Tables:
     """Two complete trials. T1's rationale claims all four criteria met, but its GBV of
     100 misses the target, so it is (correctly) HOLD. T2 fails on yield. The extract
-    date is the latest LAST_CHG_DATE: 2026-01-01."""
+    date is the latest LAST_CHG_DATE: 2026-01-01. M1 has two lab rows, M2 none."""
     germplasm = pd.DataFrame({"MATERIAL_GUID": ["M1", "M2"], "MATERIAL_ID": ["L-001", "L-002"]})
     trial = pd.DataFrame({
         "TRIAL_GUID": ["T1", "T2"], "TRIAL_ID": ["TR-0001", "TR-0002"],
         "START_YEAR": [2025, 2026], "STATUS_LID": ["COMPLETE", "COMPLETE"],
     })
-    observation = pd.DataFrame({"ATTACHED_TO_FIELD_ENTITY_ID": ["T1", "T2"], "GID": ["M1", "M2"]})
+    observation = pd.DataFrame({"ID": ["1", "2"], "ATTACHED_TO_FIELD_ENTITY_ID": ["T1", "T2"],
+                                "GID": ["M1", "M2"]})
+    lab = pd.DataFrame({"ROWGUID": ["L1", "L2"], "MATERIAL_GUID": ["M1", "M1"],
+                        "TRAIT_GUID": ["TR1", "TR2"], "NUMBER_VALUE": [1.0, 2.0]})
     operations = pd.DataFrame({
         "OPERATION_GUID": ["P1", "P2", "P3"], "TRIAL_GUID": ["T1", "T1", "T2"],
         "MATERIAL_GUID": ["M1", "M2", "M2"],
@@ -33,7 +45,8 @@ def synthetic_tables() -> Tables:
         "OPERATION_DATE": ["2025-05-01", "2025-04-01", "2027-01-01"],
     })
     genomics = pd.DataFrame({
-        "MATERIAL_GUID": ["M1", "M2"], "SAMPLE_ID": ["S1", "S2"],
+        "GENOMIC_SAMPLE_GUID": ["G1", "G2"], "MATERIAL_GUID": ["M1", "M2"],
+        "SAMPLE_ID": ["S1", "S2"],
         "GENOMIC_BREEDING_VALUE": [100.0, 110.0],
         "MARKER_DISEASE_RESISTANCE": ["RESISTANT", "SUSCEPTIBLE"],
         "GENOTYPING_DATE": ["2025-01-01", "2026-06-01"],
@@ -46,8 +59,10 @@ def synthetic_tables() -> Tables:
         "TRIAL_RECOMMENDATION": ["HOLD", "FAIL"],
         "RECOMMENDATION_RATIONALE": [ALL_MET, "yield below target; moisture meets threshold"],
     })
-    return {"germplasm": germplasm, "trial": trial, "observation": observation,
-            "operations": operations, "genomics": genomics, "recommendations": recommendations}
+    return with_provenance({
+        "germplasm": germplasm, "trial": trial, "observation": observation,
+        "operations": operations, "lab": lab, "genomics": genomics,
+        "recommendations": recommendations})
 
 
 @pytest.fixture(scope="module")
@@ -94,6 +109,19 @@ def test_example_points_at_a_violating_record(checks: pd.DataFrame) -> None:
                       "example"] == "TR-0002"
     assert checks.loc["Rationale reports all four criteria met, yet not PASS",
                       "example"] == "TR-0001"
+
+
+def test_operation_checks_one_row_per_operation_nan_when_not_checkable() -> None:
+    t = synthetic_tables()
+    t["trial"] = t["trial"].assign(START_YEAR=[2025, float("nan")])
+    t["operations"].loc[1, ["OPERATION_DATE", "MATERIAL_GUID"]] = None
+    oc = operation_checks(t).set_index("OPERATION_GUID")
+    assert list(oc.columns) == ["TRIAL_GUID", "MATERIAL_GUID", "wrong_year",
+                                "planned_past_extract", "unlinked"]
+    assert oc["wrong_year"].tolist()[0] == 0.0
+    assert oc["wrong_year"].isna().tolist() == [False, True, True]  # P2 undated, P3's trial
+    assert oc["planned_past_extract"].isna().all()  # P2 undated; P1, P3 not PLANNED
+    assert oc["unlinked"].tolist()[0] == 0.0 and oc["unlinked"].isna().tolist()[1]
 
 
 # --- real data --------------------------------------------------------------

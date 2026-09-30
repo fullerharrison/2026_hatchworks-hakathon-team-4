@@ -5,7 +5,11 @@ trial's season, a completed trial has no work still planned, and trial aggregate
 agree with the materials the files link to the trial. Records where either side is
 missing are "not checkable" and excluded from the denominator rather than passing.
 
-Ported unchanged from ``analysis/uc4_eda/lifecycle.py`` (the evidence record).
+Ported from ``analysis/uc4_eda/lifecycle.py`` (the evidence record, left unchanged).
+The per-operation checks are split out as ``operation_checks()`` so ``checks.py``
+flags the same operations the summary counts; they also treat a missing
+``START_YEAR`` or GUID as not checkable. ``chronology_checks()`` still reproduces the
+EDA's ``chronology_checks.csv``.
 """
 
 from __future__ import annotations
@@ -69,31 +73,57 @@ def _harvest_before_planting(ops: pd.DataFrame) -> pd.Series:
     return before(first["HARVEST"], first["PLANTING"])
 
 
+def _operation_checks(t: dict[str, pd.DataFrame], ops: pd.DataFrame) -> pd.DataFrame:
+    snap = pd.Series(snapshot_date(t), index=ops.index)
+    planned = ops["OPERATION_STATUS_LID"] == "PLANNED"
+    wrong_year = (ops["date"].dt.year != ops["START_YEAR"]).astype(float)
+    obs_pairs = set(zip(t["observation"]["ATTACHED_TO_FIELD_ENTITY_ID"], t["observation"]["GID"]))
+    unlinked = [float("nan") if pd.isna(a) or pd.isna(b) else float((a, b) not in obs_pairs)
+                for a, b in zip(ops["TRIAL_GUID"], ops["MATERIAL_GUID"])]
+    return pd.DataFrame({
+        "OPERATION_GUID": ops["OPERATION_GUID"],
+        "TRIAL_GUID": ops["TRIAL_GUID"],
+        "MATERIAL_GUID": ops["MATERIAL_GUID"],
+        "wrong_year": wrong_year.where(ops["date"].notna() & ops["START_YEAR"].notna()),
+        "planned_past_extract": before(ops["OPERATION_DATE"], snap).where(planned),
+        "unlinked": pd.Series(unlinked, index=ops.index, dtype=float),
+    }, index=ops.index)
+
+
+def operation_checks(t: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """One row per operation: 1.0 violated, 0.0 not, NaN not checkable (or not applicable).
+
+    Columns: ``OPERATION_GUID``, ``TRIAL_GUID``, ``MATERIAL_GUID``; ``wrong_year``
+    (dated outside the trial's ``START_YEAR``; NaN without a date or start year),
+    ``planned_past_extract`` (PLANNED and dated before ``snapshot_date``; NaN when not
+    PLANNED or undated) and ``unlinked`` (the operation's trial + material pair has no
+    observation row; NaN when either GUID is missing).
+    """
+    return _operation_checks(t, operations_with_trial(t))
+
+
 def _operation_rows(t: dict[str, pd.DataFrame]) -> list[dict[str, object]]:
     ops = operations_with_trial(t)
+    oc = _operation_checks(t, ops)
     snap = pd.Series(snapshot_date(t), index=ops.index)
     planned = ops["OPERATION_STATUS_LID"] == "PLANNED"
     done = ~planned
-    wrong_year = (ops["date"].dt.year != ops["START_YEAR"]).astype(float)
     complete = ops[ops["TRIAL_STATUS"] == "COMPLETE"].groupby("TRIAL_ID")["OPERATION_STATUS_LID"]
     hbp = _harvest_before_planting(ops)
-    obs_pairs = set(zip(t["observation"]["ATTACHED_TO_FIELD_ENTITY_ID"], t["observation"]["GID"]))
-    unlinked = pd.Series([float((a, b) not in obs_pairs)
-                          for a, b in zip(ops["TRIAL_GUID"], ops["MATERIAL_GUID"])], index=ops.index)
     return [
         _row("Operation dated outside its trial's start year", "Operations",
-             wrong_year.where(ops["date"].notna()), ops["TRIAL_ID"]),
+             oc["wrong_year"], ops["TRIAL_ID"]),
         _row("Completed trial still has planned operations", "Operations",
              complete.apply(lambda s: float((s == "PLANNED").any())),
              complete.size().index.to_series()),
         _row("Planned operation dated before the extract", "Operations",
-             before(ops.loc[planned, "OPERATION_DATE"], snap[planned]), ops.loc[planned, "OPERATION_GUID"]),
+             oc.loc[planned, "planned_past_extract"], ops.loc[planned, "OPERATION_GUID"]),
         _row("Completed operation dated after the extract", "Operations",
              before(snap[done], ops.loc[done, "OPERATION_DATE"]), ops.loc[done, "OPERATION_GUID"]),
         _row("Trial's first harvest dated before its first planting", "Operations",
              hbp, hbp.index.to_series()),
         _row("Operation's trial + material not linked in observations", "Links",
-             unlinked, ops["OPERATION_GUID"]),
+             oc["unlinked"], ops["OPERATION_GUID"]),
     ]
 
 

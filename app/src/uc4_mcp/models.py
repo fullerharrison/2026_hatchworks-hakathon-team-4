@@ -19,6 +19,8 @@ import numpy as np
 import pandas as pd
 
 REF_SEP = "#"
+# No "error": flags never change a verdict.
+SEVERITIES = ("info", "warning")
 
 
 @dataclass(frozen=True)
