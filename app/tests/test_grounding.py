@@ -114,6 +114,22 @@ def test_verdict_not_in_cited_result_is_flagged() -> None:
     assert check(f"SYN-TR-0037 is GREEN [{REF}].", "", [SCORE]).verdicts == ("GREEN",)
 
 
+def test_verdict_must_match_a_verdict_field_of_the_real_result(store: EvidenceStore) -> None:
+    score = to_json_safe(store.score_trial("SYN-TR-0037"))
+    ref = score["result"]["evidence_row_ids"][0]
+    real = [ToolTrace("score_trial", {"query": "SYN-TR-0037"}, "ok", score)]
+    assert check(f"SYN-TR-0037 is PASS [{ref}].", "", real).verdicts == ("PASS",)
+    assert check(f"SYN-TR-0037 is HOLD (amber) [{ref}].", "", real).ok
+
+
+def test_verdict_in_list_results_is_read_from_the_verdict_key() -> None:
+    rows = trace("query_trials", [{"trial_id": "SYN-TR-0037", "verdict": "HOLD",
+                                   "reason": "FAIL-like text"}])
+    assert check("SYN-TR-0037 is HOLD [tool:query_trials].", "", [rows]).ok
+    g = check("SYN-TR-0037 is FAIL [tool:query_trials].", "", [rows])
+    assert g.verdicts == ("FAIL",)
+
+
 def test_supported_verdict_and_colour_are_ok() -> None:
     assert check(f"HOLD (amber) [{REF}]", "", [SCORE]).ok
 

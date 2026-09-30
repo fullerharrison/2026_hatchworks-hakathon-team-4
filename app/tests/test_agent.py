@@ -76,12 +76,12 @@ def test_uncited_answer_is_repaired(store: EvidenceStore) -> None:
 
 
 def test_unsupported_verdict_is_repaired_then_unverified(store: EvidenceStore) -> None:
-    bad = f"SYN-TR-0037 is green [{REF_0037}]."
+    bad = f"SYN-TR-0037 is PASS [{REF_0037}]."
     chat = FakeChat([call("score_trial", query="SYN-TR-0037"), say(bad), say(bad)])
     a = run_ask(store, chat, "Is SYN-TR-0037 fine?")
     repair = chat.seen[2][-1]["content"]
-    assert "verdict or colour words" in repair and "green" in repair
-    assert a.status == "unverified" and a.problems == ("verdict green not in cited results",)
+    assert "verdict or colour words" in repair and "PASS" in repair
+    assert a.status == "unverified" and a.problems == ("verdict PASS not in cited results",)
 
 
 def test_an_exception_becomes_an_error_answer(store: EvidenceStore,

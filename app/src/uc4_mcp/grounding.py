@@ -8,7 +8,6 @@ Citations are ``[<source_file>#<row_id>]`` (a row, as in ``evidence_row_ids``) o
 
 from __future__ import annotations
 
-import json
 import re
 from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass
@@ -26,6 +25,8 @@ NOT_QUANTITIES = re.compile(
 # Verdicts are upper-case codes; colours are matched in any case ("Amber", "RED").
 VERDICT_WORDS = re.compile(r"\b(?:PASS|HOLD|FAIL)\b")
 COLOUR_WORDS = re.compile(r"\b(?:green|amber|red)\b", re.IGNORECASE)
+# Result keys whose values may support a verdict or colour word in an answer.
+VERDICT_KEYS = frozenset({"verdict", "supplied_verdict", "colour"})
 # Units may be glued on ("25kg"); the lookbehind still skips identifiers like Q3 or H2O.
 NUMBER = re.compile(r"(?<![\w.])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)")
 
@@ -117,14 +118,27 @@ def _matches(token: str, pool: Iterable[float]) -> bool:
 def _unsupported_verdicts(answer: str, cited: Sequence[ToolTrace]) -> tuple[str, ...]:
     """Verdict and colour words in ``answer`` (citations excluded) that no cited result has."""
     text = CITATION.sub(" ", answer)
-    blobs = [json.dumps(t.result, default=str) for t in cited]
+    values = [v for t in cited for v in _verdict_values(t.result)]
     words: list[str] = []
     for pattern in (VERDICT_WORDS, COLOUR_WORDS):
         for word in pattern.findall(text):
-            found = re.compile(rf"\b{word}\b", pattern.flags)
-            if not any(found.search(b) for b in blobs):
+            fold = (lambda s: s) if pattern is VERDICT_WORDS else str.lower
+            if fold(word) not in {fold(v) for v in values}:
                 words.append(word)
     return tuple(dict.fromkeys(words))
+
+
+def _verdict_values(obj: Any) -> Iterator[str]:
+    """Values of ``VERDICT_KEYS`` anywhere in a tool result; free text does not count."""
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            if key in VERDICT_KEYS and isinstance(value, str):
+                yield value
+            else:
+                yield from _verdict_values(value)
+    elif isinstance(obj, list):
+        for value in obj:
+            yield from _verdict_values(value)
 
 
 def check(answer: str, question: str, traces: Sequence[ToolTrace]) -> Grounding:
