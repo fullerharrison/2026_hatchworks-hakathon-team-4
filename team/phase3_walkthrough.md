@@ -5,7 +5,7 @@
 ## Setup
 
 - Server: `uc4-ask serve` on http://127.0.0.1:8766/.
-- `UC4_ZIP` pinned to `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case.zip` (the original v2 archive). A second archive, `..._09-30-2026.zip`, now sits in `get_started/` and makes `find_zip` ambiguous without the variable.
+- `UC4_ZIP` pinned to `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case.zip` (the original v2 archive). A second archive, `..._09-30-2026.zip`, now sits in `get_started/` and makes `find_zip` ambiguous without the variable. Since ba94b9f the loader picks the v2 archive by exact name, so `UC4_ZIP` is optional.
 - `UC4_DECISION_LOG` = `%TEMP%\uc4-walkthrough.jsonl`, so rehearsal decisions stay out of the real log.
 - Method: DOM text read back through the page (`get_page_text` and JavaScript). The Chrome window was minimized, so screenshots and GIF frames could not be captured ("Cannot take screenshot with 0 width") and real mouse and keyboard events were not delivered. Controls were driven with `form_input`, `element.click()` and `form.requestSubmit()`. Real pointer and keyboard behaviour (clicking rows, Enter/Space on line rows, tabbing) was not exercised: only DOM-simulated.
 
@@ -44,12 +44,16 @@ The rejected blank-reason attempts (scenario 7) left no line.
 
 Also: blank-reason client check, buttons re-enabled in `finally`, line-row keyboard and source-toggle bubbling, duplicated verdict word in the line panel, `GET /decisions?trial=` returns 409 for an ambiguous query.
 
-Scenario 6 re-check: to be re-checked by the controller.
+Re-check (2026-09-30, Claude in Chrome, commit 1f6078a, server started without `UC4_ZIP`; the evidence layer is pinned to the v2 archive by exact name since ba94b9f):
+
+- Scenario 6 again: typed a PASS draft on SYN-TR-0037, then searched "SYN-TR-003" and got 10 candidate buttons. Banner, criteria and history cleared, "Record decision" was disabled, and a forced form submit wrote nothing (decision log file absent afterwards).
+- Picking SYN-TR-0033 from the candidates opened "● PASS" with the draft reset (reason empty, no decision selected).
+- The line panel no longer repeats the verdict word (e.g. "SYN-TR-0009 ■ FAIL: yield 6.04 t/ha < 7 t/ha (knockout, inferred threshold)").
+- A whitespace-only reason shows "A reason of 5 to 1000 characters is required." inline, with no request.
+- Full suite without `UC4_ZIP`: 393 passed, 1 deselected.
+- Keyboard behaviour on line rows and the source toggle remains unexercised (DOM-driven; screenshots still fail with a capture timeout).
 
 ## Open
 
 - **Screenshots and GIF** (`team/screenshots/phase3_*.png`, `phase3_walkthrough.gif`): still to be taken by a human with the browser window visible.
 - **Live `/ask` answer** (scenario 11 with numbered citations and disclaimer): pending Portkey credentials. Only the "Ask unavailable" path is verified.
-- **Finding 1, stale trial after failed search:** after an ambiguous or unknown search the previous trial's banner and decision form remain visible, and the form still targets the previous trial. Demo risk: a decision could be recorded against the wrong trial. Already deferred as a Task 3 minor.
-- **Finding 2, generic 422 text:** Pydantic's "String should have at least 5 characters" is shown for a blank reason. A breeder-facing message ("A reason of 5-1000 characters is required") would read better.
-- **Finding 3, repeated verdict word:** the line panel shows "▲ HOLD: HOLD: …" (verdict word repeated from `reason`).
