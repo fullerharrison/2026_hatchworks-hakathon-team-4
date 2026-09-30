@@ -102,3 +102,23 @@ Open the `http://127.0.0.1:6274?MCP_INSPECTOR_API_TOKEN=…` URL it prints, clic
 Do not use `mcp dev app/src/uc4_mcp/server.py`. It pre-fills `uv run --with mcp==2.2.0 mcp run app/src/uc4_mcp/server.py`, which builds a throwaway env with only `mcp` and uses a relative path, so Connect fails ("Failed to connect"). The session it opens is read-only ("Read-only session"), so the command can't be fixed in the UI either.
 
 If Connect fails, read the end of `app/logs/uc4_mcp.log`: a new `uc4-mcp starting over stdio` line means the server started and the fault is on the Inspector side; no new line means the launch failed.
+
+## Question agent
+
+`uc4-ask` answers plain-English questions from the 8 tools above, citing a row
+(`[file#row_id]`) or a whole tool result (`[tool:query_trials]`) for every number. An
+ambiguous ID gets a "which one?" list; an answer whose numbers are not in the cited results
+is rewritten once and otherwise marked unverified. Settings: `app/agent.toml` (model,
+sampling, round limits; committed). Secrets come from the environment only:
+
+```powershell
+$env:PORTKEY_API_KEY = "<key>"            # required
+$env:PORTKEY_VIRTUAL_KEY = "<virtual key>" # or PORTKEY_CONFIG / PORTKEY_PROVIDER
+# optional: UC4_LLM_BASE_URL (company gateway), UC4_LLM_MODEL (override agent.toml)
+uv run --project app uc4-ask ping
+uv run --project app uc4-ask ask "Why is SYN-TR-0037 amber?"
+uv run --project app uc4-ask chat
+```
+
+Each question is logged as one JSON line (question, tools, status, tokens, seconds) in
+`app/logs/uc4_agent.log`; tool calls also go to `app/logs/uc4_mcp.log`.
