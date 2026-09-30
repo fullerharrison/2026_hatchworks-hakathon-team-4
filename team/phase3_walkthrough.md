@@ -51,7 +51,7 @@ Re-check (2026-09-30, Claude in Chrome, commit 1f6078a, server started without `
 - The line panel no longer repeats the verdict word (e.g. "SYN-TR-0009 ■ FAIL: yield 6.04 t/ha < 7 t/ha (knockout, inferred threshold)").
 - A whitespace-only reason shows "A reason of 5 to 1000 characters is required." inline, with no request.
 - Full suite without `UC4_ZIP`: 393 passed, 1 deselected.
-- Keyboard behaviour on line rows and the source toggle remains unexercised (DOM-driven; screenshots still fail with a capture timeout).
+- Keyboard behaviour on line rows and the source toggle was not exercised in that DOM-driven re-check; the trusted-input run below closes that gap.
 
 ## Live Ask and deck screenshots (2026-09-30)
 
@@ -73,7 +73,54 @@ Screenshots were captured by a Playwright script driving the installed Chrome (h
 | [phase3_4_override.png](screenshots/phase3_4_override.png) | PASS override by `breeder-a` against HOLD |
 | [phase3_5_line_panel.png](screenshots/phase3_5_line_panel.png) | line SYN-MZ-00013: genomics, lab, per-trial verdicts, flags |
 
-## Open
+## Real input checks (2026-09-30)
 
-- **GIF** (`phase3_walkthrough.gif`): not taken.
-- Real pointer and keyboard behaviour is still exercised only through DOM events.
+[test_browser.py](../app/tests/test_browser.py) starts its own server with model credentials
+removed and a temporary decision log. Playwright drives installed Chrome through real
+mouse/keyboard input; a page-level probe rejects untrusted click, mousedown and keydown
+events. No DOM-dispatched input is used.
+
+```powershell
+uv run --project app --group browser pytest -q -m browser app/tests/test_browser.py
+```
+
+Result: **6 passed**, no skips. All six checks assert rendered DOM state:
+
+| Input | Observed | Result |
+| --- | --- | --- |
+| Mouse click on third line row | Panel names SYN-MZ-00025 | pass |
+| Tab to rows, Enter on first and Space on second | Panels name SYN-MZ-00013 and SYN-MZ-00019; Space default is prevented | pass |
+| Tab to nested source, Enter/Space; mouse click another source | Details expand/collapse with matching aria-expanded; no line panel opens | pass |
+| Type SYN-TR-0001 in search and press Enter | FAIL banner for SYN-TR-0001, replacing the initial HOLD trial | pass |
+| Keyboard-only alias, radio arrows, reason and submit | FAIL override by breeder-k appears in history; exactly one decision appended | pass |
+| Type Ask question and press Enter, no model | Ask unavailable warning; no Portkey request | pass |
+
+Default regression command: `uv run --project app pytest -q app/tests`:
+**393 passed, 7 deselected** (six browser checks and one live check).
+The browser tests and live tests remain opt-in.
+
+## Reproducible capture and GIF (2026-09-30)
+
+The recovered scratchpad script is now [capture.py](screenshots/capture.py), a
+self-contained uv script with Playwright and Pillow. Run with a server already started
+with `.env` loaded and `UC4_DECISION_LOG` pointing to a fresh temporary path; see the
+[retake commands](../app/README.md#browser-input-checks-and-demo-capture).
+
+```powershell
+uv run team/screenshots/capture.py --base http://127.0.0.1:8876/
+```
+
+This run regenerated all six PNGs listed above (1440x900 viewport at 2x, four section
+crops). Both Ask requests returned live answers; the two rehearsal PASS overrides were
+written only to the temporary log, each preserving the original HOLD recommendation.
+The search box is blurred before the trial shots.
+
+**[Walkthrough GIF](screenshots/phase3_walkthrough.gif):** eight distinct nonblank frames,
+1280x800, two seconds per frame, 16 seconds total, looping; **297,540 bytes**, below 8 MB.
+Scenes: HOLD trial, criteria, flags, Ask question, live answer, override draft, recorded
+history, line panel. Pillow checks verified every PNG, every GIF frame and its timing;
+the PNGs and GIF frame contact sheet were reopened for visual review.
+
+Options: `--out DIR` to change the output directory, `--no-gif` to retake only the PNGs.
+Chrome runs headlessly, so a minimized desktop window cannot block capture. There are
+no remaining items from the stopped agent's demo close-out list.

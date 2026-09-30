@@ -32,9 +32,9 @@ The breeder then records a decision (PASS, HOLD or FAIL) with a required reason.
   - `test_earlier_lines_are_never_rewritten` (Task 1)
   - no PUT, PATCH or DELETE routes (`test_no_update_or_delete_routes`, Task 2)
   - the existing `test_zip_unchanged_by_loading`
-- [x] The screen shows the trial view described in the uc4 README "Suggested minimal screen": colour and reason, the criteria table, the ten lines with genomics and lab, and the "Record decision" action. The Task 5 walkthrough covers every scenario in "Validate the demo" (11 of 11 observed, see [phase3_walkthrough.md](../../team/phase3_walkthrough.md)). Scenario 11 is verified only for the no-model path until Portkey credentials exist.
-- [ ] Screenshots in team/screenshots/phase3_* — open: the walkthrough window was minimized
-- [x] The offline suite is green: `uv run --project app pytest -q app/tests`. 392 passed, 1 deselected on commit `9aec632` (run with `UC4_ZIP` pinned to the original zip).
+- [x] The screen shows the trial view described in the uc4 README "Suggested minimal screen": colour and reason, the criteria table, the ten lines with genomics and lab, and the "Record decision" action. The Task 5 walkthrough covers every scenario in "Validate the demo" (11 of 11 observed, see [phase3_walkthrough.md](../../team/phase3_walkthrough.md)); Scenario 11 also has a live cited answer. Six trusted mouse/keyboard checks pass in [test_browser.py](../../app/tests/test_browser.py).
+- [x] Six deck screenshots in [team/screenshots](../../team/screenshots/) and the [walkthrough GIF](../../team/screenshots/phase3_walkthrough.gif), reproducible with [capture.py](../../team/screenshots/capture.py). Headless Chrome avoids the minimized-window problem. GIF verified: eight frames, 16 seconds, 297,540 bytes.
+- [x] The offline suite is green: `uv run --project app pytest -q app/tests`. 393 passed, 7 deselected on `demo-live-ask` (six browser tests and one live test are opt-in); `uv run --project app --group browser pytest -q -m browser app/tests/test_browser.py`: 6 passed.
 
 ## Decisions (made while planning, 2026-09-30)
 
@@ -869,10 +869,10 @@ Finish:
 
 Then:
 
-- [ ] Log the session in `team/PROMPT_LOG.md` in its existing format.
-- [ ] Tick this file's exit criteria with the evidence (test names, screenshot paths).
-- [ ] Update the task.md status line to "Phase 3 detailed in …; done".
-- [ ] Commit: `docs(log): phase 3 walkthrough and close-out`.
+- [x] Log the session in [team/PROMPT_LOG.md](../../team/PROMPT_LOG.md) in its existing format.
+- [x] Tick this file's exit criteria with the evidence (test names, screenshot paths).
+- [x] Update the [task.md](task.md) status line: Phase 3 done, screenshots and live Ask verified.
+- [x] Include the walkthrough close-out in one commit on `demo-live-ask`.
 
 If a scenario fails, fix it in the task that owns the code, with a regression test, before ticking the box.
 

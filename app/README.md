@@ -175,6 +175,45 @@ a later rule change never rewrites what the breeder saw. `user` is a demo alias:
 authentication. Only `/ask` needs the Portkey variables; the rest of the screen works
 without them.
 
+### Browser input checks and demo capture
+
+The opt-in browser suite uses trusted Chrome mouse and keyboard input, starts its own
+server without model credentials, and writes decisions to a temporary log:
+
+```powershell
+uv run --project app --group browser pytest -q -m browser app/tests/test_browser.py
+```
+
+It needs installed Google Chrome (otherwise the tests skip). The default suite excludes
+both `browser` and `live`; its dependencies and token usage are unchanged.
+
+To retake the six deck PNGs and the walkthrough GIF, start a separate rehearsal server:
+
+```powershell
+$env:UC4_DECISION_LOG = Join-Path "$env:TEMP" ("uc4-capture-" + [guid]::NewGuid().ToString() + ".jsonl")
+uv run --project app --env-file .env uc4-ask serve
+```
+
+In another terminal, from the repo root:
+
+```powershell
+uv run team/screenshots/capture.py
+```
+
+[capture.py](../team/screenshots/capture.py) installs Playwright and Pillow in an isolated
+uv script environment, not the app environment. It uses installed Chrome headlessly;
+outputs default to [team/screenshots](../team/screenshots/). Options: `--base URL` for
+another port, `--out DIR` for another destination, `--no-gif` for PNGs only.
+The PNGs use 1440x900 at 2x; the GIF has eight 1280x800 scenes at two seconds each and is
+resized to 1024px if needed to stay below 8 MB.
+
+A full capture makes two live Ask requests and records two PASS overrides against HOLD
+(one of each with `--no-gif`), so set `UC4_DECISION_LOG` on the server before starting it.
+Without a configured model the script captures and reports the unavailable warning,
+which is not live-answer evidence even though the PNG filename remains the same.
+Results: [walkthrough](../team/phase3_walkthrough.md),
+[GIF](../team/screenshots/phase3_walkthrough.gif).
+
 | Route | Purpose |
 | --- | --- |
 | `GET /` | the breeder screen; `/static/*` holds its files |
