@@ -93,6 +93,82 @@ class Candidate:
     label: str
 
 
+@dataclass(frozen=True)
+class Resolution:
+    """Outcome of resolving a trial or line query: ``guid`` is set only when ``"ok"``."""
+
+    status: str  # "ok" | "many" | "none"
+    guid: str | None
+    candidates: tuple[Candidate, ...]
+    message: str
+
+
+@dataclass(frozen=True)
+class OperationView:
+    """One field operation; ``evidence`` holds its type and status rows, both dated."""
+
+    operation_guid: str
+    operation_type: str
+    status: str
+    date: str | None
+    evidence: tuple[EvidenceRow, ...]
+
+
+@dataclass(frozen=True)
+class TrialLine:
+    """A line the observation file links to a trial, with its genomics values."""
+
+    material_guid: str
+    material_id: str
+    link: EvidenceRow  # the observation row
+    genomics: tuple[EvidenceRow, ...]  # GBV and disease-resistance marker
+
+
+@dataclass(frozen=True)
+class TrialView:
+    """Everything the files say about one trial. Verdicts are per trial."""
+
+    trial_guid: str
+    trial_id: str
+    meta: tuple[EvidenceRow, ...]  # trial row: start year, status, location
+    values: tuple[EvidenceRow, ...]  # recommendations row: trial-level values
+    recommendation: Recommendation
+    supplied_gbv_mean: float | None
+    linked_gbv_mean: float | None  # over the observation-linked lines
+    supplied_resistant_pct: float | None
+    linked_resistant_pct: float | None
+    lines: tuple[TrialLine, ...]
+    operations: tuple[OperationView, ...]  # by date, then GUID
+    flags: tuple[Flag, ...]  # trial scope, then operations in order
+
+
+@dataclass(frozen=True)
+class LineTrial:
+    """A trial a line appears in, with that trial's verdict (not a verdict on the line)."""
+
+    trial_guid: str
+    trial_id: str
+    verdict: str
+    colour: str
+    reason: str
+    link: EvidenceRow  # the observation row
+
+
+@dataclass(frozen=True)
+class LineView:
+    """Everything the files say about one line (material)."""
+
+    material_guid: str
+    material_id: str
+    identity: tuple[EvidenceRow, ...]
+    genomics: tuple[EvidenceRow, ...]
+    lab: tuple[EvidenceRow, ...]
+    trials: tuple[LineTrial, ...]
+    operations: tuple[OperationView, ...]
+    flags: tuple[Flag, ...]  # line scope, then operations in order
+    note: str
+
+
 def ok(result: Any, message: str = "") -> dict[str, Any]:
     """Envelope for a single resolved result."""
     return {"status": "ok", "result": result, "message": message}

@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from uc4_mcp.sources import find_zip, load_tables
+from uc4_mcp.store import EvidenceStore
 
 
 @pytest.fixture(scope="session")
@@ -21,3 +22,9 @@ def zip_path() -> Path:
 def tables(zip_path: Path) -> dict[str, pd.DataFrame]:
     """All seven tables with provenance columns."""
     return load_tables(zip_path)
+
+
+@pytest.fixture(scope="session")
+def store(tables: dict[str, pd.DataFrame]) -> EvidenceStore:
+    """The evidence store over the session tables (the zip is read once)."""
+    return EvidenceStore.from_tables(tables)
