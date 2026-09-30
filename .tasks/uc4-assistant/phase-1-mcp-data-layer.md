@@ -204,22 +204,24 @@ Run tests with `uv run --project app pytest -q app/tests` from the repo root. Th
 
    Tests (added in the review): `flag="NOT_A_CODE"` → envelope with status `none`, `is_error` False; exactly the 8 tools, no `ping`; `list_sources` lists 7 files with rows = `EXPECTED_ROWS`, non-empty `lacks`, and the extract date; the rule resource is `application/json`, lists the flag codes and the extract date, and its brackets equal `rule_intervals.csv`; store-level envelope tests for `find_*`, `get_*` and `score_trial` (ok, many, none); nothing on stdout (`capsys`) and one log line per call (temporary log path); description content as above; `read_only_hint` on every tool. Existing tests: `mcp.Client(server)` in-process lists the 8 tools and 2 resources and calls each with the acceptance inputs, including `query_trials flag=COMPLETE_TRIAL_HAS_PLANNED_OPS` (60 trials) and `flag=NOT_A_CODE` (status `none`); the `query_trials` docstring lists the valid `flag` codes from `FLAG_CODES`; every response has the envelope shape.
 8. **Stdio test, run commands, docs (45 min).** `[project.scripts] uc4-mcp = "uc4_mcp.server:main"`; `--transport stdio` (default) or `http --port 8765`. `tests/test_stdio.py` launches `uc4-mcp` as a subprocess via `mcp.Client(StdioServerParameters(...))` and calls `baseline_check`; a stray print would break this. `app/README.md`: prerequisites (uv, Node for the Inspector), `UV_PROJECT_ENVIRONMENT`, run commands, the OpenCode `opencode.json` entry from step 1, the Claude Code `claude mcp add` line, and the n8n MCP Client URL.
-9. **Manual check (15 min).** MCP Inspector (`uv run --project app mcp dev app/src/uc4_mcp/server.py`; confirm the 2.x CLI command in step 1): call `score_trial SYN-TR-0037`, `find_trial SYN-TR-003`, `query_trials knockout=disease only=true`. Save a screenshot for the deck, log the session in [PROMPT_LOG.md](../../team/PROMPT_LOG.md).
+9. **Manual check (15 min).** MCP Inspector (`npx.cmd @modelcontextprotocol/inspector "$env:LOCALAPPDATA\uc4-mcp\.venv\Scripts\uc4-mcp.exe"`, see [app/README.md](../../app/README.md#mcp-inspector); `mcp dev` opens a read-only session whose preset `uv run --with mcp …` command fails): call `score_trial SYN-TR-0037`, `find_trial SYN-TR-003`, `query_trials knockout=disease only=true`. Save a screenshot for the deck, log the session in [PROMPT_LOG.md](../../team/PROMPT_LOG.md).
 
 Estimated total: about 8 hours.
 
 ## Exit criteria
 
-- [ ] `uv run --project app pytest -q app/tests` passes, including the ported 72/72 test.
-- [ ] `baseline_check` returns 72 matched, 0 mismatches.
-- [ ] `score_trial` for 0003, 0037 and 0001 returns the verdict, every criterion with value, threshold and bracket, and source row IDs.
-- [ ] `find_trial "SYN-TR-003"` returns 10 candidates, not a guess.
-- [ ] Every flag count and every `query_trials` count equals the tables above.
-- [ ] Every tool output is valid JSON (`allow_nan=False`) and uses the envelope.
-- [ ] The stdio subprocess test passes, and OpenCode has connected to the server.
-- [ ] Every tool docstring states grain, units, "inferred" and an example input.
-- [ ] No tool writes to disk except the log; the zip is unchanged.
-- [ ] `app/README.md` lets a teammate connect OpenCode to the server in under 5 minutes.
+Status 2026-09-29, after step 9. "Manual" means confirmed by hand in the MCP Inspector (the user's session, recorded in `app/logs/uc4_mcp.log`).
+
+- [x] `uv run --project app pytest -q app/tests` passes, including the ported 72/72 test (244 passed).
+- [x] `baseline_check` returns 72 matched, 0 mismatches (manual, and `test_stdio.py`).
+- [x] `score_trial` for 0003, 0037 and 0001 returns the verdict, every criterion with value, threshold and bracket, and source row IDs (0037 manual, 0001 manual via `get_trial`; 0003 by `test_server.py`).
+- [x] `find_trial "SYN-TR-003"` returns 10 candidates, not a guess (manual).
+- [x] Every flag count and every `query_trials` count equals the tables above (tests; the disease-knockout 16 and `COMPLETE_TRIAL_HAS_PLANNED_OPS` 60 also manual).
+- [x] Every tool output is valid JSON (`allow_nan=False`) and uses the envelope (tests).
+- [x] The stdio subprocess test passes, and OpenCode has connected to the server (step 8).
+- [x] Every tool docstring states grain, units, "inferred" and an example input (as made testable in step 7: `test_descriptions_state_grain_inference_and_an_example`).
+- [x] No tool writes to disk except the log; the zip is unchanged (`test_zip_unchanged_by_loading`).
+- [ ] `app/README.md` lets a teammate connect OpenCode to the server in under 5 minutes. Open: needs a teammate to try it.
 
 ## Hand-off to Phases 2 and 3
 

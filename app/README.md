@@ -91,8 +91,14 @@ Start the server with `--transport http --port 8765`, then point an **MCP Client
 
 ## MCP Inspector
 
-Needs Node. `mcp dev` is still the 2.x command:
+Needs Node and the venv (any `uv run --project app …` creates it). Start the Inspector with the server's console script, from any directory:
 
 ```powershell
-uv run --project app mcp dev app/src/uc4_mcp/server.py
+npx.cmd @modelcontextprotocol/inspector "$env:LOCALAPPDATA\uc4-mcp\.venv\Scripts\uc4-mcp.exe"
 ```
+
+Open the `http://127.0.0.1:6274?MCP_INSPECTOR_API_TOKEN=…` URL it prints, click **Connect**, then **Tools → List Tools** (8 tools). Smoke test: `score_trial` with `SYN-TR-0037` returns HOLD, `resistant lines 30% < 50%`. In a writable session, the same setting by hand is: Transport STDIO, Command `C:\Users\<you>\AppData\Local\uc4-mcp\.venv\Scripts\uc4-mcp.exe`, no arguments, no env vars. The editable install lets the server find `get_started/*.zip` from its own files.
+
+Do not use `mcp dev app/src/uc4_mcp/server.py`. It pre-fills `uv run --with mcp==2.2.0 mcp run app/src/uc4_mcp/server.py`, which builds a throwaway env with only `mcp` and uses a relative path, so Connect fails ("Failed to connect"). The session it opens is read-only ("Read-only session"), so the command can't be fixed in the UI either.
+
+If Connect fails, read the end of `app/logs/uc4_mcp.log`: a new `uc4-mcp starting over stdio` line means the server started and the fault is on the Inspector side; no new line means the launch failed.
