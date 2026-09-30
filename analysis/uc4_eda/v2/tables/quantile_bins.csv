@@ -1,0 +1,15 @@
+table,column,method,n,n_missing,q0,q0.25,q0.5,q0.75,q1,n_bins,collapsed,bin_counts,level_to_bin
+recommendations,YIELD_T_HA,numeric (per trial),72,0,5.52,7.6525,9.975,11.325,13.45,4,False,18/18/18/18,
+recommendations,MOISTURE_PCT,numeric (per trial),72,0,13.2,16.1,18.9,22.575,26.5,4,False,19/18/17/18,
+recommendations,DISEASE_SCORE,numeric (per trial),72,0,1.1,2.6,5.8,7.425,8.4,4,False,19/18/17/18,
+recommendations,GENOMIC_BREEDING_VALUE_MEAN,numeric (per trial),72,0,95.3,100.8,105.2,106.8,109.8,4,False,19/19/19/15,
+recommendations,RESISTANT_MATERIAL_PCT,numeric (per trial),72,0,10.0,30.0,50.0,50.0,70.0,3,True,28/35/9,
+recommendations,PLANT_HEIGHT_CM,numeric (per trial),72,0,156.1,191.1,224.0,253.25,295.5,4,False,18/18/18/18,
+recommendations,FLOWERING_DAYS,numeric (per trial),72,0,50.0,58.75,67.5,80.0,90.0,4,False,18/18/19/17,
+genomics,MARKER_DISEASE_RESISTANCE,ordinal rank,150,0,1.0,2.0,2.0,3.0,3.0,2,True,87/63,SUSCEPTIBLE->Q1; INTERMEDIATE->Q1; RESISTANT->Q2
+genomics,MARKER_YIELD_POTENTIAL,ordinal rank,150,0,1.0,1.0,2.0,3.0,3.0,2,True,81/69,LOW->Q1; MEDIUM->Q1; HIGH->Q2
+genomics,MARKER_DROUGHT_TOLERANCE,ordinal rank,150,0,1.0,2.0,2.5,3.0,3.0,2,True,75/0/75,UNFAVOURABLE->Q1; NEUTRAL->Q1; FAVOURABLE->Q3
+genomics,MARKER_MATURITY,ordinal rank,150,0,1.0,1.0,2.0,2.0,3.0,2,True,118/32,EARLY->Q1; MID->Q1; LATE->Q2
+recommendations,TRIAL_RECOMMENDATION,ordinal rank,72,0,1.0,1.0,2.0,2.0,3.0,2,True,65/7,FAIL->Q1; HOLD->Q1; PASS->Q2
+trial,START_YEAR,ordinal rank,72,0,1.0,1.0,2.0,3.0,3.0,2,True,48/24,2024->Q1; 2025->Q1; 2026->Q2
+operations,OPERATION_STATUS_LID,ordinal rank,216,0,1.0,1.0,1.0,2.0,2.0,1,True,216,PLANNED->Q1; COMPLETED->Q1

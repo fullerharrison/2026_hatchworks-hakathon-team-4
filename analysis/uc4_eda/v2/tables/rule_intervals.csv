@@ -1,0 +1,8 @@
+criterion,column,test,bracket_low,bracket_high,used
+YIELD_T_HA meets target,YIELD_T_HA,>= t,8.9,9.14,9.0
+MOISTURE_PCT acceptable,MOISTURE_PCT,<= t,21.8,22.1,22.0
+DISEASE_SCORE acceptable,DISEASE_SCORE,<= t,4.9,5.2,5.0
+GENOMIC_BREEDING_VALUE_MEAN meets target,GENOMIC_BREEDING_VALUE_MEAN,>= t,101.0,103.4,102.0
+RESISTANT_MATERIAL_PCT for PASS,RESISTANT_MATERIAL_PCT,>= t,30.0,50.0,50.0
+Yield knockout (FAIL below),YIELD_T_HA,< t,6.72,7.13,7.0
+Disease knockout (FAIL above),DISEASE_SCORE,> t,7.0,7.2,7.0
