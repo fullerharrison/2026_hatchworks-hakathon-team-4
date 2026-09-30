@@ -7,6 +7,7 @@ it carries the stdio protocol; logging goes to ``app/logs/uc4_mcp.log``.
 
 from __future__ import annotations
 
+import argparse
 import functools
 import json
 import logging
@@ -173,8 +174,19 @@ def configure_logging(path: Path = LOG_PATH) -> logging.Handler:
     return handler
 
 
-def main() -> None:
-    """Run the server over stdio, loading the zip first so a missing archive fails at once."""
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """``--transport stdio`` (default) or ``http`` with ``--host`` and ``--port``."""
+    parser = argparse.ArgumentParser(prog="uc4-mcp", description=__doc__)
+    parser.add_argument("--transport", choices=["stdio", "http"], default="stdio")
+    parser.add_argument("--host", default="127.0.0.1",
+                        help="HTTP only; 0.0.0.0 for clients in Docker (no authentication)")
+    parser.add_argument("--port", type=int, default=8765, help="HTTP only; serves /mcp")
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> None:
+    """Run the server, loading the zip first so a missing archive fails at once."""
+    args = parse_args(argv)
     configure_logging()
     try:
         _default_store()
@@ -182,5 +194,8 @@ def main() -> None:
         logger.error("Cannot start: %s", e)
         sys.stderr.write(f"{e}\n")
         raise SystemExit(1) from e
-    logger.info("uc4-mcp starting over stdio")
-    server.run("stdio")
+    logger.info("uc4-mcp starting over %s", args.transport)
+    if args.transport == "http":
+        server.run("streamable-http", host=args.host, port=args.port)
+    else:
+        server.run("stdio")

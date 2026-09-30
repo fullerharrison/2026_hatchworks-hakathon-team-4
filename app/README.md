@@ -2,6 +2,12 @@
 
 Read-only MCP server over the UC4 v2 data files. Plan: [phase-1-mcp-data-layer.md](../.tasks/uc4-assistant/phase-1-mcp-data-layer.md).
 
+## Prerequisites
+
+- [uv](https://docs.astral.sh/uv/) (it installs Python 3.12 and the dependencies).
+- The v2 zip in `get_started/` (see [Data](#data)).
+- Node, only for the MCP Inspector.
+
 ## Environment
 
 The repo lives in OneDrive, so keep the virtual environment outside it (avoids sync churn and file locks). Set this once per shell before any `uv` command:
@@ -26,6 +32,36 @@ uv run --project app pytest -q app/tests
 
 The tests and server read `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case*.zip`, which is git-ignored (data clearance is still open), so copy it there after cloning. Exactly one archive may match; otherwise, or to use a copy elsewhere, set `UC4_ZIP` to its full path.
 
+## Run
+
+From the repo root:
+
+```powershell
+uv run --project app uc4-mcp                                   # stdio (what MCP clients launch)
+uv run --project app uc4-mcp --transport http --port 8765      # streamable HTTP at http://127.0.0.1:8765/mcp
+```
+
+- The server loads the zip at startup; a missing zip exits with code 1 and a message naming `UC4_ZIP`.
+- Logs go to `app/logs/uc4_mcp.log`, never stdout (stdout carries the stdio protocol).
+- `--host 0.0.0.0` is only for clients in Docker (see [n8n](#connect-n8n-http)).
+
+## Tools and resources
+
+Every tool returns `{"status": "ok" | "many" | "none", "result" | "candidates", "message"}`, and every value cites `source_file` and `row_id`. Verdicts are per trial; thresholds are SYNTH_V1 (inferred).
+
+| Tool | Example input | Returns |
+| --- | --- | --- |
+| `list_sources` | none | the 7 files: rows, key, grain, synthetic marker, what each lacks; extract date |
+| `find_trial` | `query="0037"` | the trial, or up to 20 candidates |
+| `find_line` | `query="SYN-MZ-00001"` | the line, or up to 20 candidates |
+| `get_trial` | `query="SYN-TR-0037"` | values, verdict, 10 linked lines, 3 operations, flags |
+| `get_line` | `query="SYN-MZ-00001"` | genomics, lab, the trials it is in with each trial's verdict, flags |
+| `score_trial` | `query="SYN-TR-0001"` | verdict, 7 criteria with thresholds and brackets, reason |
+| `query_trials` | `knockout="disease", only=true` | matching trials with verdict and reason |
+| `baseline_check` | none | `{checked: 72, matched: 72, mismatches: []}` |
+
+Resources: `uc4://sources` and `uc4://rule/SYNTH_V1` (criteria, thresholds, brackets, flag codes), both JSON.
+
 ## Connect OpenCode (stdio)
 
 The repo-root [opencode.json](../opencode.json) already registers the server as `uc4`. Start OpenCode from the repo root in a shell where `UV_PROJECT_ENVIRONMENT` is set, then check:
@@ -34,9 +70,24 @@ The repo-root [opencode.json](../opencode.json) already registers the server as 
 opencode mcp list        # expect: ✓ uc4 connected
 ```
 
-Verified 2026-09-29 with OpenCode 1.18.32 and `mcp` 2.2.0: `opencode run "Call the uc4 ping tool…"` returned `pong`.
+Verified 2026-09-29 with OpenCode 1.18.32 and `mcp` 2.2.0 against the 8-tool server.
 
 Do not add an `environment` block with `{env:LOCALAPPDATA}` to `opencode.json`: OpenCode substitutes the value before parsing, and the Windows backslashes make the JSON invalid.
+
+## Connect Claude Code (stdio)
+
+MCP clients pass only a few environment variables to the server, so give it `UV_PROJECT_ENVIRONMENT` explicitly (otherwise `uv` builds a venv inside OneDrive). Use an absolute `--project` path, since Claude Code may start in another directory:
+
+```powershell
+claude mcp add uc4 --env UV_PROJECT_ENVIRONMENT="$env:LOCALAPPDATA\uc4-mcp\.venv" -- uv run --project "C:\path\to\2026_hatchworks-hakathon\app" uc4-mcp
+```
+
+## Connect n8n (HTTP)
+
+Start the server with `--transport http --port 8765`, then point an **MCP Client** node (HTTP streamable) at:
+
+- `http://127.0.0.1:8765/mcp` when n8n runs on the same machine.
+- `http://host.docker.internal:8765/mcp` when n8n runs in Docker. Start the server with `--host 0.0.0.0` for this: bound to 127.0.0.1 it rejects any Host header other than localhost. `0.0.0.0` exposes the server, which has no authentication, to your network, so use it only on a trusted one.
 
 ## MCP Inspector
 
