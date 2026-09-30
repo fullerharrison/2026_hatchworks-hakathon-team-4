@@ -66,7 +66,11 @@ class DecisionLog:
             return []
         out = []
         with self._lock:
-            lines = self.path.read_text(encoding="utf-8").splitlines()
+            # Split on "\n" only: splitlines() also splits on U+2028, U+0085 and friends,
+            # which json.dumps(ensure_ascii=False) leaves unescaped inside a reason.
+            lines = self.path.read_text(encoding="utf-8").split("\n")
+        if lines and lines[-1] == "":
+            lines.pop()
         for n, line in enumerate(lines, start=1):
             try:
                 record = OverrideRecord(**json.loads(line))

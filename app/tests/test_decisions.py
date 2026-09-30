@@ -111,6 +111,14 @@ def test_read_round_trips_in_order_and_filters(store: EvidenceStore,
     json.dumps(to_json_safe(a), allow_nan=False)
 
 
+def test_reason_with_unicode_line_separators_round_trips(store: EvidenceStore,
+                                                        log: DecisionLog) -> None:
+    reason = "pasted from Word text\u0085more"
+    r = decide(store, log, reason=reason)
+    assert log.path.read_bytes().count(b"\n") == 1
+    assert log.read() == [r] and log.read()[0].reason == reason
+
+
 def test_malformed_line_names_its_number(store: EvidenceStore, log: DecisionLog) -> None:
     decide(store, log)
     with log.path.open("a", encoding="utf-8") as f:
