@@ -7,8 +7,10 @@ from typing import Any
 
 import pandas as pd
 import pytest
+from test_lifecycle import EDA_TABLES
 
 from uc4_mcp.checks import FLAG_CODES
+from uc4_mcp.sources import EXPECTED_ROWS, ROW_KEYS
 from uc4_mcp.models import EvidenceRow, LineView, TrialView, to_json_safe
 from uc4_mcp.rules import explain, threshold_intervals
 from uc4_mcp.store import MAX_CANDIDATES, VALUE_FIELDS, EvidenceStore, resolve
@@ -282,3 +284,59 @@ def test_invalid_filters_give_none_listing_valid_values(store: EvidenceStore,
     env = store.query_trials(**kwargs)
     assert env["status"] == "none" and "result" not in env
     assert all(v in env["message"] for v in valid)
+
+
+# --- envelopes for the tools (step 7) ------------------------------------------------
+
+
+def test_find_envelopes(store: EvidenceStore) -> None:
+    env = store.find_trial("0037")
+    assert env["status"] == "ok"
+    assert (env["result"].id, env["result"].guid) == ("SYN-TR-0037", TRIAL.format(37))
+    env = store.find_trial("SYN-TR-003")
+    assert env["status"] == "many" and len(env["candidates"]) == 10 and "result" not in env
+    assert store.find_trial("XYZ") == {"status": "none", "message": "No trial matches 'XYZ'"}
+    assert store.find_line("SYN-MZ-00001")["result"].id == "SYN-MZ-00001"
+    assert len(store.find_line("003")["candidates"]) == 11
+
+
+def test_get_and_score_envelopes(store: EvidenceStore) -> None:
+    trial = store.get_trial("SYN-TR-0037")
+    assert trial["status"] == "ok" and trial["result"] == store.trial_view(TRIAL.format(37))
+    line = store.get_line("SYN-MZ-00001")
+    assert line["status"] == "ok" and line["result"].material_id == "SYN-MZ-00001"
+    score = store.score_trial("0037")
+    assert score["result"] == store.recommendation(TRIAL.format(37))
+    assert store.get_trial("SYN-TR-003")["status"] == "many"
+    assert store.get_line("")["status"] == "none"
+    assert store.score_trial("XYZ")["status"] == "none"
+
+
+def test_list_sources(store: EvidenceStore, tables: Tables) -> None:
+    env = store.list_sources()
+    assert env["status"] == "ok"
+    result = env["result"]
+    assert result["extract_date"] == "2026-09-26 12:00"
+    files = {f["table"]: f for f in result["files"]}
+    assert len(files) == 7
+    for key, f in files.items():
+        assert f["rows"] == EXPECTED_ROWS[key] == len(tables[key])
+        assert f["member"] == tables[key]["_source_file"].iloc[0]
+        assert f["key"] == ROW_KEYS[key] and f["lacks"] and f["grain"]
+        assert set(f["synthetic_marker"]) == {"column", "value"}
+    assert files["observation"]["grain"] == "trial-line links"
+    assert files["trial"]["grain"] == "trials"
+
+
+def test_rule_brackets_equal_the_eda_table(store: EvidenceStore) -> None:
+    rule = store.rule()
+    assert rule["rule_version"] == "SYNTH_V1 (inferred)" and "inferred" in rule["note"]
+    assert rule["extract_date"] == "2026-09-26 12:00"
+    assert [f["code"] for f in rule["flags"]] == list(FLAG_CODES)
+    expected = pd.read_csv(EDA_TABLES / "rule_intervals.csv")
+    got = {c["name"]: c for c in rule["criteria"]}
+    assert len(got) == len(expected) == 7
+    for row in expected.to_dict("records"):
+        c = got[row["criterion"]]
+        assert c["bracket"] == (row["bracket_low"], row["bracket_high"])
+        assert c["threshold"] == row["used"] and c["field"] == row["column"]

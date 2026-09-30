@@ -10,18 +10,20 @@ from __future__ import annotations
 
 import dataclasses
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
 
 from uc4_mcp.checks import FLAG_CODES, all_flags
+from uc4_mcp.lifecycle import snapshot_date, stage_counts
 from uc4_mcp.models import (Candidate, EvidenceRow, Flag, LineTrial, LineView, OperationView,
-                            Recommendation, Resolution, TrialLine, TrialView, none, ok,
+                            Recommendation, Resolution, TrialLine, TrialView, many, none, ok,
                             to_json_safe)
-from uc4_mcp.rules import CRITERIA, explain, genomics_reconciliation, threshold_intervals
-from uc4_mcp.sources import find_zip, lab_trait_label, load_tables
+from uc4_mcp.rules import (CRITERIA, SYNTH_V1, explain, genomics_reconciliation,
+                           threshold_intervals)
+from uc4_mcp.sources import ROW_KEYS, SOURCES, find_zip, lab_trait_label, load_tables
 
 Tables = dict[str, pd.DataFrame]
 Record = dict[str, Any]
@@ -61,6 +63,10 @@ KNOCKOUTS: dict[str, frozenset[str]] = {
     "both": frozenset({"YIELD_T_HA", "DISEASE_SCORE"})}
 MISSED_FIELDS = tuple(s.field for s in CRITERIA if s.kind == "pass")
 QUERY_FLAGS = tuple(c for c, s in FLAG_CODES.items() if s.scope in ("trial", "operation"))
+# stage_counts names two sources differently from the table keys.
+STAGE_KEYS = {"trial": "trials", "observation": "observations"}
+RULE_NOTE = ("SYNTH_V1 thresholds are inferred: the simplest fixed values that reproduce all 72 "
+             "supplied verdicts. Each bracket is the range the data allows; confirm with the SME.")
 
 
 def _text(value: Any) -> str | None:
@@ -137,6 +143,8 @@ class EvidenceStore:
         self._material_id = dict(zip(germplasm["MATERIAL_GUID"], germplasm["MATERIAL_ID"]))
         self.operation_trial = dict(zip(tables["operations"]["OPERATION_GUID"],
                                         tables["operations"]["TRIAL_GUID"]))
+        self._intervals = threshold_intervals(tables["recommendations"])
+        self._extract_date = snapshot_date(tables).strftime("%Y-%m-%d %H:%M")
         self._recs = self._recommendations(tables["recommendations"])
         self._linked = genomics_reconciliation(tables).set_index("TRIAL_GUID")[
             ["gbv_observation", "resistant_observation"]].to_dict("index")
@@ -161,9 +169,8 @@ class EvidenceStore:
         return cls(load_tables(zip_path or find_zip()))
 
     def _recommendations(self, rec: pd.DataFrame) -> dict[str, Recommendation]:
-        intervals = threshold_intervals(rec)
         return {str(row["TRIAL_GUID"]): dataclasses.replace(
-                    explain(row, intervals),
+                    explain(row, self._intervals),
                     flags=self.flags.by_trial.get(str(row["TRIAL_GUID"]), ()))
                 for _, row in rec.iterrows()}
 
@@ -342,6 +349,76 @@ class EvidenceStore:
                 if self._matches(rec, verdict, knockout, missed, only, flag)]
         return ok(rows, _plural(len(rows), "trial"))
 
+    # --- tool envelopes -------------------------------------------------------
+
+    @staticmethod
+    def _envelope(res: Resolution, build: Callable[[str], Any]) -> dict[str, Any]:
+        if res.status == "ok":
+            return ok(build(str(res.guid)), res.message)
+        if res.status == "many":
+            return many(res.candidates, res.message)
+        return none(res.message)
+
+    @staticmethod
+    def _candidate(keys: pd.DataFrame, guid: str) -> Candidate:
+        row = keys[keys["guid"] == guid].iloc[0]
+        return Candidate(id=str(row["id"]), guid=guid, label=str(row["label"]))
+
+    def find_trial(self, query: str) -> dict[str, Any]:
+        """Envelope: the matching trial as a ``Candidate``, candidates, or none."""
+        return self._envelope(self.resolve_trial(query),
+                              lambda g: self._candidate(self._trial_keys, g))
+
+    def find_line(self, query: str) -> dict[str, Any]:
+        """Envelope: the matching line as a ``Candidate``, candidates, or none."""
+        return self._envelope(self.resolve_line(query),
+                              lambda g: self._candidate(self._line_keys, g))
+
+    def get_trial(self, query: str) -> dict[str, Any]:
+        """Envelope: the ``TrialView`` of the matching trial."""
+        return self._envelope(self.resolve_trial(query), self.trial_view)
+
+    def get_line(self, query: str) -> dict[str, Any]:
+        """Envelope: the ``LineView`` of the matching line."""
+        return self._envelope(self.resolve_line(query), self.line_view)
+
+    def score_trial(self, query: str) -> dict[str, Any]:
+        """Envelope: the ``Recommendation`` of the matching trial."""
+        return self._envelope(self.resolve_trial(query), self.recommendation)
+
+    def list_sources(self) -> dict[str, Any]:
+        """Envelope: the extract date and, per file, member, rows, key, grain, detail,
+        synthetic marker and what it lacks."""
+        counts = stage_counts(self.tables)
+        files = []
+        for key, df in self.tables.items():
+            stage = counts[STAGE_KEYS.get(key, key)]
+            info = SOURCES[key]
+            column, value = info.synthetic_marker
+            files.append({"table": key, "member": str(df["_source_file"].iloc[0]),
+                          "rows": len(df), "key": ROW_KEYS[key], "grain": stage["unit"],
+                          "detail": stage["detail"],
+                          "synthetic_marker": {"column": column, "value": value},
+                          "lacks": info.lacks})
+        return ok({"extract_date": self._extract_date, "files": files},
+                  f"{len(files)} files; extract taken {self._extract_date}")
+
+    def rule(self) -> dict[str, Any]:
+        """The SYNTH_V1 rule: each criterion with threshold and bracket, the flag catalogue
+        and the extract date (the ``uc4://rule/SYNTH_V1`` resource)."""
+        brackets = {str(r["criterion"]): (float(r["bracket_low"]), float(r["bracket_high"]))
+                    for r in self._intervals.to_dict("records")}
+        return {
+            "rule_version": SYNTH_V1.version, "note": RULE_NOTE,
+            "extract_date": self._extract_date,
+            "criteria": [{"name": s.interval, "field": s.field, "label": s.label,
+                          "test": s.test, "threshold": float(getattr(SYNTH_V1, s.rule_attr)),
+                          "unit": s.unit.strip() or None, "kind": s.kind,
+                          "bracket": brackets[s.interval]} for s in CRITERIA],
+            "flags": [{"code": c, "scope": s.scope, "severity": s.severity,
+                       "meaning": s.meaning} for c, s in FLAG_CODES.items()],
+        }
+
     def baseline(self) -> dict[str, Any]:
         """SYNTH_V1 verdicts against the supplied ones: expect 72 checked, 72 matched."""
         recs = [self._recs[g] for g in self.trial_guids]
@@ -349,3 +426,8 @@ class EvidenceStore:
                        "supplied": r.supplied_verdict} for r in recs if not r.matches_supplied]
         return {"checked": len(recs), "matched": len(recs) - len(mismatches),
                 "mismatches": mismatches}
+
+    def baseline_check(self) -> dict[str, Any]:
+        """Envelope around ``baseline()``."""
+        result = self.baseline()
+        return ok(result, f"{result['matched']} of {result['checked']} verdicts match")

@@ -11,6 +11,7 @@ import os
 import re
 import zipfile
 from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
@@ -46,6 +47,39 @@ ROW_KEYS: dict[str, str] = {
     "lab": "ROWGUID",
     "genomics": "GENOMIC_SAMPLE_GUID",
     "recommendations": "TRIAL_GUID",
+}
+
+
+@dataclass(frozen=True)
+class SourceInfo:
+    """What ``list_sources`` says about a file beyond its counts.
+
+    Attributes:
+        synthetic_marker: ``(column, value)`` present on every row, marking mock data.
+        lacks: What a reader might expect from the file that it does not hold.
+    """
+
+    synthetic_marker: tuple[str, str]
+    lacks: str
+
+
+_REMARK = ("REMARK", "SYNTHETIC — hackathon mock data")
+SOURCES: dict[str, SourceInfo] = {
+    "germplasm": SourceInfo(_REMARK, "Pedigree, parents, stage and advancement decision: "
+                                     "IDs, status and material type only"),
+    "trial": SourceInfo(_REMARK, "Design, begin date, replications and measured values: ID, "
+                                 "start year, status and location only (values are in the "
+                                 "recommendations file)"),
+    "observation": SourceInfo(_REMARK, "Measured values: each row only links a line to a "
+                                       "trial, with a replication number"),
+    "operations": SourceInfo(_REMARK, "Quantities and results: type, status, date and plot "
+                                      "only"),
+    "lab": SourceInfo(_REMARK, "Trait names, a trial key and dates: line, trait GUID and a "
+                               "number only"),
+    "genomics": SourceInfo(_REMARK, "A trial key: one sample per line, not per trial"),
+    "recommendations": SourceInfo(("IS_SYNTHETIC", "True"),
+                                  "Thresholds: outcomes and a rationale only, so the SYNTH_V1 "
+                                  "cut-points are inferred"),
 }
 
 # Trial-level traits in the recommendation file: code -> (label, unit).

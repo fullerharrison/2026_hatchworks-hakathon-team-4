@@ -11,6 +11,7 @@ from uc4_mcp.sources import (
     EXPECTED_ROWS,
     FILES,
     ROW_KEYS,
+    SOURCES,
     ZIP_ENV,
     ZIP_GLOB,
     find_zip,
@@ -31,6 +32,20 @@ def _write_zip(path: Path, members: dict[str, str]) -> Path:
         for name, text in members.items():
             zf.writestr(name, text)
     return path
+
+
+# --- source catalogue --------------------------------------------------------
+
+
+@pytest.mark.parametrize("key", list(FILES))
+def test_every_row_carries_its_synthetic_marker(tables: Tables, key: str) -> None:
+    column, value = SOURCES[key].synthetic_marker
+    assert (tables[key][column].astype(str) == value).all()
+
+
+def test_every_source_says_what_it_lacks() -> None:
+    assert list(SOURCES) == list(FILES)
+    assert all(s.lacks for s in SOURCES.values())
 
 
 # --- loading ----------------------------------------------------------------
