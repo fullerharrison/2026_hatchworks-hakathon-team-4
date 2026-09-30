@@ -23,6 +23,15 @@ def test_three_level_ordinal_is_flagged_collapsed() -> None:
     assert sum(result.counts) == 100
 
 
+def test_empty_interval_between_ties_is_not_counted_as_a_bin() -> None:
+    # Median falls between B (rank 2) and C (rank 3): edges 1 / 2 / 2.5 / 3, and no
+    # value lies in (2, 2.5]. Same shape as MARKER_DROUGHT_TOLERANCE in v2.
+    levels = pd.Series(["A"] * 30 + ["B"] * 45 + ["C"] * 75)
+    result = quantile_bin(ordinal_encode(levels, ["A", "B", "C"]))
+    assert result.counts == [75, 0, 75]
+    assert result.n_bins == 2
+
+
 def test_target_encoding_matches_hand_calculation() -> None:
     df = pd.DataFrame({"region": ["EU", "EU", "NAM", "NAM", None], "yield": [8.0, 10.0, 6.0, np.nan, 5.0]})
     encoded = target_encode(df, "region", "yield")

@@ -39,7 +39,8 @@ class BinResult:
 
     @property
     def n_bins(self) -> int:
-        return len(self.counts)
+        """Bins that hold at least one value; an interval between two ties can be empty."""
+        return sum(c > 0 for c in self.counts)
 
 
 def quantile_bin(values: pd.Series, q: Sequence[float] = QUANTILES) -> BinResult:

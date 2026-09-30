@@ -50,6 +50,22 @@ def snapshot_date(t: dict[str, pd.DataFrame]) -> pd.Timestamp:
     return cast(pd.Timestamp, pd.concat(stamps).max())
 
 
+def month_span(dates: pd.Series) -> str:
+    """``April to September 2026``, or ``April 2025 to September 2026`` across years."""
+    d = _dt(dates).dropna()
+    lo, hi = d.min(), d.max()
+    return f"{lo:%B} to {hi:%B %Y}" if lo.year == hi.year else f"{lo:%B %Y} to {hi:%B %Y}"
+
+
+def header_facts(t: dict[str, pd.DataFrame]) -> dict[str, object]:
+    """Counts shown in the report header, derived rather than typed in."""
+    years = t["trial"]["START_YEAR"]
+    return {"lines": len(t["germplasm"]), "trials": len(t["trial"]),
+            "sites": t["trial"]["LOCATION_GUID"].nunique(),
+            "years": f"{years.min()} to {years.max()}",
+            "operation_months": month_span(t["operations"]["OPERATION_DATE"])}
+
+
 def operations_with_trial(t: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Operations with their trial's ID, start year and status attached."""
     trial = t["trial"][["TRIAL_GUID", "TRIAL_ID", "START_YEAR", "STATUS_LID"]].rename(

@@ -9,6 +9,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from plant_lifecycle import lifecycle_coverage
+
 CAPTIONS: dict[str, tuple[str, str]] = {
     "fig01_inventory": ("Inventory", "Rows per file, and whether each column is complete, "
                         "partly missing, constant or entirely null. Full list: tables/column_quality.csv."),
@@ -29,6 +31,12 @@ CAPTIONS: dict[str, tuple[str, str]] = {
                                   "trial's start year, with the extract date."),
     "fig09_consistency_checks": ("Consistency checks", "Share of checkable records that break "
                                  "each rule. Full list: tables/chronology_checks.csv."),
+    "fig11_plant_lifecycle": ("Season phases", "Each growth phase, what the plant does in it, and "
+                              "the supplied columns that describe it. Full list: "
+                              "tables/lifecycle_phase_map.csv."),
+    "fig12_trial_timelines": ("Trial seasons", "Operations for each trial with a planting record, "
+                              "in days after that planting, against its expected flowering. Full "
+                              "list with a sentence per trial: tables/trial_timeline.csv."),
     "fig10a_bins_numeric": ("Numeric bins", "Quartile edges for each trial-level trait."),
     "fig10b_bins_categorical": ("Ordinal bins", "Quantile edges after rank encoding. Where edges "
                                 "tie, fewer than four bins exist."),
@@ -187,8 +195,10 @@ def lifecycle_map(stages: dict[str, dict[str, object]], checks: pd.DataFrame) ->
     return f'<ol class="map">{"".join(cards)}</ol>'
 
 
-def findings(tables: dict[str, pd.DataFrame], mat: pd.DataFrame) -> list[str]:
+def findings(tables: dict[str, pd.DataFrame], mat: pd.DataFrame,
+             facts: dict[str, object]) -> list[str]:
     checks = tables["chronology_checks"].set_index("rule")
+    cov = lifecycle_coverage(tables["trial_timeline"])
     trials = tables["trial_level"]
     counts = trials["TRIAL_RECOMMENDATION"].value_counts()
     mismatch = int(checks.loc["Supplied recommendation differs from the inferred rule", "violations"])
@@ -215,8 +225,63 @@ def findings(tables: dict[str, pd.DataFrame], mat: pd.DataFrame) -> list[str]:
         "a block-of-10 mapping by line ID reproduces all of them.",
         f"<b>Operations ignore the trial calendar.</b> {int(year['violations'])} of "
         f"{int(year['checked'])} operations fall outside their trial's start year; all are dated "
-        "April to September 2026. Lab results (all 150 lines) have no dates or trait names.",
+        f"{facts['operation_months']}. Lab results (all {facts['lines']} lines) have no dates or "
+        "trait names.",
+        f"<b>Most trials cannot be told as a season.</b> Only {cov['placed']} of {cov['trials']} "
+        f"trials have a planting record to anchor on, {cov['planting_and_harvest']} have both "
+        f"planting and harvest, and {cov['in_order']} read in a plausible order (harvest after "
+        "expected flowering). Every other trial-level value has no date at all.",
     ]
+
+
+def phase_table(pm: pd.DataFrame) -> pd.DataFrame:
+    """One row per phase: the evidence columns with their fill, and the gap."""
+    def evidence(g: pd.DataFrame) -> str:
+        return "; ".join(f"{r.column} {r.present}/{r.total}" for r in g.itertuples())
+
+    rows = [{"phase": g["phase"].iloc[0], "stage": g["stage_code"].iloc[0],
+             "when": g["when"].iloc[0], "data (filled / total)": evidence(g),
+             "gap": g["gap"].iloc[0]} for _, g in pm.groupby("order")]
+    return pd.DataFrame(rows)
+
+
+def example_narratives(tl: pd.DataFrame) -> str:
+    """One narrative per verdict, preferring trials whose season can be placed."""
+    items = []
+    for verdict in ["PASS", "HOLD", "FAIL"]:
+        pool = tl[tl["TRIAL_RECOMMENDATION"] == verdict].sort_values(
+            ["no_planting", "no_harvest", "harvest_before_planting", "harvest_before_flowering",
+             "TRIAL_ID"])
+        if len(pool):
+            items.append(f"<li>{escape(str(pool['narrative'].iloc[0]))}</li>")
+    return f'<ul class="findings">{"".join(items)}</ul>'
+
+
+def plant_lifecycle_section(fig: dict[str, Path], tables: dict[str, pd.DataFrame]) -> str:
+    """The season view: phases, what describes them, and each trial placed on a season."""
+    tl, pm = tables["trial_timeline"], tables["lifecycle_phase_map"]
+    cov = lifecycle_coverage(tl)
+    table = table_html(phase_table(pm), ["phase", "stage", "when", "data (filled / total)", "gap"],
+                       set(), wrap={"data (filled / total)", "gap"})
+    return f"""<section id="plant-lifecycle"><div class="section-head">
+<span class="eyebrow">Plant lifecycle</span><h2>A season, phase by phase</h2>
+<p>To say <i>what happened and when</i>, every value is placed on the crop's season: before
+sowing, planting, vegetative growth, flowering, grain fill, harvest and the decision. The files
+never name the crop; the trait ranges fit maize, so maize stage codes are used. Only operations
+carry in-season dates, so each trial's season is counted in days from its first planting, and
+flowering is placed at planting + <code>FLOWERING_DAYS</code>.</p></div>
+{figure(fig["fig11_plant_lifecycle"])}
+{table}
+<p class="note"><b>{cov['placed']} of {cov['trials']} trials can be placed on a season.</b>
+{cov['planting_and_harvest']} have both a planting and a harvest, and {cov['in_order']} of those
+are harvested after expected flowering. The rest are described without dates, and the
+assistant should say so rather than infer them.</p>
+{figure(fig["fig12_trial_timelines"])}
+<div class="section-head"><h3>What the assistant can say, one trial per verdict</h3>
+<p>Generated from the timeline table; every trial has one in
+<code>tables/trial_timeline.csv</code>.</p></div>
+{example_narratives(tl)}
+</section>"""
 
 
 def stage_sections(fig: dict[str, Path]) -> str:
@@ -252,12 +317,12 @@ def stage_sections(fig: dict[str, Path]) -> str:
 
 def write_report(path: Path, figs: list[Path], tables: dict[str, pd.DataFrame],
                  mat: pd.DataFrame, stages: dict[str, dict[str, object]],
-                 snapshot: pd.Timestamp) -> Path:
+                 snapshot: pd.Timestamp, facts: dict[str, object]) -> Path:
     """Render the lifecycle report and return its path."""
     fig = {p.stem: p for p in figs}
     snap_text = f"{snapshot:%d %b %Y %H:%M}"
     checks = tables["chronology_checks"]
-    items = "".join(f"<li>{f}</li>" for f in findings(tables, mat))
+    items = "".join(f"<li>{f}</li>" for f in findings(tables, mat, facts))
     check_table = table_html(checks.assign(share=lambda d: d["share"].map("{:.0%}".format)),
                              ["stage", "rule", "checked", "violations", "share", "example"],
                              {"checked", "violations", "share"})
@@ -275,19 +340,22 @@ def write_report(path: Path, figs: list[Path], tables: dict[str, pd.DataFrame],
   <p>The seven synthetic UC4 files the SME sent on 29 Sep 2026, including the pre-configured
   trial recommendations: which lines, where they were tested, what the recommendation says, the
   rule that reproduces it, and whether the evidence traces back.</p>
-  <div class="facts"><span><b>150</b> lines</span><span><b>72</b> trials</span>
-  <span><b>6</b> sites</span><span><b>2024 to 2026</b></span>
+  <div class="facts"><span><b>{facts["lines"]}</b> lines</span>
+  <span><b>{facts["trials"]}</b> trials</span><span><b>{facts["sites"]}</b> sites</span>
+  <span><b>{facts["years"]}</b></span>
   <span><b>{len(tables["trial_level"])}</b> trial verdicts</span>
   <span>synthetic, read-only</span></div>
-  <nav class="toc"><a href="#sources">Sources</a><a href="#rule">Rule</a><a href="#genomics">Genomics</a>
+  <nav class="toc"><a href="#plant-lifecycle">Season</a><a href="#sources">Sources</a>
+  <a href="#rule">Rule</a><a href="#genomics">Genomics</a>
   <a href="#reconciliation">Reconciliation</a><a href="#lab">Lab</a><a href="#operations">Operations</a>
-  <a href="#checks">Checks</a><a href="#appendix">Appendix</a></nav>
+  <a href="#thresholds">Thresholds</a><a href="#checks">Checks</a><a href="#appendix">Appendix</a></nav>
 </header>
 <p class="note"><b>Inferred, not supplied.</b> The recommendation file states outcomes and a rule
 version, not thresholds. The cut-points on this page are the simplest fixed values that
 reproduce every outcome. Confirm them with the UC4 expert before presenting them as the rule.
 The v1 (kickoff) profile is kept in <code>v1/report_v1.html</code>.</p>
 <section><h2>Key findings</h2><ul class="findings">{items}</ul></section>
+{plant_lifecycle_section(fig, tables)}
 <section id="sources"><div class="section-head"><h2>The sources in this data</h2>
 <p>Seven files, with the record count in each and the key that links it. The badge counts
 consistency rules that fail for that source.</p></div>

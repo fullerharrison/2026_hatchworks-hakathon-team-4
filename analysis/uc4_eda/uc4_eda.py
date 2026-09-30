@@ -14,8 +14,9 @@ import pandas as pd
 import lifecycle_plots
 import plots
 from bin_cases import bins_table, fig_binning, numeric_cases, ordinal_cases
-from lifecycle import chronology_checks, snapshot_date, stage_counts
+from lifecycle import chronology_checks, header_facts, snapshot_date, stage_counts
 from load import TRAITS, find_zip, load_tables, material_table
+from plant_lifecycle import phase_map, trial_timeline
 from report import write_report
 from rules import apply_rule, criteria_flags, genomics_reconciliation, threshold_intervals
 from style import apply_style
@@ -69,6 +70,7 @@ def main() -> None:
     mat = material_table(t)
     rec = t["recommendations"]
     checks = chronology_checks(t)
+    timeline, pm = trial_timeline(t), phase_map(t)
     figs = [
         plots.fig_inventory(t),
         plots.fig_rule_traits(rec),
@@ -79,6 +81,8 @@ def main() -> None:
         plots.fig_reconciliation(t),
         lifecycle_plots.fig_operations_calendar(t),
         lifecycle_plots.fig_checks(checks),
+        lifecycle_plots.fig_plant_lifecycle(pm),
+        lifecycle_plots.fig_trial_timelines(t, timeline),
     ]
     num, cat = numeric_cases(t), ordinal_cases(t)
     figs.append(fig_binning(num, "fig10a_bins_numeric", "Quartile bins: trial-level traits",
@@ -91,6 +95,8 @@ def main() -> None:
     TABLE_DIR.mkdir(exist_ok=True)
     tables = {
         "chronology_checks": checks,
+        "trial_timeline": timeline,
+        "lifecycle_phase_map": pm,
         "trial_level": trial_level(t),
         "rule_intervals": threshold_intervals(rec),
         "genomics_reconciliation": genomics_reconciliation(t),
@@ -103,7 +109,8 @@ def main() -> None:
     }
     for name, df in tables.items():
         df.to_csv(TABLE_DIR / f"{name}.csv", index=False)
-    out = write_report(HERE / "report.html", figs, tables, mat, stage_counts(t), snapshot_date(t))
+    out = write_report(HERE / "report.html", figs, tables, mat, stage_counts(t), snapshot_date(t),
+                       header_facts(t))
     print(f"{len(figs)} figures, {len(tables)} tables -> {out}")
 
 
