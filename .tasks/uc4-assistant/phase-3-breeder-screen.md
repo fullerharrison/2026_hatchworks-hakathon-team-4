@@ -25,15 +25,15 @@ The breeder then records a decision (PASS, HOLD or FAIL) with a required reason.
 
 **Exit criteria (from task.md, made checkable):**
 
-- [ ] An override without a reason is rejected, and nothing is written. Tested by `test_blank_or_short_reason_is_rejected_and_nothing_written` (Task 1) and `test_post_without_reason_is_422_and_log_untouched` (Task 2). It is also rejected in the browser (Task 5).
-- [ ] Each log line keeps the original recommendation (a full copy), the decision, the reason, the user and the timestamp. Tested by `test_record_copies_the_recommendation` (Task 1) and `test_post_then_get_decisions` (Task 2).
-- [ ] The source data and the recommendation never change:
+- [x] An override without a reason is rejected, and nothing is written. Tested by `test_blank_or_short_reason_is_rejected_and_nothing_written` (Task 1) and `test_post_without_reason_is_422_and_log_untouched` (Task 2). It is also rejected in the browser (Task 5): scenario 7 in [phase3_walkthrough.md](../../team/phase3_walkthrough.md), log file absent afterwards.
+- [x] Each log line keeps the original recommendation (a full copy), the decision, the reason, the user and the timestamp. Tested by `test_record_copies_the_recommendation` (Task 1) and `test_post_then_get_decisions` (Task 2). Walkthrough scenario 8 and the log-file evidence in [phase3_walkthrough.md](../../team/phase3_walkthrough.md).
+- [x] The source data and the recommendation never change:
   - `test_store_recommendation_unchanged_by_decisions` (Task 1)
   - `test_earlier_lines_are_never_rewritten` (Task 1)
   - no PUT, PATCH or DELETE routes (`test_no_update_or_delete_routes`, Task 2)
   - the existing `test_zip_unchanged_by_loading`
-- [ ] The screen shows the trial view described in the uc4 README "Suggested minimal screen": colour and reason, the criteria table, the ten lines with genomics and lab, and the "Record decision" action. The Task 5 walkthrough covers every scenario in "Validate the demo", with screenshots in `team/screenshots/phase3_*`.
-- [ ] The offline suite is green: `uv run --project app pytest -q app/tests`.
+- [x] The screen shows the trial view described in the uc4 README "Suggested minimal screen": colour and reason, the criteria table, the ten lines with genomics and lab, and the "Record decision" action. The Task 5 walkthrough covers every scenario in "Validate the demo" (11 of 11 observed, see [phase3_walkthrough.md](../../team/phase3_walkthrough.md)). **Screenshots in `team/screenshots/phase3_*` are still to be taken** (the Chrome window was minimized during the walkthrough), and scenario 11 is verified only for the no-model path until Portkey credentials exist.
+- [x] The offline suite is green: `uv run --project app pytest -q app/tests`. 392 passed, 1 deselected on commit `9aec632` (run with `UC4_ZIP` pinned to the original zip).
 
 ## Decisions (made while planning, 2026-09-30)
 
