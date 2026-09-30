@@ -78,7 +78,7 @@ Full list: [SME_ANSWERS follow-ups][followups].
 | Question | Until answered |
 | --- | --- |
 | Exact cut-points and inclusive bounds | Use `rules.SYNTH_V1`; show the bracket from `rule_intervals.csv` beside each threshold |
-| Resistant % missing from the rationale | Engine explanation, not supplied text, is shown; flag `RATIONALE_OMITS_CRITERION` |
+| Resistant % missing from the rationale | Engine explanation, not supplied text, is shown; `Recommendation.rationale_omits` names the omitted criterion (33 trials); flag `RATIONALE_READS_AS_PASS` where the text says all four met but the verdict is not PASS (4) |
 | Trial vs line as the unit of decision | Score trials; a line view lists its 4-5 trial verdicts without combining them |
 | Which lines make up each trial's aggregates | Flag `AGGREGATE_LINKS_UNVERIFIED` on every trial |
 | Lab trait meanings | Label "Lab trait …xx"; never used in scoring |
