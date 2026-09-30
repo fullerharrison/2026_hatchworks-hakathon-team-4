@@ -163,14 +163,15 @@ def _default_store() -> EvidenceStore:
 server = create_server(_default_store)
 
 
-def configure_logging(path: Path = LOG_PATH) -> logging.Handler:
-    """Send the ``uc4_mcp`` logger to a file (never stdout); returns the handler added."""
+def configure_logging(path: Path = LOG_PATH, name: str = "uc4_mcp") -> logging.Handler:
+    """Send logger ``name`` to a file (never stdout); returns the handler added."""
     path.parent.mkdir(parents=True, exist_ok=True)
     handler = logging.FileHandler(path, encoding="utf-8")
     handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
+    log = logging.getLogger(name)
+    log.addHandler(handler)
+    log.setLevel(logging.INFO)
+    log.propagate = False
     return handler
 
 
