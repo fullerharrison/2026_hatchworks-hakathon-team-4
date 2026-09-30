@@ -5,6 +5,7 @@ import json
 import logging
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import pytest
 from fakes import REF_0037, FakeChat, call, say
@@ -93,6 +94,36 @@ def test_chat_keeps_history(use: None, monkeypatch: pytest.MonkeyPatch,
     assert [m["role"] for m in second_question[1:]] == ["user", "assistant", "user"]
     assert "which one?" in second_question[2]["content"]
     assert "HOLD" in capsys.readouterr().out
+
+
+def test_serve_preloads_the_store_and_names_the_screen(
+        use: None, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    log = tmp_path / "decisions.jsonl"
+    monkeypatch.setenv("UC4_DECISION_LOG", str(log))
+    loaded: list[bool] = []
+    monkeypatch.setattr(cli, "_default_store", lambda: loaded.append(True))
+    started: dict[str, Any] = {}
+
+    def fake_run(app: Any, **kwargs: Any) -> None:
+        started.update(app=app, loaded=list(loaded), **kwargs)
+    monkeypatch.setattr(cli.uvicorn, "run", fake_run)
+    assert run(["serve", "--port", "9123"]) == 0
+    out = capsys.readouterr().out
+    assert f"Breeder screen: http://127.0.0.1:9123/  (decisions: {log})" in out
+    assert started["loaded"] == [True] and started["port"] == 9123
+    assert "/decisions" in {getattr(r, "path", None) for r in started["app"].routes}
+
+
+def test_serve_exits_1_when_the_zip_is_missing(
+        use: None, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    def missing() -> None:
+        raise FileNotFoundError("no archive; set UC4_ZIP")
+    monkeypatch.setattr(cli, "_default_store", missing)
+    monkeypatch.setattr(cli.uvicorn, "run", lambda *a, **k: pytest.fail("server started"))
+    assert run(["serve"]) == 1
+    assert "set UC4_ZIP" in capsys.readouterr().err
 
 
 def test_quiet_sdk_logging() -> None:

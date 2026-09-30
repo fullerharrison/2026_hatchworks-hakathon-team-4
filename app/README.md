@@ -149,3 +149,36 @@ returns the answer JSON (`status`: answered | clarify | unverified | error; `tex
 
 > **Warning:** there is no authentication. Use `--host 0.0.0.0` on a trusted network only:
 > anyone who can reach the port can query the data and spend the Portkey quota.
+
+## Breeder screen
+
+```powershell
+uv run --project app uc4-ask serve            # then open http://127.0.0.1:8766/
+```
+
+The server loads the zip first, so a missing archive exits with code 1 and the message from
+the [Data](#data) section; if `get_started/` holds more than one matching archive, set
+`UC4_ZIP` to the one to use (see [Environment](#environment)). It then prints the screen URL
+and the decision log path.
+
+The screen lists the trials with their verdict and reason. Selecting a trial shows the seven
+criteria with thresholds and brackets, the linked lines, the flags, and the recorded
+decisions, and lets the breeder accept or override the recommendation and ask the agent a
+question about the trial.
+
+Decisions are appended to `app/data/decisions.jsonl` (git-ignored); set `UC4_DECISION_LOG` to
+move it. The log is append-only, and each line copies the recommendation shown at the time, so
+a later rule change never rewrites what the breeder saw. `user` is a demo alias: there is no
+authentication. Only `/ask` needs the Portkey variables; the rest of the screen works
+without them.
+
+| Route | Purpose |
+| --- | --- |
+| `GET /` | the breeder screen; `/static/*` holds its files |
+| `GET /trials` | all trials with verdict and reason |
+| `GET /trials/{query}` | one trial: criteria, linked lines, flags |
+| `GET /lines/{query}` | one line: genomics, lab, its trials |
+| `POST /decisions` | append a decision to the log |
+| `GET /decisions?trial=` | the decisions recorded for a trial |
+| `POST /ask` | the question agent (needs Portkey) |
+| `GET /health` | status, and why the model is not configured |

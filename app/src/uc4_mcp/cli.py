@@ -2,7 +2,7 @@
 
     uc4-ask ask "Why is SYN-TR-0037 amber?" [--json]
     uc4-ask chat                              follow-up questions keep the conversation
-    uc4-ask serve [--host 127.0.0.1] [--port 8766]   POST /ask, GET /health
+    uc4-ask serve [--host 127.0.0.1] [--port 8766]   breeder screen at /, POST /ask, /decisions
     uc4-ask eval [--cases PATH] [--out DIR]   run the supported questions
     uc4-ask ping                           check the Portkey route supports tool calls
 """
@@ -25,11 +25,12 @@ from mcp.server.mcpserver import MCPServer
 from uc4_mcp.agent import AGENT_LOG, Answer, ask, load_agent_settings
 from uc4_mcp.api import create_app
 from uc4_mcp.bridge import open_bridge
+from uc4_mcp.decisions import DecisionLog, log_path
 from uc4_mcp.evals import (CASES_PATH, RESULTS_DIR, CaseResult, load_cases, report,
                            result_stem, run_cases)
 from uc4_mcp.llm import ChatModel, LLMError, PortkeyChat, load_settings, ping
 from uc4_mcp.models import to_json_safe
-from uc4_mcp.server import configure_logging
+from uc4_mcp.server import _default_store, configure_logging
 
 MAX_HISTORY = 10  # messages kept in chat (5 questions and answers)
 server: MCPServer | None = None  # None: the uc4 server over the zip; tests set their own
@@ -107,8 +108,18 @@ def cmd_chat(args: argparse.Namespace) -> int:
 
 
 def cmd_serve(args: argparse.Namespace) -> int:
-    uvicorn.run(create_app(make_model, server, load_agent_settings()),
-                host=args.host, port=args.port, log_level="warning")
+    """Serve the breeder screen and API; a missing zip exits 1 before the port opens."""
+    try:
+        _default_store()
+    except FileNotFoundError as e:
+        sys.stderr.write(f"{e}\n")
+        return 1
+    log = DecisionLog(log_path())
+    print(f"Breeder screen: http://{args.host}:{args.port}/  (decisions: {log.path})",
+          flush=True)
+    app = create_app(make_model, server, load_agent_settings(),
+                     get_store=_default_store, log=log)
+    uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
     return 0
 
 
@@ -147,7 +158,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_ask)
     sub.add_parser("chat", help="interactive; empty line or EOF quits"
                    ).set_defaults(func=cmd_chat)
-    p = sub.add_parser("serve", help="HTTP API: POST /ask, GET /health")
+    p = sub.add_parser("serve", help="HTTP: breeder screen at /, POST /ask, /trials, /decisions")
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--port", type=int, default=8766)
     p.set_defaults(func=cmd_serve)
