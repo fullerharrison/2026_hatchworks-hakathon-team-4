@@ -134,10 +134,6 @@ The tools below are the ones every teammate can use all week: **OpenCode**, **Gi
 [hb4]: ../get_started/2026_Participant_Handbook.pdf#page=4
 [brief]: ../get_started/2026_Use_Case_Briefs.pdf
 [brief5]: ../get_started/2026_Use_Case_Briefs.pdf#page=5
-[ver]: VERIFICATION.md
-[ver-uc1]: VERIFICATION.md#uc1-plant-capacity-utilization
-[ver-uc2]: VERIFICATION.md#uc2-market-intelligence-and-demand-capture
-[ver-uc3]: VERIFICATION.md#uc3-commercial-data-integrity-agent
 [ver-uc4]: VERIFICATION.md#uc4-rd-data-source-unification
 [uc4]: uc4/README.md
 [sme]: ../team/SME_ANSWERS.md
