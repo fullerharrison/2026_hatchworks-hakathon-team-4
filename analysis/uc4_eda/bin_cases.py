@@ -1,7 +1,8 @@
-"""Quantile-binning cases for UC4 v2: trial-level numeric traits and ordinal columns.
+"""Quantile-binning cases for UC4: trial-level numeric traits and ordinal columns.
 
-v2 germplasm has no nominal attributes left (origin, generation, kernel type...), so
-the v1 target-encoded nominal cases are gone.
+v3 germplasm has nominal attributes again (generation, stage...), but the v1
+target-encoded nominal cases are not restored: the trial verdict they were encoded
+against does not follow the line (see ``rules.decision_by_verdict``).
 """
 
 from __future__ import annotations

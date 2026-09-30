@@ -1,4 +1,7 @@
-"""Descriptive and rule figures for the seven UC4 v2 tables (figures 1 to 7)."""
+"""Descriptive and rule figures for the seven UC4 tables (figures 1 to 7).
+
+Genomics and reconciliation figures expect ``load.align``-ed tables.
+"""
 
 from __future__ import annotations
 
@@ -11,7 +14,7 @@ from matplotlib.axes import Axes
 from matplotlib.patches import Patch
 
 from load import MARKERS, RECOMMENDATIONS, TRAITS, lab_trait_label
-from rules import SYNTH_V1, criteria_flags, genomics_reconciliation
+from rules import SYNTH_V1, apply_rule, criteria_flags, genomics_reconciliation
 from style import (
     BLUE, INK, INK_2, MUTED, NEUTRAL, REC_COLORS, SERIES, SURFACE, grid, headline, save,
     subtitle,
@@ -89,8 +92,8 @@ def fig_inventory(t: dict[str, pd.DataFrame]) -> Path:
     wide = tab.loc[["germplasm", "trial"]]
     dead = int(wide[["Constant", "All null"]].to_numpy().sum())
     top = headline(fig, f"Seven synthetic CSVs, {rows.sum():,} rows",
-                   f"Germplasm and trial keep their wide v1 headers, but {dead} of their "
-                   f"{int(wide.to_numpy().sum())} columns are now empty or constant.")
+                   f"Germplasm and trial keep their wide headers; {dead} of their "
+                   f"{int(wide.to_numpy().sum())} columns are still empty or constant.")
     fig.tight_layout(rect=(0, 0, 1, top))
     return save(fig, "fig01_inventory")
 
@@ -127,9 +130,10 @@ def fig_rule_traits(rec: pd.DataFrame) -> Path:
     grid(last)
     fig.legend(handles=[Patch(color=REC_COLORS[r], label=r.title()) for r in RECOMMENDATIONS],
                loc="upper right", ncol=3, bbox_to_anchor=(0.99, 0.99))
+    agree = int((apply_rule(rec) == rec["TRIAL_RECOMMENDATION"]).sum())
     top = headline(fig, "The SME's trial recommendations and the thresholds that reproduce them",
                    "One dot per trial. Dashed lines are the inferred fixed cut-points; together "
-                   "they reproduce all 72 supplied PASS / HOLD / FAIL outcomes.")
+                   f"they reproduce {agree} of {len(rec)} supplied PASS / HOLD / FAIL outcomes.")
     fig.tight_layout(rect=(0, 0, 1, top), h_pad=2.5)
     return save(fig, "fig02_rule_traits")
 
@@ -168,9 +172,13 @@ CATEGORICALS: list[tuple[str, str, str]] = [
     ("trial", "START_YEAR", "Trial start year"),
     ("trial", "STATUS_LID", "Trial status"),
     ("recommendations", "TRIAL_RECOMMENDATION", "Supplied recommendation"),
+    ("germplasm", "ADVANCEMENT_DECISION", "Line advancement decision"),
+    ("germplasm", "STAGE_CODE_LID", "Breeding stage"),
+    ("germplasm", "GENERATION_CODE", "Generation"),
+    ("germplasm", "STATUS_LID", "Material status"),
+    ("observation", "QUALITY_FLAG_LID", "Plot quality flag"),
     ("observation", "REPLICATION_NO", "Replication label"),
     ("operations", "OPERATION_STATUS_LID", "Operation status"),
-    ("germplasm", "STATUS_LID", "Material status"),
 ]
 
 
@@ -195,14 +203,18 @@ def ops_panel(ax: Axes, ops: pd.DataFrame) -> None:
 
 
 def fig_categoricals(t: dict[str, pd.DataFrame]) -> Path:
-    fig, axes = plt.subplots(3, 4, figsize=(13, 8.8))
+    rows = -(-(len(CATEGORICALS) + 1) // 4)
+    fig, axes = plt.subplots(rows, 4, figsize=(13, 2.95 * rows))
     for ax, (table, col, title) in zip(axes.flat, CATEGORICALS):
         hbar(ax, level_counts(t[table][col]), title)
         subtitle(ax, f"{table} · {col}")
+    for ax in axes.flat[len(CATEGORICALS):-1]:
+        ax.set_axis_off()
     ops_panel(axes.flat[-1], t["operations"])
+    single = [title for table, col, title in CATEGORICALS if t[table][col].nunique() == 1]
     top = headline(fig, "Categorical make-up",
-                   "Genomic markers have three levels each; QC, trial status and material "
-                   "status hold a single value. Grey = missing.")
+                   "Genomic markers have three levels each; single-valued: "
+                   f"{', '.join(single).lower() or 'none'}. Grey = missing.")
     fig.tight_layout(rect=(0, 0, 1, top), h_pad=2.2, w_pad=2)
     return save(fig, "fig04_categoricals")
 
@@ -211,20 +223,31 @@ def fig_lab(t: dict[str, pd.DataFrame]) -> Path:
     lab = t["lab"].assign(TRAIT=lambda d: d["TRAIT_GUID"].map(lab_trait_label))
     traits = sorted(lab["TRAIT"].unique())
     fig, axes = plt.subplots(1, len(traits), figsize=(13, 4))
+    n_numeric = 0
     for ax, trait in zip(axes, traits):
         d = lab[lab["TRAIT"] == trait]
         nums = d["NUMBER_VALUE"].dropna()
-        ax.hist(nums, bins=np.arange(0, 21, 1.5), color=BLUE, edgecolor=SURFACE, linewidth=1.2)
+        if nums.empty:
+            # A categorical lab trait: its calls live in ALPHA_VALUE.
+            hbar(ax, level_counts(d["ALPHA_VALUE"]), trait)
+            subtitle(ax, f"{len(d)} rows, {d['MATERIAL_GUID'].nunique()} materials · ALPHA_VALUE")
+            continue
+        n_numeric += 1
+        # Per-trait bins: v3 traits sit on very different scales (about 1 to 300).
+        ax.hist(nums, bins=14, color=BLUE, edgecolor=SURFACE, linewidth=1.2)
         ax.axvline(nums.median(), color=INK, linewidth=0.9)
         ax.set_xlabel("NUMBER_VALUE (unit not supplied)")
         ax.set_title(trait)
         subtitle(ax, f"{len(d)} rows, {d['MATERIAL_GUID'].nunique()} materials · "
                      f"median {nums.median():.3g}")
         grid(ax)
+    n_alpha = len(traits) - n_numeric
     top = headline(fig, "Lab results by TRAIT_GUID",
-                   f"Four unnamed numeric traits, each spread evenly over {lab['NUMBER_VALUE'].min():.0f}"
-                   f" to {lab['NUMBER_VALUE'].max():.0f}. No trait dictionary, units or dates ship "
-                   "with the data, and the rule does not use them.")
+                   f"{n_numeric} unnamed numeric traits on different scales "
+                   f"({lab['NUMBER_VALUE'].min():.0f} to {lab['NUMBER_VALUE'].max():.0f})"
+                   + (f" and {n_alpha} categorical" if n_alpha else "")
+                   + f", on {lab['MATERIAL_GUID'].nunique()} lines. Results are dated, but no trait "
+                   "dictionary or units ship, and the rule does not use them.")
     fig.tight_layout(rect=(0, 0, 1, top))
     return save(fig, "fig05_lab")
 
@@ -252,9 +275,11 @@ def fig_genomics(t: dict[str, pd.DataFrame]) -> Path:
     ax.set_title("GBV by disease-resistance marker")
     subtitle(ax, "one dot per line, bar = median")
     grid(ax)
-    top = headline(fig, "Genomics: one sample per line, all QC PASS",
-                   "New in v2. The trial file's GBV mean and resistant share are built from these "
-                   "values, but not from the lines the observations link to (figure 7).")
+    qc = "/".join(gen["QC_STATUS_LID"].unique())
+    top = headline(fig, f"Genomics: one sample per line, QC {qc}",
+                   "Joined to lines by GUID position only: its MATERIAL_GUIDs are not in "
+                   "germplasm. The trial file's GBV mean and resistant share do not follow the "
+                   "lines observed in each trial (figure 7).")
     fig.tight_layout(rect=(0, 0, 1, top), w_pad=2.5)
     return save(fig, "fig06_genomics")
 
@@ -280,8 +305,11 @@ def fig_reconciliation(t: dict[str, pd.DataFrame]) -> Path:
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(12, 5.2))
     recon_panel(a1, recon, "GENOMIC_BREEDING_VALUE_MEAN", "gbv", "GBV mean per trial")
     recon_panel(a2, recon, "RESISTANT_MATERIAL_PCT", "resistant", "Resistant materials per trial (%)")
+    n = len(recon)
+    obs_gbv, blk_gbv = int(recon["gbv_match_observation"].sum()), int(recon["gbv_match_block"].sum())
     top = headline(fig, "Trial aggregates do not come from the materials linked to the trial",
-                   "Grey line = perfect agreement. Observation links reproduce no GBV mean; the "
-                   "'block' mapping (trial k ↔ lines of block (k−1) mod 15) reproduces all 72.")
+                   f"Grey line = perfect agreement. Observation links reproduce {obs_gbv} of {n} "
+                   f"GBV means; the v2 'block' mapping (trial k ↔ lines of block (k−1) mod 15) "
+                   f"now reproduces {blk_gbv}.")
     fig.tight_layout(rect=(0, 0, 1, top), w_pad=3)
     return save(fig, "fig07_reconciliation")

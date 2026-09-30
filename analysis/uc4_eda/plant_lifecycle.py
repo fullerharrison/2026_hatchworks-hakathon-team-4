@@ -1,13 +1,15 @@
-"""The v2 record placed on a crop season: which growth phase each value describes, and when.
+"""The v3 record placed on a crop season: which growth phase each value describes, and when.
 
-The files never name the crop (``CROP_GUID`` is empty). Yield in t/ha, plant height of
-1.5 to 3 m, 50 to 90 days to flowering and grain moisture at harvest fit maize, so the
-phases use maize growth-stage codes (VE, V, VT/R1, R2-R6). Treat that as an assumption.
+The files never name the crop (``CROP_GUID`` is one unnamed GUID). Yield in t/ha, plant
+height of 1.5 to 3 m, 45 to 95 days to flowering and grain moisture at harvest fit maize,
+so the phases use maize growth-stage codes (VE, V, VT/R1, R2-R6). Treat that as an
+assumption.
 
-Only the operations carry in-season dates, so each trial's season is anchored on its
-first PLANTING and expressed in days after planting (DAP). Flowering is then placed at
-planting + ``FLOWERING_DAYS``. A trial with no planting record cannot be placed, and
-nothing is guessed for it.
+Each trial's season is anchored on its first PLANTING operation and expressed in days
+after planting (DAP), as in v2, so the two versions stay comparable. Flowering is then
+placed at planting + ``FLOWERING_DAYS``. A trial with no planting record cannot be
+placed, and nothing is guessed for it. v3 plot observations and ``BEGIN_DATE`` are
+dated too; ``lifecycle.chronology_checks`` tests them against the trial year.
 """
 
 from __future__ import annotations
@@ -28,11 +30,16 @@ IN_SEASON = ["vegetative", "flowering", "grain_fill"]
 
 @dataclass(frozen=True)
 class Evidence:
-    """One column that describes a phase; ``op_type`` restricts operations to one type."""
+    """One column that describes a phase.
+
+    ``op_type`` restricts operations to one type; ``trait`` restricts observations to
+    one TRAIT_CODE. Both count trials with at least one such record.
+    """
 
     table: str
     column: str
     op_type: str | None = None
+    trait: str | None = None
 
 
 @dataclass(frozen=True)
@@ -54,45 +61,56 @@ MARKER_COLS = ["MARKER_DISEASE_RESISTANCE", "MARKER_YIELD_POTENTIAL",
 PHASES: list[Phase] = [
     Phase("pre_season", "Line and genotype", "before sowing", "before planting",
           "The line exists, is genotyped, and has lab tests on its seed or tissue.",
-          (Evidence("germplasm", "MATERIAL_ID"), Evidence("genomics", "GENOTYPING_DATE"),
+          (Evidence("germplasm", "MATERIAL_ID"), Evidence("germplasm", "PEDIGREE"),
+           Evidence("germplasm", "STAGE_CODE_LID"), Evidence("genomics", "GENOTYPING_DATE"),
            Evidence("genomics", "GENOMIC_BREEDING_VALUE"), Evidence("lab", "NUMBER_VALUE"),
            Evidence("lab", "OBSERVATION_DATE")),
-          "Lab results have no date or trait name; germplasm has no stage or pedigree."),
+          "Pedigree and lab dates are new in v3, but lab traits are still unnamed and "
+          "genomics joins lines only by GUID position."),
     Phase("planting", "Planting and emergence", "VE", "day 0",
           "Seed goes in; seedlings emerge within about a week.",
           (Evidence("operations", "OPERATION_DATE", "PLANTING"), Evidence("trial", "START_YEAR"),
            Evidence("trial", "BEGIN_DATE")),
-          "Trial BEGIN_DATE is empty. Planting dates are all 2026, whatever the trial year."),
+          "BEGIN_DATE is new in v3 and matches the start year; most operations do not."),
     Phase("vegetative", "Vegetative growth", "V1 to Vn", "day 0 to flowering - 14",
           "Leaves and stalk build up; the plant reaches its final height before tasselling.",
           (Evidence("recommendations", "PLANT_HEIGHT_CM"),
+           Evidence("observation", "OBSERVATION_VALUE", trait="PLANT_HEIGHT_CM"),
            Evidence("operations", "OPERATION_DATE", "IRRIGATION"),
            Evidence("genomics", "MARKER_DROUGHT_TOLERANCE")),
-          "Height is one trial mean with no measurement date."),
+          "Plot heights are dated but few per trial, and do not average to the trial value."),
     Phase("flowering", "Flowering", "VT / R1", "flowering ± 14 days",
           "Tassel and silks emerge and pollination sets kernel number. Water stress here "
           "costs the most yield.",
-          (Evidence("recommendations", "FLOWERING_DAYS"), Evidence("genomics", "MARKER_MATURITY"),
+          (Evidence("recommendations", "FLOWERING_DAYS"),
+           Evidence("observation", "OBSERVATION_VALUE", trait="FLOWERING_DAYS"),
+           Evidence("genomics", "MARKER_MATURITY"),
            Evidence("operations", "OPERATION_DATE", "IRRIGATION")),
           "Flowering is a day count, not a date: it can only be placed where planting is recorded."),
     Phase("grain_fill", "Grain fill to maturity", "R2 to R6", "flowering + 14 to harvest",
           "Kernels fill and dry down to physiological maturity; disease now cuts grain fill.",
           (Evidence("recommendations", "DISEASE_SCORE"),
+           Evidence("observation", "OBSERVATION_VALUE", trait="DISEASE_SCORE"),
            Evidence("genomics", "MARKER_DISEASE_RESISTANCE"),
            Evidence("operations", "OPERATION_DATE", "IRRIGATION")),
-          "Disease score is one trial value with no scoring date."),
+          "Plot disease scores do not average to the trial's score."),
     Phase("harvest", "Harvest", "harvest", "harvest operation",
           "Grain is harvested and weighed; moisture is measured at harvest.",
           (Evidence("operations", "OPERATION_DATE", "HARVEST"),
            Evidence("recommendations", "YIELD_T_HA"), Evidence("recommendations", "MOISTURE_PCT"),
+           Evidence("observation", "OBSERVATION_VALUE", trait="YIELD_T_HA"),
+           Evidence("observation", "OBSERVATION_VALUE", trait="MOISTURE_PCT"),
            Evidence("genomics", "MARKER_YIELD_POTENTIAL")),
           "Some harvests are dated before the trial's planting or expected flowering."),
     Phase("decision", "Recommendation", "decision", "after harvest",
-          "Trial values run through the SYNTH_V1 rule to a PASS, HOLD or FAIL.",
+          "Trial values run through the SYNTH_V1 rule to a PASS, HOLD or FAIL; each line "
+          "carries its own advancement decision.",
           (Evidence("recommendations", "TRIAL_RECOMMENDATION"),
            Evidence("recommendations", "RECOMMENDATION_RATIONALE"),
-           Evidence("recommendations", "RULE_VERSION")),
-          "No decision date; the rationale never mentions the resistant-material criterion."),
+           Evidence("recommendations", "RULE_VERSION"),
+           Evidence("germplasm", "ADVANCEMENT_DECISION")),
+          "No decision date; the rationale omits the resistant-material criterion, and no "
+          "rule links a line's decision to its trials' verdicts."),
 ]
 PHASE_NAMES = {p.key: p.name for p in PHASES}
 
@@ -100,9 +118,10 @@ PHASE_NAMES = {p.key: p.name for p in PHASES}
 def _coverage(t: dict[str, pd.DataFrame], e: Evidence) -> tuple[int, int, str]:
     """(present, total, unit) for one evidence column; op types count trials with that op."""
     df = t[e.table]
-    if e.op_type:
-        trials = cast(pd.Series, df.loc[df["OPERATION_TYPE_LID"] == e.op_type, "TRIAL_GUID"])
-        return trials.nunique(), len(t["trial"]), "trials"
+    if e.op_type or e.trait:
+        key, val = ("OPERATION_TYPE_LID", e.op_type) if e.op_type else ("TRAIT_CODE", e.trait)
+        rows = df[(df[key] == val) & df[e.column].notna()]
+        return cast(pd.Series, rows["TRIAL_GUID"]).nunique(), len(t["trial"]), "trials"
     return int(cast(pd.Series, df[e.column]).notna().sum()), len(df), "rows"
 
 
@@ -112,7 +131,8 @@ def phase_map(t: dict[str, pd.DataFrame]) -> pd.DataFrame:
     for i, p in enumerate(PHASES):
         for e in p.evidence:
             present, total, unit = _coverage(t, e)
-            label = f"{e.column} ({e.op_type.lower()})" if e.op_type else e.column
+            tag = e.op_type or e.trait
+            label = f"{e.column} ({tag.lower()})" if tag else e.column
             rows.append({"order": i, "phase": p.name, "stage_code": p.code, "when": p.window,
                          "source": e.table, "column": label, "present": present,
                          "total": total, "unit": unit, "gap": p.gap})

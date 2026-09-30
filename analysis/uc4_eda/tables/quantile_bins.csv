@@ -11,5 +11,5 @@ genomics,MARKER_YIELD_POTENTIAL,ordinal rank,150,0,1.0,1.0,2.0,3.0,3.0,2,True,81
 genomics,MARKER_DROUGHT_TOLERANCE,ordinal rank,150,0,1.0,2.0,2.5,3.0,3.0,2,True,75/0/75,UNFAVOURABLE->Q1; NEUTRAL->Q1; FAVOURABLE->Q3
 genomics,MARKER_MATURITY,ordinal rank,150,0,1.0,1.0,2.0,2.0,3.0,2,True,118/32,EARLY->Q1; MID->Q1; LATE->Q2
 recommendations,TRIAL_RECOMMENDATION,ordinal rank,72,0,1.0,1.0,2.0,2.0,3.0,2,True,65/7,FAIL->Q1; HOLD->Q1; PASS->Q2
-trial,START_YEAR,ordinal rank,72,0,1.0,1.0,2.0,3.0,3.0,2,True,48/24,2024->Q1; 2025->Q1; 2026->Q2
-operations,OPERATION_STATUS_LID,ordinal rank,216,0,1.0,1.0,1.0,2.0,2.0,1,True,216,PLANNED->Q1; COMPLETED->Q1
+trial,START_YEAR,ordinal rank,72,0,1.0,1.0,2.0,3.0,3.0,2,True,49/23,2024->Q1; 2025->Q1; 2026->Q2
+operations,OPERATION_STATUS_LID,ordinal rank,216,0,1.0,1.0,2.0,2.0,2.0,1,True,216,PLANNED->Q1; COMPLETED->Q1

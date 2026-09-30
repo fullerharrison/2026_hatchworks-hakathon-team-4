@@ -1,4 +1,7 @@
-"""Self-contained HTML report (figures embedded as base64) for the UC4 v2 archive."""
+"""Self-contained HTML report (figures embedded as base64) for the UC4 v3 archive.
+
+Every number in the prose is read from the generated tables, never typed in.
+"""
 
 from __future__ import annotations
 
@@ -21,9 +24,17 @@ CAPTIONS: dict[str, tuple[str, str]] = {
                          "knockout sent each FAIL trial there."),
     "fig04_categoricals": ("Categoricals", "Level counts for every categorical column the breeder "
                            "assistant might filter or group on."),
-    "fig05_lab": ("Lab results", "The four lab TRAIT_GUIDs. Names, units and dates are not supplied."),
+    "fig05_lab": ("Lab results", "The four lab TRAIT_GUIDs; one is categorical (ALPHA_VALUE). "
+                  "Names and units are not supplied."),
     "fig06_genomics": ("Genomics", "Breeding value, genotyping QC and the disease-resistance "
-                       "marker for the 150 lines."),
+                       "marker for the 150 genotyped lines, joined to lines by GUID position."),
+    "fig13_links": ("Recorded links", "Every key one file uses to point at another, and how many "
+                    "of its values the target file holds. Full list: tables/link_rates.csv."),
+    "fig14_field_traits": ("Plot values", "The five field traits measured per plot, split by "
+                           "quality flag."),
+    "fig15_field_reconciliation": ("Plots vs trial values", "Each trial's supplied trait value "
+                                   "against the mean of its own plots. Full list: "
+                                   "tables/field_reconciliation.csv."),
     "fig07_reconciliation": ("Reconciliation", "Trial genomics aggregates as supplied vs recomputed "
                              "from the lines each mapping assigns to the trial. Full list: "
                              "tables/genomics_reconciliation.csv."),
@@ -44,13 +55,13 @@ CAPTIONS: dict[str, tuple[str, str]] = {
 
 # Source map: (key in stage_counts, card title, join key, consistency-check stage).
 STAGES: list[tuple[str, str, str, str | None]] = [
-    ("germplasm", "Breeding lines", "MATERIAL_GUID", None),
-    ("genomics", "Genomics", "MATERIAL_GUID (one sample per line)", "Record keeping"),
+    ("germplasm", "Breeding lines", "MATERIAL_GUID; parents by MATERIAL_GUID", None),
+    ("genomics", "Genomics", "MATERIAL_GUID from v2: joins by GUID position only", "Links"),
     ("lab", "Lab tests", "MATERIAL_GUID only (no trial key)", None),
     ("trials", "Field trials", "TRIAL_GUID", None),
-    ("observations", "Trial-line links", "ATTACHED_TO_FIELD_ENTITY_ID + GID", "Links"),
+    ("observations", "Plot observations", "TRIAL_GUID + MATERIAL_GUID", "Observations"),
     ("operations", "Field operations", "TRIAL_GUID + MATERIAL_GUID", "Operations"),
-    ("recommendations", "Trial recommendation", "TRIAL_GUID (one verdict per trial)",
+    ("recommendations", "Trial recommendation", "TRIAL_ID only (its GUIDs are from v2)",
      "Recommendation"),
 ]
 
@@ -195,42 +206,82 @@ def lifecycle_map(stages: dict[str, dict[str, object]], checks: pd.DataFrame) ->
     return f'<ol class="map">{"".join(cards)}</ol>'
 
 
+def _check(tables: dict[str, pd.DataFrame], rule: str) -> pd.Series:
+    return tables["chronology_checks"].set_index("rule").loc[rule]
+
+
+def _of(row: pd.Series) -> str:
+    """``violations/checked`` for one check row."""
+    return f"{int(row['violations'])}/{int(row['checked'])}"
+
+
+def _link(tables: dict[str, pd.DataFrame], label: str) -> str:
+    r = tables["link_rates"].set_index("link").loc[label]
+    return f"{int(r['resolved'])}/{int(r['distinct'])}"
+
+
+def _carried(tables: dict[str, pd.DataFrame]) -> list[str]:
+    """Files whose content is unchanged from the previous archive."""
+    d = tables["version_diff"]
+    return d.loc[d["identical"].astype(bool), "file"].tolist()
+
+
+def _decision_shares(tables: dict[str, pd.DataFrame]) -> dict[str, float]:
+    d = tables["decision_by_verdict"].set_index("TRIAL_RECOMMENDATION")["advance_share"]
+    return {k: float(v) for k, v in d.items()}
+
+
 def findings(tables: dict[str, pd.DataFrame], mat: pd.DataFrame,
              facts: dict[str, object]) -> list[str]:
-    checks = tables["chronology_checks"].set_index("rule")
     cov = lifecycle_coverage(tables["trial_timeline"])
     trials = tables["trial_level"]
     counts = trials["TRIAL_RECOMMENDATION"].value_counts()
-    mismatch = int(checks.loc["Supplied recommendation differs from the inferred rule", "violations"])
-    hidden = checks.loc["Rationale reports all four criteria met, yet not PASS"]
-    gbv = checks.loc["Trial GBV mean differs from its observation-linked materials"]
-    year = checks.loc["Operation dated outside its trial's start year"]
+    match = _check(tables, "Supplied recommendation differs from the inferred rule")
+    hidden = _check(tables, "Rationale reports all four criteria met, yet not PASS")
+    gbv = _check(tables, "Trial GBV mean differs from its observation-linked materials")
+    field = _check(tables, "Trial trait value differs from the mean of its plots")
+    status = _check(tables, "Trial has a verdict but is not COMPLETE in the trial file")
+    planned = _check(tables, "Plot observation on a trial still PLANNED")
+    obs_year = _check(tables, "Plot observation dated outside its trial's start year")
+    op_year = _check(tables, "Operation dated outside its trial's start year")
+    recon = tables["genomics_reconciliation"]
+    carried = " and ".join(f"<code>{c}</code>" for c in _carried(tables)) or "none"
+    decisions = mat["ADVANCEMENT_DECISION"].value_counts()
+    share = _decision_shares(tables)
+    links = tables["link_rates"]
     return [
-        f"<b>The scoring logic now ships as outcomes, not thresholds.</b> "
-        f"<code>trial_recommendations_synthetic.csv</code> gives one verdict per trial (PASS "
-        f"{counts.get('PASS', 0)}, HOLD {counts.get('HOLD', 0)}, FAIL {counts.get('FAIL', 0)}) "
-        "with a text rationale and <code>RULE_VERSION = SYNTH_V1</code>, but no cut-points.",
-        f"<b>Fixed thresholds reproduce every verdict</b> ({len(trials) - mismatch} of "
-        f"{len(trials)}): FAIL if yield &lt; 7 t/ha or disease &gt; 7; PASS if yield ≥ 9, "
-        "moisture ≤ 22%, disease ≤ 5, GBV mean ≥ ~102 and resistant materials ≥ 50%; otherwise "
-        "HOLD. The comparison basis is a fixed target, not a check variety or trial mean.",
+        f"<b>Two files were resent unchanged.</b> {carried} are identical to the v2 files, so "
+        "they still carry v2 keys. The other five were regenerated and share no GUID with v2. "
+        f"Genomics lines resolve {_link(tables, 'Genomics → line')} and recommendation trial GUIDs "
+        f"{_link(tables, 'Recommendation → trial (GUID)')}; "
+        f"{int((links['share'] == 1).sum())} of {len(links)} recorded links resolve fully.",
+        f"<b>The inferred rule still reproduces every verdict</b> "
+        f"({int(match['checked'] - match['violations'])} of {int(match['checked'])}), as it must "
+        f"with an unchanged file: PASS {counts.get('PASS', 0)}, HOLD {counts.get('HOLD', 0)}, "
+        f"FAIL {counts.get('FAIL', 0)}. FAIL if yield &lt; 7 t/ha or disease &gt; 7; PASS if "
+        "yield ≥ 9, moisture ≤ 22%, disease ≤ 5, GBV mean ≥ ~102 and resistant materials ≥ 50%; "
+        "otherwise HOLD.",
         f"<b>The rationale text hides one criterion.</b> {int(hidden['violations'])} of "
         f"{int(hidden['checked'])} trials whose rationale says all four criteria are met are HOLD, "
         "held back by the resistant-material share the text never mentions.",
-        f"<b>The grain changed from line to trial.</b> Observations now carry no values: they only "
-        f"link {mat['n_trials'].min()} to {mat['n_trials'].max()} trials to each line. The "
-        "pedigree, breeding stage and <code>ADVANCEMENT_DECISION</code> of v1 are gone.",
-        f"<b>Trial aggregates do not follow the recorded links.</b> The GBV mean differs from the "
-        f"observation-linked lines in {int(gbv['violations'])} of {int(gbv['checked'])} trials; "
-        "a block-of-10 mapping by line ID reproduces all of them.",
-        f"<b>Operations ignore the trial calendar.</b> {int(year['violations'])} of "
-        f"{int(year['checked'])} operations fall outside their trial's start year; all are dated "
-        f"{facts['operation_months']}. Lab results (all {facts['lines']} lines) have no dates or "
-        "trait names.",
-        f"<b>Most trials cannot be told as a season.</b> Only {cov['placed']} of {cov['trials']} "
-        f"trials have a planting record to anchor on, {cov['planting_and_harvest']} have both "
-        f"planting and harvest, and {cov['in_order']} read in a plausible order (harvest after "
-        "expected flowering). Every other trial-level value has no date at all.",
+        f"<b>Plots now carry values, but not the trials' values.</b> {_of(field)} trial × trait "
+        "pairs differ from the mean of the trial's own plots, with or without non-accepted plots. "
+        "The trial values were computed before these plots existed.",
+        f"<b>Genomic aggregates do not follow the observed lines either.</b> The GBV mean differs "
+        f"from the lines observed in the trial in {_of(gbv)} trials (joined by GUID position). "
+        f"The v2 block-of-10 mapping now reproduces {int(recon['gbv_match_block'].sum())}.",
+        f"<b>Lines carry their own decision again.</b> Pedigree, breeding stage and "
+        f"<code>ADVANCEMENT_DECISION</code> are back (ADVANCE {decisions.get('ADVANCE', 0)}, HOLD "
+        f"{decisions.get('HOLD', 0)}, DISCARD {decisions.get('DISCARD', 0)}). ADVANCE lines make "
+        f"up {share.get('PASS', 0):.0%} of lines in PASS trials and {share.get('FAIL', 0):.0%} in "
+        "FAIL trials: the line decision does not follow the trial verdict.",
+        f"<b>Trial status contradicts the verdicts.</b> {_of(status)} trials with a verdict are "
+        f"not COMPLETE in the trial file, and {_of(planned)} plot values sit on trials still "
+        "PLANNED.",
+        f"<b>Plots follow the calendar; operations do not.</b> {_of(obs_year)} plot values fall "
+        f"outside their trial's start year, against {_of(op_year)} operations (dated "
+        f"{facts['operation_months']}). Only {cov['placed']} of {cov['trials']} trials have a "
+        f"planting operation to anchor a season, and {cov['in_order']} read in a plausible order.",
     ]
 
 
@@ -239,13 +290,19 @@ def meeting_briefing(tables: dict[str, pd.DataFrame],
     """Introduce the synthetic archive for newcomers and expose its audit trail."""
     trials = tables["trial_level"].set_index("TRIAL_ID")
     counts = trials["TRIAL_RECOMMENDATION"].value_counts()
-    checks = tables["chronology_checks"].set_index("rule")
-    gbv = checks.loc["Trial GBV mean differs from its observation-linked materials"]
-    resistant = checks.loc["Trial resistant % differs from its observation-linked materials"]
-    operations = checks.loc["Operation dated outside its trial's start year"]
-    links = checks.loc["Operation's trial + material not linked in observations"]
-    hidden = checks.loc["Rationale reports all four criteria met, yet not PASS"]
-    match = checks.loc["Supplied recommendation differs from the inferred rule"]
+    gbv = _check(tables, "Trial GBV mean differs from its observation-linked materials")
+    resistant = _check(tables, "Trial resistant % differs from its observation-linked materials")
+    field = _check(tables, "Trial trait value differs from the mean of its plots")
+    operations = _check(tables, "Operation dated outside its trial's start year")
+    obs_year = _check(tables, "Plot observation dated outside its trial's start year")
+    op_links = _check(tables, "Operation's trial + material not linked in observations")
+    hidden = _check(tables, "Rationale reports all four criteria met, yet not PASS")
+    match = _check(tables, "Supplied recommendation differs from the inferred rule")
+    status = _check(tables, "Trial has a verdict but is not COMPLETE in the trial file")
+    no_lab = _check(tables, "Line with no lab result")
+    carried = " and ".join(_carried(tables)) or "none"
+    links = tables["link_rates"]
+    share = _decision_shares(tables)
     passing = trials.loc["SYN-TR-0003"]
     holding = trials.loc["SYN-TR-0037"]
     failing = trials.loc["SYN-TR-0001"]
@@ -253,14 +310,19 @@ def meeting_briefing(tables: dict[str, pd.DataFrame],
   <span class="eyebrow">Start here · plain language</span><h2>What is in this data?</h2>
   <p>This is a synthetic snapshot, not results from live breeding systems. A <b>line</b> is a
   candidate plant material; a <b>trial</b> tests a group of lines at one site. The supplied
-  PASS / HOLD / FAIL label describes a <b>trial</b>, not a final decision about any line.</p></div>
+  PASS / HOLD / FAIL label describes a <b>trial</b>; each line now also carries its own
+  advancement decision.</p></div>
   <ul class="findings">
   <li><b>What we have.</b> Seven files describe {stages['germplasm']['n']} lines,
-  {stages['trials']['n']} trials, {stages['observations']['n']} trial-line links,
+  {stages['trials']['n']} trials, {stages['observations']['n']} plot values,
   {stages['genomics']['n']} genomic records, {stages['lab']['n']} lab results and
   {stages['operations']['n']} field operations. Each trial has one of
   {counts.get('PASS', 0)} PASS, {counts.get('HOLD', 0)} HOLD or {counts.get('FAIL', 0)} FAIL
   recommendations. <a href="#sources">Explore the sources</a>.</li>
+  <li><b>What changed on 30 Sep.</b> The SME re-linked lines, trials, plots and operations, and
+  added pedigree, breeding stage, line decisions and per-plot measurements. Two files
+  ({carried}) were resent unchanged from 29 Sep, so they do not connect by key to the rest.
+  <a href="#changes">See what changed</a>.</li>
   <li><b>What a verdict means.</b> {passing.name} is PASS (yield {passing['YIELD_T_HA']:g} t/ha,
   disease {passing['DISEASE_SCORE']:g}); {holding.name} is HOLD despite favourable wording.
   Its trial record reports {holding['RESISTANT_MATERIAL_PCT']:g}% resistant materials, below
@@ -268,10 +330,10 @@ def meeting_briefing(tables: dict[str, pd.DataFrame],
   {failing.name} is FAIL with disease {failing['DISEASE_SCORE']:g}. The cut-points used to
   explain these labels are <b>inferred from the outcomes</b>, not a supplied scoring policy.
   <a href="#rule">See the rule</a>.</li>
-  <li><b>What we cannot conclude.</b> The files give no yield or disease measurement for an
-  individual line, no names or units for the lab traits, and no reliable trial chronology.
-  The trial's genomic summary also does not match the lines linked to it. We cannot use a
-  trial verdict as a line advancement decision. <a href="#expert">Review the evidence limits</a>.</li>
+  <li><b>What we cannot conclude.</b> A trial's yield or disease value is not the average of
+  its own plots, its genomic summary does not match its lines, and a line's advancement
+  decision does not follow its trials' verdicts. Until the SME explains how these relate, a
+  trial verdict cannot justify a line decision. <a href="#expert">Review the evidence limits</a>.</li>
   </ul></section>
   <section id="expert"><div class="section-head">
   <span class="eyebrow">For technical readers · evidence audit</span>
@@ -280,36 +342,64 @@ def meeting_briefing(tables: dict[str, pd.DataFrame],
   matching the records does not establish the SME's intended thresholds or make the
   underlying joins valid.</p></div>
   <ul class="findings">
-  <li><b>Grain and provenance.</b> The {stages['observations']['n']} observation rows link
-  trial and material IDs but contain no field-trait values. Yield, moisture, disease, height
-  and flowering occur once per trial in the recommendation file; lab results join to material
-  IDs but have no trial key, trait dictionary, units or dates.
-  <a href="#sources">Source keys and counts</a>; <a href="#lab">lab detail</a>.</li>
+  <li><b>Joins.</b> {int((links['share'] == 1).sum())}/{len(links)} recorded links resolve fully.
+  The {carried} files keep their v2 keys: genomics lines resolve
+  {_link(tables, 'Genomics → line')}, recommendation trial GUIDs
+  {_link(tables, 'Recommendation → trial (GUID)')}. This profile repairs them for analysis:
+  recommendations by <code>TRIAL_ID</code>, a shared key
+  ({_link(tables, 'Recommendation → trial (ID)')}), and genomics by the last GUID block, which
+  <b>is positional and not a verified join</b>. {_of(no_lab)} lines have no lab result.
+  <a href="#links">Link rates</a> and <a href="tables/link_rates.csv">their table</a>.</li>
+  <li><b>Grain and provenance.</b> The {stages['observations']['n']} plot values carry trait,
+  unit, date, replicate and quality flag, and link trial and line. Lab results are dated and
+  join lines, but have no trial key, trait dictionary or units.
+  <a href="#field">Plot values</a>; <a href="#lab">lab detail</a>.</li>
   <li><b>Rule fit is not rule authority.</b> A fixed-threshold reconstruction agrees with
   {int(match['checked'] - match['violations'])}/{int(match['checked'])} supplied trial verdicts.
   {int(hidden['violations'])}/{int(hidden['checked'])} rationales stating all four named
   criteria are met still have a HOLD verdict: resistant-material share is omitted from the
   text. <a href="#thresholds">Inspect the observed threshold brackets</a> and
   <a href="tables/rule_intervals.csv">their source table</a>.</li>
-  <li><b>Recorded links do not reproduce genomic summaries.</b> Trial GBV differs from the
-  observation-linked lines in {int(gbv['violations'])}/{int(gbv['checked'])} trials; resistant
-  share differs in {int(resistant['violations'])}/{int(resistant['checked'])}. An ID-ordered
-  block of ten lines reproduces the supplied aggregates, but no file records that mapping;
-  it is not a verified join. {int(links['violations'])}/{int(links['checked'])} operation
-  trial-material pairs also lack an observation link.
-  <a href="#reconciliation">See reconciliation</a> and
-  <a href="tables/genomics_reconciliation.csv">trial-by-trial results</a>.</li>
-  <li><b>Dates are not a season record.</b>
-{int(operations['violations'])}/{int(operations['checked'])} operations are outside the
-linked trial's start year. The
-  operation dates and undated measurements cannot establish a reliable sequence or duration.
+  <li><b>Trial values do not trace back.</b> {_of(field)} trial × trait pairs differ from the
+  trial's plot mean. Trial GBV differs from the observed lines in {_of(gbv)} trials; resistant
+  share in {_of(resistant)}. {_of(op_links)} operation trial-line pairs lack a plot record.
+  <a href="#reconciliation">See reconciliation</a>,
+  <a href="tables/field_reconciliation.csv">plot-level</a> and
+  <a href="tables/genomics_reconciliation.csv">genomic results</a>.</li>
+  <li><b>Status and dates.</b> {_of(status)} trials with a verdict are not COMPLETE. Plot values
+  are outside their trial's start year in {_of(obs_year)} cases, operations in
+  {_of(operations)}. ADVANCE lines are {share.get('PASS', 0):.0%} of PASS-trial lines and
+  {share.get('FAIL', 0):.0%} of FAIL-trial lines.
   <a href="#checks">Review all consistency checks</a> and
   <a href="tables/chronology_checks.csv">their denominators</a>.</li>
   </ul>
-  <p class="note"><b>Questions for the UC4 expert:</b> What are the authoritative cut-points
-  and bounds? Which lines produced the trial aggregates? What do the four lab traits mean?
-  Is the intended crop maize? Until confirmed, none of these assumptions is a source fact.</p>
+  <p class="note"><b>Questions for the UC4 expert:</b> Can genomics and trial recommendations be
+  regenerated from the corrected lines and trials? How are trial values computed from plots
+  (which quality flags, which replicates)? How does a line's advancement decision relate to its
+  trials' verdicts? What are the authoritative cut-points? What do the four lab traits and the
+  operation quantity units mean? Is the intended crop maize? Until confirmed, none of these
+  assumptions is a source fact.</p>
   </section>"""
+
+
+def changes_section(fig: dict[str, Path], tables: dict[str, pd.DataFrame]) -> str:
+    """What the 30 Sep archive changed, file by file, and which links now resolve."""
+    diff = tables["version_diff"].assign(
+        same_as_v2=lambda d: d["identical"].map({True: "yes", False: "no"}),
+        cols_added=lambda d: d["cols_added"].map(lambda s: len(s.split(", ")) if s else 0),
+        cols_removed=lambda d: d["cols_removed"].map(lambda s: len(s.split(", ")) if s else 0))
+    cols = ["file", "same_as_v2", "rows_new", "filled_cols_old", "filled_cols_new",
+            "n_newly_filled", "cols_added", "cols_removed", "shared_guids"]
+    table = table_html(diff, cols, set(cols) - {"file", "same_as_v2"})
+    return f"""<section id="changes"><div class="section-head">
+<span class="eyebrow">v2 → v3</span><h2>What changed on 30 Sep</h2>
+<p>Each file against the 29 Sep (v2) archive: filled columns before and after, schema changes,
+and how many GUID values it still shares with v2. Regenerated files share none; unchanged files
+share all of theirs. Column lists: <code>tables/version_diff.csv</code>.</p></div>
+{table}
+<div id="links" class="section-head"><h3>Which recorded links resolve</h3></div>
+{figure(fig["fig13_links"])}
+</section>"""
 
 
 def phase_table(pm: pd.DataFrame) -> pd.DataFrame:
@@ -345,9 +435,10 @@ def plant_lifecycle_section(fig: dict[str, Path], tables: dict[str, pd.DataFrame
 <span class="eyebrow">Plant lifecycle</span><h2>A season, phase by phase</h2>
 <p>To say <i>what happened and when</i>, every value is placed on the crop's season: before
 sowing, planting, vegetative growth, flowering, grain fill, harvest and the decision. The files
-never name the crop; the trait ranges fit maize, so maize stage codes are used. Only operations
-carry in-season dates, so each trial's season is counted in days from its first planting, and
-flowering is placed at planting + <code>FLOWERING_DAYS</code>.</p></div>
+never name the crop; the trait ranges fit maize, so maize stage codes are used. Each trial's
+season is counted in days from its first planting operation, and flowering is placed at
+planting + <code>FLOWERING_DAYS</code>. Plot observations and <code>BEGIN_DATE</code> are dated
+too; the consistency checks test them against the trial year.</p></div>
 {figure(fig["fig11_plant_lifecycle"])}
 {table}
 <p class="note"><b>{cov['placed']} of {cov['trials']} trials can be placed on a season.</b>
@@ -375,21 +466,29 @@ def stage_sections(fig: dict[str, Path]) -> str:
             "and a rationale naming four criteria. Two knockouts (low yield, high disease) decide "
             "FAIL; five criteria together decide PASS. The cut-points are inferred: the file "
             "brackets them but does not state them.", ["fig02_rule_traits", "fig03_rule_paths"]),
+        sec("field", "Sources", "Plot observations",
+            "New in v3: every observation row is one plot value for one of five field traits, "
+            "with a unit, a date, a replicate and a quality flag. These are the first line-level "
+            "field measurements in any UC4 archive.", ["fig14_field_traits"]),
         sec("genomics", "Sources", "Genomics",
-            "New in v2: one genotyped sample per line with four marker calls, a genomic breeding "
-            "value and QC. The trial file summarises these per trial.", ["fig06_genomics"]),
-        sec("reconciliation", "Sources", "Do the trial aggregates trace back to lines?",
-            "A breeder asking <i>why</i> a trial failed will want the lines behind it. The genomics "
-            "aggregates can be rebuilt, but only from a mapping the files never record. The field "
-            "aggregates (yield, moisture, disease, height, flowering) have no line-level source at "
-            "all, because v2 observations carry no values.", ["fig07_reconciliation"]),
+            "One genotyped sample per line with four marker calls, a genomic breeding value and "
+            "QC. The file is unchanged from v2, so it joins the regenerated lines only by the "
+            "last block of the GUID. The trial file summarises these values per trial.",
+            ["fig06_genomics"]),
+        sec("reconciliation", "Sources", "Do the trial values trace back to plots and lines?",
+            "A breeder asking <i>why</i> a trial failed will want the plots and lines behind it. "
+            "Neither the field values nor the genomic summaries can be rebuilt from the records "
+            "the files link to the trial. The recommendation file is unchanged from v2, so it "
+            "was computed before these plots and links existed.",
+            ["fig15_field_reconciliation", "fig07_reconciliation"]),
         sec("lab", "Sources", "Lab tests",
-            "Lab results attach to a line, not a trial. Every line now has two or three, but "
-            "names, units and dates are missing and the recommendation does not use them.",
+            "Lab results attach to a line, not a trial. They are now dated, but some lines have "
+            "none, trait names and units are missing, and the recommendation does not use them.",
             ["fig05_lab"]),
         sec("operations", "Sources", "Field operations",
-            "Planting, irrigation and harvest only, with no quantities. The dates do not follow "
-            "the trials they belong to.", ["fig08_operations_calendar"]),
+            "Planting, fertiliser, irrigation, inspection and harvest, now with a quantity. The "
+            "quantity units vary within an operation type, and the dates do not follow the "
+            "trials they belong to.", ["fig08_operations_calendar"]),
     ])
 
 
@@ -408,33 +507,36 @@ def write_report(path: Path, figs: list[Path], tables: dict[str, pd.DataFrame],
     interval_table = table_html(intervals, ["criterion", "column", "test", "used", "bracket_low",
                                             "bracket_high"],
                                 {"used", "bracket_low", "bracket_high"})
-    html = f"""<title>UC4 Breeding Data Profile</title>
+    html = f"""<meta charset="utf-8">
+<title>UC4 Breeding Data Profile</title>
 {FONTS}
 <style>{CSS}</style>
 <main>
 <header>
-  <span class="eyebrow">Hackathon 2026 · UC4 R&amp;D data source unification · v2 archive</span>
+  <span class="eyebrow">Hackathon 2026 · UC4 R&amp;D data source unification · v3 archive</span>
   <h1>Breeding trials, from line to recommendation</h1>
-  <p>The seven synthetic UC4 files the SME sent on 29 Sep 2026, including the pre-configured
-  trial recommendations: which lines, where they were tested, what the recommendation says, the
-  rule that reproduces it, and whether the evidence traces back.</p>
+  <p>The corrected seven synthetic UC4 files the SME sent on 30 Sep 2026: which lines, where they
+  were tested, what each plot measured, what the recommendation says, the rule that reproduces
+  it, and whether the evidence traces back.</p>
   <div class="facts"><span><b>{facts["lines"]}</b> lines</span>
   <span><b>{facts["trials"]}</b> trials</span><span><b>{facts["sites"]}</b> sites</span>
   <span><b>{facts["years"]}</b></span>
   <span><b>{len(tables["trial_level"])}</b> trial verdicts</span>
   <span>synthetic, read-only</span></div>
   <nav class="toc"><a href="#overview">Overview</a><a href="#expert">Evidence audit</a>
-  <a href="#plant-lifecycle">Season</a><a href="#sources">Sources</a>
-  <a href="#rule">Rule</a><a href="#genomics">Genomics</a>
+  <a href="#changes">v2 → v3</a><a href="#plant-lifecycle">Season</a><a href="#sources">Sources</a>
+  <a href="#rule">Rule</a><a href="#field">Plots</a><a href="#genomics">Genomics</a>
   <a href="#reconciliation">Reconciliation</a><a href="#lab">Lab</a><a href="#operations">Operations</a>
   <a href="#thresholds">Thresholds</a><a href="#checks">Checks</a><a href="#appendix">Appendix</a></nav>
 </header>
 <p class="note"><b>Inferred, not supplied.</b> The recommendation file states outcomes and a rule
 version, not thresholds. The cut-points on this page are the simplest fixed values that
 reproduce every outcome. Confirm them with the UC4 expert before presenting them as the rule.
-The v1 (kickoff) profile is kept in <code>v1/report_v1.html</code>.</p>
+Earlier profiles are kept in <a href="v2/report_v2.html">v2/report_v2.html</a> (29 Sep) and
+<a href="v1/report_v1.html">v1/report_v1.html</a> (kickoff).</p>
 {meeting_briefing(tables, stages)}
 <section><h2>Key findings</h2><ul class="findings">{items}</ul></section>
+{changes_section(fig, tables)}
 {plant_lifecycle_section(fig, tables)}
 <section id="sources"><div class="section-head"><h2>The sources in this data</h2>
 <p>Seven files, with the record count in each and the key that links it. The badge counts
@@ -473,13 +575,14 @@ four bins collapse (<span class="pill tie">tied</span>). Use these bins descript
 {figure(fig["fig10b_bins_categorical"])}
 </section>
 <section><div class="section-head"><span class="eyebrow">Appendix</span><h2>Numeric summary</h2>
-<p>All numeric columns: trial-level traits, genomics and lab values. Lab traits have no
-supplied unit.</p></div>
+<p>All numeric columns: trial-level traits, plot-level traits (<code>PLOT</code>), genomics
+and lab values. Lab traits have no supplied unit.</p></div>
 {table_html(tables["numeric_summary"], ["group", "count", "missing", "mean", "std", "min", "25%",
                                          "50%", "75%", "max"],
             {"count", "missing", "mean", "std", "min", "25%", "50%", "75%", "max"})}
 </section>
-<footer>Generated by analysis/uc4_eda/uc4_eda.py from the v2 UC4 archive in get_started/.
+<footer>Generated by analysis/uc4_eda/uc4_eda.py from the v3 UC4 archive (30 Sep 2026) in
+get_started/, with the v2 archive for the version comparison.
 The data is synthetic. The thresholds are inferred from the SYNTH_V1 outcomes; nothing here is a
 confirmed Syngenta scoring rule or a real breeding result. Row-level CSV links require the
 adjacent tables/ folder when sharing this HTML on its own.</footer>

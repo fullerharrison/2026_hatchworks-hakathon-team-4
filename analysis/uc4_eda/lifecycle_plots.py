@@ -15,10 +15,16 @@ from matplotlib.patches import Patch, Polygon
 
 from lifecycle import OPERATION_ORDER, month_span, operations_with_trial, snapshot_date
 from plant_lifecycle import FLOWERING_HALF_WINDOW, PHASES, Phase, operation_phases
+from load import VERSION
 from style import BLUE, INK, INK_2, MUTED, NEUTRAL, SERIES, SURFACE, grid, headline, save
 
 OP_STATUS_COLORS = {"COMPLETED": SERIES[0], "PLANNED": SERIES[1]}
-OP_MARKERS = {"PLANTING": "o", "IRRIGATION": "s", "HARVEST": "^"}
+OP_MARKERS = {"PLANTING": "o", "FERTILISER_APPLICATION": "D", "IRRIGATION": "s",
+              "PLOT_INSPECTION": "v", "HARVEST": "^"}
+
+
+def _op_label(op: str) -> str:
+    return op.replace("_", " ").title()
 
 
 def fig_operations_calendar(t: dict[str, pd.DataFrame]) -> Path:
@@ -42,7 +48,7 @@ def fig_operations_calendar(t: dict[str, pd.DataFrame]) -> Path:
     grid(ax, "x")
     handles = [Line2D([], [], color=c, marker="o", linestyle="none", label=s.title())
                for s, c in OP_STATUS_COLORS.items()]
-    handles += [Line2D([], [], color=MUTED, marker=m, linestyle="none", label=o.title())
+    handles += [Line2D([], [], color=MUTED, marker=m, linestyle="none", label=_op_label(o))
                 for o, m in OP_MARKERS.items()]
     ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(0, -0.1), ncol=5)
     wrong = int((ops["date"].dt.year != ops["START_YEAR"]).sum())
@@ -130,7 +136,7 @@ def fig_trial_timelines(t: dict[str, pd.DataFrame], tl: pd.DataFrame) -> Path:
     ax.axvline(0, color=INK, linewidth=0.8, zorder=2)
     ax.set_xlabel("days after the trial's first planting")
     grid(ax, "x")
-    handles = [Line2D([], [], color=INK_2, marker=m, linestyle="none", label=o.title())
+    handles = [Line2D([], [], color=INK_2, marker=m, linestyle="none", label=_op_label(o))
                for o, m in OP_MARKERS.items()]
     handles += [Line2D([], [], color=SERIES[1], marker="o", linestyle="none",
                        label="out of order"),
@@ -171,7 +177,7 @@ def fig_checks(checks: pd.DataFrame) -> Path:
     grid(ax, "x")
     ax.tick_params(axis="y", length=0)
     failing = int((checks["violations"] > 0).sum())
-    top = headline(fig, "Consistency checks on the v2 record",
+    top = headline(fig, f"Consistency checks on the {VERSION} record",
                    f"Share of checkable records that break each rule. {failing} of {len(checks)} "
                    "rules fail somewhere; the inferred rule matches every supplied verdict.")
     fig.tight_layout(rect=(0, 0, 1, top))

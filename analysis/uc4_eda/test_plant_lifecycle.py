@@ -88,7 +88,12 @@ def test_coverage_counts_only_plausible_seasons(timeline: pd.DataFrame) -> None:
 
 
 def test_phase_map_counts_trials_with_each_operation_type() -> None:
-    pm = phase_map({**tables(), "germplasm": pd.DataFrame({"MATERIAL_ID": ["L1"]}),
+    germplasm = pd.DataFrame({"MATERIAL_ID": ["L1"], "PEDIGREE": ["A/B"], "STAGE_CODE_LID": ["S1"],
+                              "ADVANCEMENT_DECISION": ["ADVANCE"]})
+    observation = pd.DataFrame({"TRIAL_GUID": ["T1", "T1", "T2"],
+                                "TRAIT_CODE": ["YIELD_T_HA", "YIELD_T_HA", "DISEASE_SCORE"],
+                                "OBSERVATION_VALUE": [10.0, None, 3.0]})
+    pm = phase_map({**tables(), "germplasm": germplasm, "observation": observation,
                     "genomics": pd.DataFrame(columns=["GENOTYPING_DATE", "GENOMIC_BREEDING_VALUE",
                                                       "MARKER_DROUGHT_TOLERANCE", "MARKER_MATURITY",
                                                       "MARKER_DISEASE_RESISTANCE",
@@ -98,4 +103,6 @@ def test_phase_map_counts_trials_with_each_operation_type() -> None:
                         PLANT_HEIGHT_CM=200.0, RECOMMENDATION_RATIONALE="x", RULE_VERSION="V1")})
     planting = pm[pm["column"] == "OPERATION_DATE (planting)"].iloc[0]
     assert (planting["present"], planting["total"]) == (2, 3)
+    plot_yield = pm[pm["column"] == "OBSERVATION_VALUE (yield_t_ha)"].iloc[0]
+    assert (plot_yield["present"], plot_yield["total"]) == (1, 3)
     assert pm["phase"].unique().tolist() == [p.name for p in PHASES]

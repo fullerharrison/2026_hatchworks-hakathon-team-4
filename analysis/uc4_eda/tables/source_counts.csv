@@ -1,8 +1,8 @@
 source,n,unit,detail
-germplasm,150,lines,"IDs only: no pedigree, stage or decision"
+germplasm,150,lines,"pedigree, stage and decision: Hold 58 / Discard 57 / Advance 35"
 genomics,150,genotyped lines,"4 markers + GBV, QC PASS"
-lab,360,lab results,"4 unnamed traits, 150 lines"
-trials,72,trials,"6 locations, 2024 to 2026, all COMPLETE"
-observations,720,trial-line links,"10 lines per trial, 4 to 5 trials per line, no values"
-operations,216,operations,"Planting, Irrigation, Harvest"
+lab,360,lab results,"4 unnamed traits, 134 of 150 lines"
+trials,72,trials,"6 locations, 2024 to 2026; Planned 33 / Complete 25 / Active 14"
+observations,720,plot values,"5 field traits, 10 lines per trial, 15 rejected"
+operations,216,operations,"Planting, Fertiliser Application, Irrigation, Plot Inspection, Harvest"
 recommendations,72,trial verdicts,Hold 35 / Fail 30 / Pass 7

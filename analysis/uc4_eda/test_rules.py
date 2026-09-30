@@ -3,8 +3,11 @@ import math
 import pandas as pd
 import pytest
 
-from load import find_zip, load_tables
-from rules import apply_rule, genomics_reconciliation, threshold_intervals
+from load import align, find_zip, load_tables
+from rules import (
+    apply_rule, decision_by_verdict, field_reconciliation, genomics_reconciliation,
+    threshold_intervals,
+)
 
 PASSING = {"YIELD_T_HA": 10.0, "MOISTURE_PCT": 18.0, "DISEASE_SCORE": 3.0,
            "GENOMIC_BREEDING_VALUE_MEAN": 106.0, "RESISTANT_MATERIAL_PCT": 50.0}
@@ -53,9 +56,20 @@ def test_used_thresholds_sit_inside_the_data_brackets(tables: dict[str, pd.DataF
     assert ((iv["used"] >= iv["bracket_low"]) & (iv["used"] <= iv["bracket_high"])).all()
 
 
-def test_only_the_block_mapping_reproduces_genomics_aggregates(
-        tables: dict[str, pd.DataFrame]) -> None:
-    rec = genomics_reconciliation(tables)
-    assert rec["gbv_match_block"].all() and rec["resistant_match_block"].all()
-    assert not rec["gbv_match_observation"].any()
+def test_no_mapping_reproduces_v3_genomics_aggregates(tables: dict[str, pd.DataFrame]) -> None:
+    rec = genomics_reconciliation(align(tables))
+    assert rec["gbv_match_observation"].sum() == 1
+    assert rec["gbv_match_block"].sum() == 0
     assert not rec["gbv_match_operations"].any()
+
+
+def test_trial_values_are_not_their_plot_means(tables: dict[str, pd.DataFrame]) -> None:
+    fr = field_reconciliation(align(tables))
+    assert (fr["n_plots"] > 0).sum() == 360
+    assert fr["match"].sum() == 6
+
+
+def test_line_decision_does_not_follow_the_trial_verdict(tables: dict[str, pd.DataFrame]) -> None:
+    d = decision_by_verdict(align(tables)).set_index("TRIAL_RECOMMENDATION")
+    assert d[["ADVANCE", "DISCARD", "HOLD"]].to_numpy().sum() == 720
+    assert d["advance_share"].max() - d["advance_share"].min() < 0.02

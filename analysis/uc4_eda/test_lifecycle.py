@@ -16,9 +16,18 @@ def tables() -> dict[str, pd.DataFrame]:
     germplasm = pd.DataFrame({"MATERIAL_GUID": ["M1", "M2"], "MATERIAL_ID": ["L-001", "L-002"]})
     trial = pd.DataFrame({
         "TRIAL_GUID": ["T1", "T2"], "TRIAL_ID": ["TR-0001", "TR-0002"],
-        "START_YEAR": [2025, 2026], "STATUS_LID": ["COMPLETE", "COMPLETE"],
+        "START_YEAR": [2025, 2026], "STATUS_LID": ["COMPLETE", "PLANNED"],
+        "BEGIN_DATE": ["2025-05-15", "2026-04-01"],
     })
-    observation = pd.DataFrame({"ATTACHED_TO_FIELD_ENTITY_ID": ["T1", "T2"], "GID": ["M1", "M2"]})
+    # T1's plot matches its trial yield; T2's plot does not, is rejected, sits in the
+    # wrong year, before its trial began, on a trial still PLANNED.
+    observation = pd.DataFrame({
+        "OBSERVATION_GUID": ["O1", "O2"], "TRIAL_GUID": ["T1", "T2"],
+        "MATERIAL_GUID": ["M1", "M2"], "TRAIT_CODE": ["YIELD_T_HA"] * 2,
+        "OBSERVATION_VALUE": [10.0, 6.0], "OBSERVATION_DATE": ["2025-06-01", "2025-06-01"],
+        "QUALITY_FLAG_LID": ["ACCEPTED", "REJECTED"],
+    })
+    lab = pd.DataFrame({"MATERIAL_GUID": ["M1"]})
     operations = pd.DataFrame({
         "OPERATION_GUID": ["P1", "P2", "P3"], "TRIAL_GUID": ["T1", "T1", "T2"],
         "MATERIAL_GUID": ["M1", "M2", "M2"],
@@ -40,7 +49,7 @@ def tables() -> dict[str, pd.DataFrame]:
         "TRIAL_RECOMMENDATION": ["HOLD", "FAIL"],
         "RECOMMENDATION_RATIONALE": [ALL_MET, "yield below target; moisture meets threshold"],
     })
-    return {"germplasm": germplasm, "trial": trial, "observation": observation,
+    return {"germplasm": germplasm, "trial": trial, "observation": observation, "lab": lab,
             "operations": operations, "genomics": genomics, "recommendations": recommendations}
 
 
@@ -56,11 +65,23 @@ def test_before_is_nan_when_a_date_is_missing() -> None:
 
 @pytest.mark.parametrize("rule, checked, violations", [
     ("Operation dated outside its trial's start year", 3, 1),
-    ("Completed trial still has planned operations", 2, 1),
+    ("Operation dated before its trial's BEGIN_DATE", 3, 2),
+    ("Operation quantity unit differs from its type's usual unit", 0, 0),
+    ("Completed trial still has planned operations", 1, 1),
     ("Planned operation dated before the extract", 1, 1),
     ("Completed operation dated after the extract", 2, 1),
     ("Trial's first harvest dated before its first planting", 1, 1),
+    ("Plot observation dated outside its trial's start year", 2, 1),
+    ("Plot observation dated before its trial's BEGIN_DATE", 2, 1),
+    ("Plot observation dated after the extract", 2, 0),
+    ("Plot observation on a trial still PLANNED", 2, 1),
+    ("Plot observation flagged REJECTED", 2, 1),
     ("Operation's trial + material not linked in observations", 3, 1),
+    ("Genomics MATERIAL_GUID not found in germplasm", 2, 0),
+    ("Recommendation TRIAL_GUID not found in the trial file", 2, 0),
+    ("Line with no lab result", 2, 1),
+    ("Trial trait value differs from the mean of its plots", 2, 1),
+    ("Trial has a verdict but is not COMPLETE in the trial file", 2, 1),
     ("Trial GBV mean differs from its observation-linked materials", 2, 1),
     ("Trial resistant % differs from its observation-linked materials", 2, 0),
     ("Rationale reports all four criteria met, yet not PASS", 1, 1),

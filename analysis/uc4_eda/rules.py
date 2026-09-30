@@ -1,6 +1,6 @@
 """The SYNTH_V1 trial recommendation rule, inferred from the SME's scoring file.
 
-The v2 archive ships ``trial_recommendations_synthetic.csv``: one PASS / HOLD / FAIL
+The v2 and v3 archives ship ``trial_recommendations_synthetic.csv``: one PASS / HOLD / FAIL
 per trial with a text rationale and ``RULE_VERSION = SYNTH_V1``. The file gives
 outcomes, not cut-points. The thresholds below are the simplest fixed values that
 reproduce every supplied outcome; the data only brackets each one (see
@@ -140,11 +140,11 @@ def trial_material_links(t: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
     """Three candidate trial -> material mappings, each as (TRIAL_GUID, MATERIAL_GUID).
 
     ``observation`` and ``operations`` are the links the files record. ``block`` is
-    the mapping that reproduces the supplied genomics aggregates: trial k takes the
-    10 consecutive materials of block (k - 1) mod 15 in MATERIAL_ID order.
+    the mapping that reproduced every v2 genomics aggregate: trial k takes the 10
+    consecutive materials of block (k - 1) mod 15 in MATERIAL_ID order. It is kept
+    to show whether a later archive still follows it.
     """
-    obs = t["observation"].rename(columns={"ATTACHED_TO_FIELD_ENTITY_ID": "TRIAL_GUID",
-                                           "GID": "MATERIAL_GUID"})
+    obs = t["observation"]
     mats = t["germplasm"].sort_values("MATERIAL_ID")["MATERIAL_GUID"].reset_index(drop=True)
     blocks = pd.DataFrame({"MATERIAL_GUID": mats, "block": mats.index // 10})
     trials = t["trial"][["TRIAL_GUID", "TRIAL_ID"]].assign(
@@ -160,7 +160,8 @@ def trial_material_links(t: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
 def genomics_reconciliation(t: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Per trial: supplied genomics aggregates vs those recomputed from each mapping.
 
-    ``gbv_match_*`` allows for the supplied one-decimal rounding.
+    ``gbv_match_*`` allows for the supplied one-decimal rounding. Expects ``align``-ed
+    tables: in v3 neither recommendations nor genomics share GUIDs with the other files.
     """
     gen = t["genomics"][["MATERIAL_GUID", "GENOMIC_BREEDING_VALUE", "MARKER_DISEASE_RESISTANCE"]]
     rec = t["recommendations"][["TRIAL_GUID", "TRIAL_ID", "GENOMIC_BREEDING_VALUE_MEAN",
@@ -179,3 +180,48 @@ def genomics_reconciliation(t: dict[str, pd.DataFrame]) -> pd.DataFrame:
         out[f"gbv_match_{name}"] = gbv_gap <= 0.051
         out[f"resistant_match_{name}"] = res_gap < 0.01
     return out.reset_index()
+
+
+def decision_by_verdict(t: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Line-in-trial pairs by the line's ADVANCEMENT_DECISION and the trial's verdict.
+
+    Expects ``align``-ed tables. Returns counts plus ``advance_share``: the share of
+    pairs in each verdict whose line is ADVANCE.
+    """
+    pairs = t["observation"][["TRIAL_GUID", "MATERIAL_GUID"]].drop_duplicates()
+    pairs = pairs.merge(t["germplasm"][["MATERIAL_GUID", "ADVANCEMENT_DECISION"]],
+                        on="MATERIAL_GUID").merge(
+        t["recommendations"][["TRIAL_GUID", "TRIAL_RECOMMENDATION"]], on="TRIAL_GUID")
+    ct = pd.crosstab(pairs["TRIAL_RECOMMENDATION"], pairs["ADVANCEMENT_DECISION"])
+    ct["advance_share"] = (ct.get("ADVANCE", 0) / ct.sum(axis=1)).round(3)
+    return ct.rename_axis(columns=None).reset_index()
+
+
+# Largest gap still read as a rounding difference: one decimal, flowering in whole days.
+FIELD_TOLERANCE: dict[str, float] = {"FLOWERING_DAYS": 0.51}
+
+
+def field_reconciliation(t: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Per trial and field trait: the supplied trial value vs the mean of its plot values.
+
+    Expects ``align``-ed tables. ``plot_mean`` uses every plot; ``accepted_mean`` only
+    ACCEPTED ones. ``match`` holds if either mean agrees within rounding.
+    """
+    obs = t["observation"]
+    rec = t["recommendations"].set_index("TRIAL_GUID")
+    traits = sorted(obs["TRAIT_CODE"].unique())
+    means = {"plot_mean": obs, "accepted_mean": obs[obs["QUALITY_FLAG_LID"] == "ACCEPTED"]}
+    frames = []
+    for trait in traits:
+        out = pd.DataFrame({"TRIAL_ID": rec["TRIAL_ID"], "trait": trait, "supplied": rec[trait]})
+        for name, d in means.items():
+            d = d[d["TRAIT_CODE"] == trait].groupby("TRIAL_GUID")["OBSERVATION_VALUE"]
+            out[name] = d.mean().round(2)
+            if name == "plot_mean":
+                out["n_plots"] = d.size()
+        tol = FIELD_TOLERANCE.get(trait, 0.051)
+        gaps = [np.abs(out[c] - out["supplied"]) <= tol for c in means]
+        out["match"] = gaps[0] | gaps[1]
+        out["n_plots"] = out["n_plots"].fillna(0).astype(int)
+        frames.append(out)
+    return pd.concat(frames).reset_index()
