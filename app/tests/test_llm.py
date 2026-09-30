@@ -1,4 +1,4 @@
-"""Task 1: settings, the Portkey chat adapter (offline, via httpx MockTransport) and ping."""
+"""Task 1: settings, the Portkey chat adapter (offline, via httpx2 MockTransport) and ping."""
 
 import json
 import tomllib
@@ -26,7 +26,7 @@ def test_load_settings_reads_file_and_env(tmp_path: Path) -> None:
     s = load_settings(path, ENV)
     assert s.model == "gpt-x" and s.base_url == DEFAULT_BASE_URL
     assert dict(s.headers) == {"x-portkey-api-key": "pk", "x-portkey-virtual-key": "vk"}
-    assert s.temperature == 0 and s.max_tokens == 500 and s.provider_key == "unused"
+    assert s.temperature == 0 and s.max_tokens == 500 and s.provider_key == "pk"
 
 
 def test_env_overrides_model_and_url(tmp_path: Path) -> None:
@@ -115,6 +115,27 @@ def test_gateway_error_becomes_llm_error() -> None:
 
     with pytest.raises(LLMError, match="LLM gateway error"):
         anyio.run(chat_with(handler).complete, [{"role": "user", "content": "hi"}], [])
+
+
+def test_provider_key_overrides_the_portkey_key(tmp_path: Path) -> None:
+    path = toml(tmp_path, '[llm]\nmodel = "@openai-prod/gpt-x"\n')
+    s = load_settings(path, {**ENV, "UC4_LLM_PROVIDER_KEY": "sk-raw"})
+    assert s.provider_key == "sk-raw" and s.model == "@openai-prod/gpt-x"
+
+
+def test_portkey_key_is_sent_as_bearer() -> None:
+    seen: dict[str, str] = {}
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        seen["auth"] = request.headers["authorization"]
+        return httpx2.Response(200, json=response({"content": "hi"}))
+
+    settings = LLMSettings(base_url="http://gw.test/v1", model="gpt-x",
+                           headers={"x-portkey-api-key": "pk"}, provider_key="pk")
+    chat = PortkeyChat(settings, http_client=httpx2.AsyncClient(
+        transport=httpx2.MockTransport(handler)))
+    anyio.run(chat.complete, [{"role": "user", "content": "hi"}], [])
+    assert seen["auth"] == "Bearer pk"
 
 
 def test_ping_reports_the_tool_call() -> None:

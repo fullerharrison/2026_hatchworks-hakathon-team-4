@@ -99,7 +99,7 @@ def load_settings(path: Path = SETTINGS_PATH,
         base_url=env.get("UC4_LLM_BASE_URL") or cfg.get("base_url", DEFAULT_BASE_URL),
         model=model,
         headers={h: env[v] for v, h in PORTKEY_HEADERS.items() if env.get(v)},
-        provider_key=env.get("UC4_LLM_PROVIDER_KEY", "unused"),
+        provider_key=env.get("UC4_LLM_PROVIDER_KEY") or env["PORTKEY_API_KEY"],
         temperature=cfg.get("temperature"),
         max_tokens=cfg.get("max_tokens"),
         timeout_s=float(cfg.get("timeout_s", 60)),
@@ -121,7 +121,8 @@ class PortkeyChat:
                  http_client: httpx2.AsyncClient | None = None) -> None:
         self.model = settings.model
         self._settings = settings
-        # With a virtual key or config, Portkey supplies the provider key; api_key is a filler.
+        # Portkey reads its own key from api_key (Authorization: Bearer); UC4_LLM_PROVIDER_KEY
+        # overrides it only for routes that need a raw provider key.
         self._client = openai.AsyncOpenAI(
             api_key=settings.provider_key, base_url=settings.base_url,
             default_headers=dict(settings.headers), timeout=settings.timeout_s,
