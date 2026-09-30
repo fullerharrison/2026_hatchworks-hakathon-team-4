@@ -23,7 +23,7 @@
 | 8 | 0037, PASS, real reason, user `breeder-a` | History "● PASS override by breeder-a at 2026-09-30T19:02:37+00:00 … Made against recommendation: HOLD"; banner still "▲ HOLD" | pass |
 | 9 | Reason `<b>bold</b> <img src=x onerror=console.log('XSS')> looks fine` (FAIL) | Shown literally; 0 `<b>`/`<img>` elements in `#history`; no XSS console message; newest entry first | pass |
 | 10 | Click first line of 0037 (SYN-MZ-00013) | Panel: "Verdicts are per trial …" note; genomics; "Lab trait …01 / …03 / …01" with "lab rows have no trial key: not linked to this trial"; 5 trial verdicts (0013, 0019, 0025, 0031, 0037); operations | pass (cosmetic: "▲ HOLD: HOLD: …" repeats the verdict word) |
-| 11 | Ask "Why is SYN-TR-0037 amber?" without Portkey configuration | "Ask unavailable: No model: set [llm] model in agent.toml or UC4_LLM_MODEL"; banner and decision form still work | pass for the no-model path; live answer pending Portkey credentials (Phase 2 open item) |
+| 11 | Ask "Why is SYN-TR-0037 amber?" without Portkey configuration | "Ask unavailable: No model: set [llm] model in agent.toml or UC4_LLM_MODEL"; banner and decision form still work | pass for the no-model path; live answer also passes (see [Live Ask](#live-ask-and-deck-screenshots-2026-09-30)) |
 
 ## Log-file evidence
 
@@ -53,7 +53,27 @@ Re-check (2026-09-30, Claude in Chrome, commit 1f6078a, server started without `
 - Full suite without `UC4_ZIP`: 393 passed, 1 deselected.
 - Keyboard behaviour on line rows and the source toggle remains unexercised (DOM-driven; screenshots still fail with a capture timeout).
 
+## Live Ask and deck screenshots (2026-09-30)
+
+Portkey credentials come from the git-ignored repo-root `.env`, loaded with
+`uv run --project app --env-file .env …`. Model: `@bedrock-aifoundry-use1-001/global.openai.gpt-6-sol`.
+
+- `uc4-ask ping`: `tool_call=yes tokens=50/17`.
+- `uc4-ask ask "Why is SYN-TR-0037 amber?"`: exit 0, `answered`. The answer gives HOLD because resistant material is 30 % < 50 % (inferred threshold), notes that the supplied rationale omits resistant material, cites `trial_recommendations_synthetic.csv#620A7637-3BE2-7307-0000-000000000025`, and ends with the disclaimer. 13 432 prompt / 777 completion tokens, 3–4 s. The model called `score_trial` twice with the same query (harmless, but it costs a round).
+- `GET /health`: `status: ok` with the model. Scenario 11 on the screen returned the same cited answer: **pass**.
+
+Screenshots were captured by a Playwright script driving the installed Chrome (headless, 1440×900 at 2×), which avoids the minimized-window problem. Decisions went to `%TEMP%\uc4-demo.jsonl`, not the real log.
+
+| File | Scene |
+| --- | --- |
+| [phase3_1_trial_0003_pass.png](screenshots/phase3_1_trial_0003_pass.png) | SYN-TR-0003 ● PASS, criteria, aggregates |
+| [phase3_2_trial_0037_hold.png](screenshots/phase3_2_trial_0037_hold.png) | SYN-TR-0037 ▲ HOLD, resistant lines "not met", rationale omission |
+| [phase3_2b_0037_flags.png](screenshots/phase3_2b_0037_flags.png) | SYN-TR-0037 flags, `RATIONALE_READS_AS_PASS` first |
+| [phase3_3_ask_live.png](screenshots/phase3_3_ask_live.png) | live Ask answer with citation and disclaimer |
+| [phase3_4_override.png](screenshots/phase3_4_override.png) | PASS override by `breeder-a` against HOLD |
+| [phase3_5_line_panel.png](screenshots/phase3_5_line_panel.png) | line SYN-MZ-00013: genomics, lab, per-trial verdicts, flags |
+
 ## Open
 
-- **Screenshots and GIF** (`team/screenshots/phase3_*.png`, `phase3_walkthrough.gif`): still to be taken by a human with the browser window visible.
-- **Live `/ask` answer** (scenario 11 with numbered citations and disclaimer): pending Portkey credentials. Only the "Ask unavailable" path is verified.
+- **GIF** (`phase3_walkthrough.gif`): not taken.
+- Real pointer and keyboard behaviour is still exercised only through DOM events.

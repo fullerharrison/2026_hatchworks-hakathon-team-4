@@ -128,6 +128,9 @@ uv run --project app uc4-ask chat
 uv run --project app uc4-ask eval    # the supported questions; report -> app/evals/results/
 ```
 
+Or keep the variables in the git-ignored repo-root `.env` and let uv load them:
+`uv run --project app --env-file .env uc4-ask serve`.
+
 `chat` quits on an empty line, `quit`, `exit` or Ctrl+Z/EOF. Exit codes: 0 answered or
 clarify, 1 unverified or error, 2 configuration error.
 
