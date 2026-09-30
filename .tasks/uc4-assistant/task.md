@@ -1,6 +1,6 @@
 # Task: UC4 breeder assistant (R&D Data Source Unification)
 
-**Created:** 2026-09-29 · **Demo:** Fri 2026-10-02, 7 min + 5 min Q&A; submit demo, deck, one-pager and repo link within 1 hour ([handbook p. 3][hb3]) · **Status:** planning; Phase 1 detailed in [phase-1-mcp-data-layer.md](phase-1-mcp-data-layer.md); Phase 2 detailed in [phase-2-nl-agent.md](phase-2-nl-agent.md).
+**Created:** 2026-09-29 · **Demo:** Fri 2026-10-02, 7 min + 5 min Q&A; submit demo, deck, one-pager and repo link within 1 hour ([handbook p. 3][hb3]) · **Status:** planning; Phase 1 detailed in [phase-1-mcp-data-layer.md](phase-1-mcp-data-layer.md); Phase 2 detailed in [phase-2-nl-agent.md](phase-2-nl-agent.md); Phase 3 detailed in [phase-3-breeder-screen.md](phase-3-breeder-screen.md).
 
 Every number below was re-measured on 2026-09-29 from the v2 archive (`get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case.zip`) using `analysis/uc4_eda/load.py` and `rules.py`; the existing EDA suite passes (40 tests). **Inferred** marks our reading of the data, **proposal** marks a design choice.
 
