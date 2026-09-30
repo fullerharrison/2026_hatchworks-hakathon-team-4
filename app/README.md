@@ -118,6 +118,7 @@ $env:PORTKEY_VIRTUAL_KEY = "<virtual key>" # or PORTKEY_CONFIG / PORTKEY_PROVIDE
 uv run --project app uc4-ask ping
 uv run --project app uc4-ask ask "Why is SYN-TR-0037 amber?"
 uv run --project app uc4-ask chat
+uv run --project app uc4-ask eval    # the supported questions; report -> app/evals/results/
 ```
 
 Each question is logged as one JSON line (question, tools, status, tokens, seconds) in

@@ -14,11 +14,11 @@
 
 **Exit criteria (from task.md, made checkable):**
 
-- [ ] ≥ 10 supported questions in `app/evals/questions.json`; `uv run --project app uc4-ask eval` against the live model passes all of them, and the report is committed under `app/evals/results/`.
-- [ ] Every answer's numbers appear in the tool output it cites (enforced by `grounding.check`, reported per case; an `unverified` answer fails its case).
-- [ ] "SYN-TR-003" produces a "which one?" reply listing 10 candidates (code path, no model choice).
-- [ ] Model and settings committed in `app/agent.toml`; secrets only in environment variables.
-- [ ] Offline suite green: `uv run --project app pytest -q app/tests`.
+- [ ] ≥ 10 supported questions in `app/evals/questions.json`; `uv run --project app uc4-ask eval` against the live model passes all of them, and the report is committed under `app/evals/results/`. Open: needs Portkey credentials (`uc4-ask ping`, then `uc4-ask eval`). The 16 questions are written and their expectations proven true of the data offline.
+- [ ] Every answer's numbers appear in the tool output it cites (enforced by `grounding.check`, reported per case; an `unverified` answer fails its case). Open: needs Portkey credentials (`uc4-ask ping`, then `uc4-ask eval`).
+- [x] "SYN-TR-003" produces a "which one?" reply listing 10 candidates (code path, no model choice). Evidence: `test_question_set_is_well_formed`, `test_expectations_are_true_of_the_data[q04-ambiguous-trial]` (10 candidates) and `test_run_cases_and_report` (agent returns `clarify` after one `find_trial` call).
+- [ ] Model and settings committed in `app/agent.toml`; secrets only in environment variables. Open: `model` is still `""` until the live run picks one.
+- [x] Offline suite green: `uv run --project app pytest -q app/tests`. Evidence: 331 passed, 1 deselected (live test), 2026-09-30.
 
 ## Decisions (made while planning, 2026-09-29)
 
