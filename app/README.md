@@ -107,19 +107,29 @@ If Connect fails, read the end of `app/logs/uc4_mcp.log`: a new `uc4-mcp startin
 
 `uc4-ask` answers plain-English questions from the 8 tools above, citing a row
 (`[file#row_id]`) or a whole tool result (`[tool:query_trials]`) for every number. An
-ambiguous ID gets a "which one?" list; an answer whose numbers are not in the cited results
-is rewritten once and otherwise marked unverified. Settings: `app/agent.toml` (model,
-sampling, round limits; committed). Secrets come from the environment only:
+ambiguous ID gets a "which one?" list; an answer with no citation, numbers or verdict/colour
+words that are not in the cited results is rewritten once and otherwise marked unverified.
+Settings: `app/agent.toml` (model, sampling, round limits; committed). Secrets come from the
+environment only.
+
+Portkey setup: `PORTKEY_API_KEY` is required. The model is a Model Catalog id
+`@<provider-slug>/<model>`, set as `model` in `agent.toml` or in `UC4_LLM_MODEL`.
+`PORTKEY_VIRTUAL_KEY`, `PORTKEY_CONFIG` and `PORTKEY_PROVIDER` are optional older routes;
+`UC4_LLM_PROVIDER_KEY` is only for routes that need a raw provider key. If the model rejects
+`temperature` or `max_tokens` (some reasoning models), delete that key from `agent.toml`.
 
 ```powershell
-$env:PORTKEY_API_KEY = "<key>"            # required
-$env:PORTKEY_VIRTUAL_KEY = "<virtual key>" # or PORTKEY_CONFIG / PORTKEY_PROVIDER
-# optional: UC4_LLM_BASE_URL (company gateway), UC4_LLM_MODEL (override agent.toml)
+$env:PORTKEY_API_KEY = "<key>"                    # required
+$env:UC4_LLM_MODEL = "@<provider-slug>/<model>"   # or model in agent.toml
+# optional: UC4_LLM_BASE_URL (company gateway), PORTKEY_VIRTUAL_KEY / PORTKEY_CONFIG
 uv run --project app uc4-ask ping
 uv run --project app uc4-ask ask "Why is SYN-TR-0037 amber?"
 uv run --project app uc4-ask chat
 uv run --project app uc4-ask eval    # the supported questions; report -> app/evals/results/
 ```
+
+`chat` quits on an empty line, `quit`, `exit` or Ctrl+Z/EOF. Exit codes: 0 answered or
+clarify, 1 unverified or error, 2 configuration error.
 
 Each question is logged as one JSON line (question, tools, status, tokens, seconds) in
 `app/logs/uc4_agent.log`; tool calls also go to `app/logs/uc4_mcp.log`.
@@ -131,7 +141,11 @@ uv run --project app uc4-ask serve            # http://127.0.0.1:8766
 ```
 
 `POST /ask` with `{"question": "...", "history": [{"role": "user"|"assistant", "content": "..."}]}`
-returns the answer JSON (`status`: answered | clarify | unverified | error; `text`;
-`citations`; `candidates`; `tool_calls` with each envelope; `usage`; `disclaimer`), always
-HTTP 200. 503 means the model is not configured; `GET /health` says why. CORS allows
-`localhost` pages only. For n8n in Docker use `--host 0.0.0.0` (no authentication).
+returns the answer JSON (`status`: answered | clarify | unverified | error; `text`; `model`;
+`citations`; `ungrounded`; `problems`; `candidates`; `tool_calls` with each envelope;
+`usage`; `disclaimer`), always HTTP 200. 503 means the model is not configured;
+`GET /health` says why. CORS allows `localhost` pages only. For n8n in Docker use
+`--host 0.0.0.0`.
+
+> **Warning:** there is no authentication. Use `--host 0.0.0.0` on a trusted network only:
+> anyone who can reach the port can query the data and spend the Portkey quota.
