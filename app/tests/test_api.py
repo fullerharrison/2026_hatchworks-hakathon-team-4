@@ -160,6 +160,16 @@ def test_post_ambiguous_or_unknown_trial(store: EvidenceStore, tmp_path: Path, t
     assert r.status_code == code and r.json()["status"] == status and not log.path.exists()
 
 
+def test_get_decisions_ambiguous_is_409_unknown_is_404(store: EvidenceStore,
+                                                       tmp_path: Path) -> None:
+    client, _ = screen_client(store, tmp_path)
+    many = client.get("/decisions", params={"trial": "SYN-TR-003"})
+    assert many.status_code == 409 and many.json()["status"] == "many"
+    assert len(many.json()["candidates"]) == 10
+    none = client.get("/decisions", params={"trial": "XYZ"})
+    assert none.status_code == 404 and none.json()["status"] == "none"
+
+
 def test_double_submit_keeps_both(store: EvidenceStore, tmp_path: Path) -> None:
     client, log = screen_client(store, tmp_path)
     a, b = post(client).json(), post(client).json()

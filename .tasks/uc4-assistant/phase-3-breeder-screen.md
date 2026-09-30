@@ -32,7 +32,8 @@ The breeder then records a decision (PASS, HOLD or FAIL) with a required reason.
   - `test_earlier_lines_are_never_rewritten` (Task 1)
   - no PUT, PATCH or DELETE routes (`test_no_update_or_delete_routes`, Task 2)
   - the existing `test_zip_unchanged_by_loading`
-- [x] The screen shows the trial view described in the uc4 README "Suggested minimal screen": colour and reason, the criteria table, the ten lines with genomics and lab, and the "Record decision" action. The Task 5 walkthrough covers every scenario in "Validate the demo" (11 of 11 observed, see [phase3_walkthrough.md](../../team/phase3_walkthrough.md)). **Screenshots in `team/screenshots/phase3_*` are still to be taken** (the Chrome window was minimized during the walkthrough), and scenario 11 is verified only for the no-model path until Portkey credentials exist.
+- [x] The screen shows the trial view described in the uc4 README "Suggested minimal screen": colour and reason, the criteria table, the ten lines with genomics and lab, and the "Record decision" action. The Task 5 walkthrough covers every scenario in "Validate the demo" (11 of 11 observed, see [phase3_walkthrough.md](../../team/phase3_walkthrough.md)). Scenario 11 is verified only for the no-model path until Portkey credentials exist.
+- [ ] Screenshots in team/screenshots/phase3_* — open: the walkthrough window was minimized
 - [x] The offline suite is green: `uv run --project app pytest -q app/tests`. 392 passed, 1 deselected on commit `9aec632` (run with `UC4_ZIP` pinned to the original zip).
 
 ## Decisions (made while planning, 2026-09-30)

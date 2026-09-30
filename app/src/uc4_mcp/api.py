@@ -137,7 +137,8 @@ def create_app(make_model: Callable[[], ChatModel], server: MCPServer | None = N
             return JSONResponse(decisions_json(None))
         res = get_store().resolve_trial(trial)
         if res.status != "ok":
-            return JSONResponse(to_json_safe(get_store().find_trial(trial)), status_code=404)
+            envelope = to_json_safe(get_store().find_trial(trial))
+            return JSONResponse(envelope, status_code=409 if envelope["status"] == "many" else 404)
         return JSONResponse(decisions_json(str(res.guid)))
 
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

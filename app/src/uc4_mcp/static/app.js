@@ -51,7 +51,8 @@ function withSource(content, refs) {
   const detail = el("span", { class: "src-detail", hidden: true, text: refs.join(", ") });
   const toggle = el("button", {
     type: "button", class: "link src", text: "source", "aria-expanded": "false",
-    onclick: () => {
+    onclick: (e) => {
+      e.stopPropagation(); // don't trigger a clickable parent row
       detail.hidden = !detail.hidden;
       toggle.setAttribute("aria-expanded", String(!detail.hidden));
     },
@@ -167,7 +168,11 @@ function renderLines(t) {
     const refs = [ref(l.link)];
     return el("tr", {
       class: "clickable", tabindex: "0", "data-refs": refsAttr(refs),
-      onclick: open, onkeydown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } },
+      onclick: open,
+      onkeydown: (e) => {
+        if (e.target !== e.currentTarget) return; // keys on the nested "source" button are its own
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+      },
     },
     el("td", { text: l.material_id }),
     withSource(fmt(field(l.genomics, "GENOMIC_BREEDING_VALUE")), refs),
@@ -179,6 +184,10 @@ function renderLines(t) {
     ...t.lines.map((l) => el("option", { value: l.material_guid, text: l.material_id })));
   show(byId("line-panel"));
 }
+
+// The reason text already starts with the verdict word; don't show it twice.
+const stripVerdict = (reason, verdict) =>
+  (reason || "").startsWith(`${verdict}: `) ? reason.slice(verdict.length + 2) : reason;
 
 function renderLinePanel(view) {
   const panel = byId("line-panel");
@@ -195,7 +204,8 @@ function renderLinePanel(view) {
       : el("p", { class: "muted", text: "No lab rows." }),
     el("h4", { text: "Trial verdicts (per trial, not per line)" }),
     el("ul", {}, view.trials.map((x) => el("li", {},
-      el("strong", { text: x.trial_id }), ` ${SHAPE[x.verdict] || ""} ${x.verdict}: ${x.reason}`))),
+      el("strong", { text: x.trial_id }),
+      ` ${SHAPE[x.verdict] || ""} ${x.verdict}: ${stripVerdict(x.reason, x.verdict)}`))),
     view.operations.length ? el("h4", { text: "Operations" }) : null,
     view.operations.length ? el("ul", {}, view.operations.map((o) =>
       el("li", { text: `${o.date || "no date"} · ${o.operation_type} · ${o.status}` }))) : null,
@@ -249,9 +259,29 @@ function highlight(refs) {
   }
 }
 
+function resetDecisionForm() {
+  const form = byId("decision-form");
+  form.elements.reason.value = "";
+  for (const r of form.querySelectorAll("input[type=radio]")) r.checked = false;
+}
+
+function clearTrial() {
+  state.trial = null;
+  state.decisions = [];
+  for (const id of ["banner", "criteria", "rationale", "aggregates", "flags", "lines",
+    "line-panel", "operations", "history", "decision-error"]) show(byId(id));
+  byId("banner").className = "banner";
+  byId("decision-form").elements.material_guid.replaceChildren(
+    el("option", { value: "", text: "No specific line" }));
+  resetDecisionForm();
+  byId("decision-form").querySelector("button[type=submit]").disabled = true;
+}
+
 function renderTrial(t, decisions) {
+  const changed = !state.trial || state.trial.trial_guid !== t.trial_guid;
   state.trial = t;
   state.decisions = decisions;
+  byId("decision-form").querySelector("button[type=submit]").disabled = false;
   renderBanner(t.recommendation);
   renderCriteria(t);
   renderRationale(t);
@@ -261,6 +291,7 @@ function renderTrial(t, decisions) {
   renderOperations(t);
   renderHistory();
   show(byId("decision-error"));
+  if (changed) resetDecisionForm(); // never carry a draft from one trial to another
 }
 
 async function openTrial(query) {
@@ -274,10 +305,11 @@ async function openTrial(query) {
     renderTrial(d.result, d.decisions || []);
     byId("trial-search").value = d.result.trial_id;
     if (location.hash !== `#${d.result.trial_id}`) history.replaceState(null, "", `#${d.result.trial_id}`);
-  } else if (d.status === "many") {
-    renderCandidates(box, d.message, d.candidates, (c) => openTrial(c.id));
   } else {
-    show(box, el("span", { class: "error", text: errorMessage(res) }));
+    // Nothing is open any more: a decision must not be recorded against the previous trial.
+    clearTrial();
+    if (d.status === "many") renderCandidates(box, d.message, d.candidates, (c) => openTrial(c.id));
+    else show(box, el("span", { class: "error", text: errorMessage(res) }));
   }
 }
 
@@ -302,24 +334,32 @@ async function submitDecision(event) {
   if (!state.trial) return show(err, "Open a trial first.");
   if (!form.elements.decision.value) return show(err, "Choose PASS, HOLD or FAIL.");
   if (!alias) return show(err, "Enter your alias first.");
-  show(err);
-  button.disabled = true;
-  const res = await post("/decisions", {
-    trial: state.trial.trial_guid, decision: form.elements.decision.value,
-    reason: form.elements.reason.value, user: alias,
-    material_guid: form.elements.material_guid.value || null,
-  });
-  if (res.status === 201) {
-    state.decisions = [res.data, ...state.decisions];
-    form.elements.reason.value = "";
-    for (const r of form.querySelectorAll("input[type=radio]")) r.checked = false;
-    renderHistory();
-    const entry = state.trials.get(state.trial.trial_id);
-    if (entry) { entry.latest_decision = res.data; renderTrialList(); }
-  } else {
-    show(err, errorMessage(res));
+  if (form.elements.reason.value.trim().length < 5) {
+    return show(err, "A reason of 5 to 1000 characters is required.");
   }
-  button.disabled = false;
+  show(err);
+  const t = state.trial; // the breeder may switch trials while the request is in flight
+  button.disabled = true;
+  try {
+    const res = await post("/decisions", {
+      trial: t.trial_guid, decision: form.elements.decision.value,
+      reason: form.elements.reason.value, user: alias,
+      material_guid: form.elements.material_guid.value || null,
+    });
+    if (res.status === 201) {
+      const entry = state.trials.get(t.trial_id);
+      if (entry) { entry.latest_decision = res.data; renderTrialList(); }
+      if (state.trial === t) {
+        state.decisions = [res.data, ...state.decisions];
+        resetDecisionForm();
+        renderHistory();
+      }
+    } else if (state.trial === t) {
+      show(err, errorMessage(res));
+    }
+  } finally {
+    button.disabled = !state.trial;
+  }
 }
 
 function renderAnswer(res) {
@@ -349,13 +389,16 @@ async function ask(question) {
   const button = byId("ask-form").querySelector("button");
   button.disabled = true;
   show(byId("answer"), el("p", { class: "muted", text: "Thinking..." }));
-  const res = await post("/ask", { question, history: state.chat.slice(-10) });
-  renderAnswer(res);
-  if (res.status === 200 && res.data && res.data.text) {
-    state.chat.push({ role: "user", content: question }, { role: "assistant", content: res.data.text });
-    state.chat = state.chat.slice(-10);
+  try {
+    const res = await post("/ask", { question, history: state.chat.slice(-10) });
+    renderAnswer(res);
+    if (res.status === 200 && res.data && res.data.text) {
+      state.chat.push({ role: "user", content: question }, { role: "assistant", content: res.data.text });
+      state.chat = state.chat.slice(-10);
+    }
+  } finally {
+    button.disabled = false;
   }
-  button.disabled = false;
 }
 
 function init() {

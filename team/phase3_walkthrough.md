@@ -1,13 +1,13 @@
 # Phase 3 walkthrough: breeder screen and override log
 
-**Date:** 2026-09-30 · **Run by:** controller, Claude in Chrome · **Branch:** `phase-3-breeder-screen` at `9aec632` · **Plan:** [phase-3-breeder-screen.md](../.tasks/uc4-assistant/phase-3-breeder-screen.md) (Task 5, "Validate the demo")
+**Date:** 2026-09-30 · **Run by:** controller, Claude in Chrome · **Branch:** `phase-3-breeder-screen` at `9aec632` (commits after it, up to the final-review fixes, were docs and EDA only; the fixes below change `app.js` and `api.py`) · **Plan:** [phase-3-breeder-screen.md](../.tasks/uc4-assistant/phase-3-breeder-screen.md) (Task 5, "Validate the demo")
 
 ## Setup
 
 - Server: `uc4-ask serve` on http://127.0.0.1:8766/.
 - `UC4_ZIP` pinned to `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case.zip` (the original v2 archive). A second archive, `..._09-30-2026.zip`, now sits in `get_started/` and makes `find_zip` ambiguous without the variable.
 - `UC4_DECISION_LOG` = `%TEMP%\uc4-walkthrough.jsonl`, so rehearsal decisions stay out of the real log.
-- Method: DOM text read back through the page (`get_page_text` and JavaScript). The Chrome window was minimized, so screenshots and GIF frames could not be captured ("Cannot take screenshot with 0 width") and real mouse and keyboard events were not delivered. Controls were driven with `form_input`, `element.click()` and `form.requestSubmit()`.
+- Method: DOM text read back through the page (`get_page_text` and JavaScript). The Chrome window was minimized, so screenshots and GIF frames could not be captured ("Cannot take screenshot with 0 width") and real mouse and keyboard events were not delivered. Controls were driven with `form_input`, `element.click()` and `form.requestSubmit()`. Real pointer and keyboard behaviour (clicking rows, Enter/Space on line rows, tabbing) was not exercised: only DOM-simulated.
 
 ## Scenarios
 
@@ -35,6 +35,16 @@ SYN-TR-0037 FAIL overrides=True breeder-a 2026-09-30T19:03:16+00:00 | recommenda
 ```
 
 The rejected blank-reason attempts (scenario 7) left no line.
+
+## Fixes after final review
+
+1. **Stale trial after ambiguous or unknown search:** a failed search now clears the trial (banner, criteria, flags, lines, operations, history) and disables the decision form; submit is blocked with "Open a trial first."
+2. **Decision draft carried across trials:** opening a different trial resets the reason, the PASS/HOLD/FAIL choice and the line select.
+3. **In-flight submit race:** the submit captures its trial before the request; history is updated only if that trial is still open.
+
+Also: blank-reason client check, buttons re-enabled in `finally`, line-row keyboard and source-toggle bubbling, duplicated verdict word in the line panel, `GET /decisions?trial=` returns 409 for an ambiguous query.
+
+Scenario 6 re-check: to be re-checked by the controller.
 
 ## Open
 
