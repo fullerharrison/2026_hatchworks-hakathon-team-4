@@ -14,4 +14,5 @@ notes.md
 # Breeder decisions (Phase 3 override log): personal records, like the data.
 app/data/
 .tasks/uc4-demo-review
-analysis/uc4_eda/.test-tmp*/
+# pytest basetemp scratch (root and per-folder)
+.test-tmp*/
