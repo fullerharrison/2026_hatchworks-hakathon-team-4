@@ -21,9 +21,24 @@ evidence, record a breeder decision, or submit enrichment for review and activat
 The baseline is 32 GREEN, 53 AMBER and 65 RED. Rules are provisional and the data are
 maize-like synthetic data for the vegetable-seed challenge.
 
-Browsing, decisions and enrichment need no model credentials. For Ask, create a `.env`
-file beside this document with your own `PORTKEY_API_KEY` and `UC4_LLM_MODEL` values
-for your team's Portkey configuration. No credentials are supplied in this package.
+Browsing, decisions and enrichment need no model credentials. To enable Ask:
+
+1. Copy `.env.example` to `.env` beside `Start-Dashboard.cmd` (not inside `app`).
+2. Set `PORTKEY_API_KEY` to **your own Portkey API token**.
+3. Set `UC4_LLM_MODEL` to a model route that your token can access. Obtain the route
+   identifier from your team's Portkey configuration; the token alone is insufficient.
+4. Leave optional routing fields blank unless your Portkey setup requires them.
+5. Restart the dashboard after editing `.env`. Existing shell variables take precedence.
+
+From PowerShell in the extracted folder, create the file without overwriting an existing one:
+
+```powershell
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+notepad .env
+```
+
+Each recipient supplies their own token. No credentials are supplied in this package.
+Keep the completed `.env` private; it is excluded from Git and the package builder.
 
 Each extracted copy maintains its own decisions and revisions in `app/data/`.
 This is a local demonstration, with self-declared reviewer names and no shared-user

@@ -28,6 +28,11 @@ uv run --project app uc4-mcp --transport http --port 8765
 
 The screen, filtering, evidence, decisions and enrichment work without a model key. Ask and the terminal question commands use the existing Portkey configuration (`PORTKEY_API_KEY` and `app/agent.toml`). Both commands load the repository `.env`; existing shell settings win.
 
+For each new user, copy the root `.env.example` to `.env`, fill in their own
+`PORTKEY_API_KEY` and an accessible `UC4_LLM_MODEL` route, then restart the server.
+Leave optional fields blank unless required by their Portkey configuration. Never
+share the completed `.env`; see [group setup instructions](../SHARE.md).
+
 `UC4_ZIP` selects a compatible candidate archive. `UC4_CANDIDATE_DB` selects the SQLite history file, defaulting to `app/data/candidate_history.sqlite3`. Source archives are copied under the database directory's `snapshots/`, named by SHA-256. Keep the database and snapshot directory together when backing up or moving the app. Configuring a different compatible archive selects its baseline on restart and preserves earlier revisions and decisions.
 
 ## Breeder workflow
