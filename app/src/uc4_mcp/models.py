@@ -152,6 +152,7 @@ class LineTrial:
     colour: str
     reason: str
     link: EvidenceRow  # the observation row
+    evidence_row_ids: tuple[str, ...] = ()  # recommendation rows supporting the verdict
 
 
 @dataclass(frozen=True)

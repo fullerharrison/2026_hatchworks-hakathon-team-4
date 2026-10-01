@@ -1,6 +1,6 @@
 """Checks an answer against the tool results it cites: it cites at least one result, every
 citation resolves, and every number and verdict or colour word appears in a cited result
-(numbers may also come from the question).
+(question text is not evidence).
 
 Citations are ``[<source_file>#<row_id>]`` (a row, as in ``evidence_row_ids``) or
 ``[tool:<name>]`` (a whole result, for tools without row ids such as ``query_trials``).
@@ -15,7 +15,7 @@ from typing import Any
 
 from uc4_mcp.bridge import ToolTrace
 
-CITATION = re.compile(r"\[((?:[\w.\-]+\.csv#[\w\-]+)|(?:tool:\w+))\]")
+CITATION = re.compile(r"\[((?:[\w.\- ]+\.csv#[\w\-]+)|(?:tool:\w+))\]")
 # Tokens with digits that are identifiers, not quantities.
 NOT_QUANTITIES = re.compile(
     r"SYN-[A-Z]{2}-\d+"
@@ -103,7 +103,7 @@ def refs_in(obj: Any) -> set[str]:
 
 def _cites(trace: ToolTrace, ref: str) -> bool:
     if ref.startswith("tool:"):
-        return trace.name == ref.removeprefix("tool:") and trace.status == "ok"
+        return trace.name == ref.removeprefix("tool:") and trace.status in {"ok", "none"}
     return ref in refs_in(trace.result)
 
 
@@ -142,14 +142,14 @@ def _verdict_values(obj: Any) -> Iterator[str]:
 
 
 def check(answer: str, question: str, traces: Sequence[ToolTrace]) -> Grounding:
-    """Ground ``answer`` in the traces it cites; numbers from the question are allowed."""
+    """Ground ``answer`` in the traces it cites; user numbers are not evidence."""
     citations: list[Citation] = []
     cited: list[ToolTrace] = []
     for ref in dict.fromkeys(CITATION.findall(answer)):
         hits = [t for t in traces if _cites(t, ref)]
         citations.append(Citation(ref, bool(hits)))
         cited += hits
-    pool = {float(n) for n in quantities(question)}
+    pool: set[float] = set()
     for t in cited:
         pool |= numbers_in(t.result)
     ungrounded = tuple(dict.fromkeys(n for n in quantities(answer) if not _matches(n, pool)))

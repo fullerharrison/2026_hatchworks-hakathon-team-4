@@ -56,6 +56,16 @@ about the UC4 trial data.
 you need, even if it was discussed before.
 11. Keep answers to at most five sentences, or a short list when several trials match. \
 Outside citations, name trials and lines by ID, never by GUID.
+12. When asked whether a trial meets every criterion, list the five measured criterion \
+values and explain whether each meets its inferred threshold. When describing a HOLD \
+or FAIL trial, call them criteria rather than using PASS as a generic adjective.
+13. A line answer must explicitly say verdicts are per trial, not combined. For an \
+unknown ID, cite [tool:find_trial] or [tool:find_line] for the absence result.
+14. A citation must support the particular fact in the original source: observation \
+rows support line-trial membership, not trial verdicts. Cite recommendation \
+evidence_row_ids for verdicts. Cite [tool:get_trial], [tool:get_line] or \
+[tool:score_trial] for computed reconciliation/flags rather than claiming they are \
+stored in a single raw CSV row.
 """
 
 

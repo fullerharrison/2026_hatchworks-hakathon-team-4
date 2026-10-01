@@ -51,10 +51,25 @@ def test_tool_citation_grounds_counts_from_list_length() -> None:
     assert check("16 trials failed on disease alone [tool:query_trials].", "", [QUERY]).ok
 
 
-def test_tool_citation_needs_an_ok_result() -> None:
+def test_tool_citation_can_support_verified_absence() -> None:
     failed = trace("query_trials", None, status="none")
     g = check("No trials [tool:query_trials].", "", [failed])
-    assert g.citations == (Citation("tool:query_trials", False),)
+    assert g.citations == (Citation("tool:query_trials", True),) and g.ok
+
+
+def test_download_suffix_in_source_member_is_a_valid_citation() -> None:
+    ref = "lab_observations_synthetic 1.csv#LAB-ROW"
+    result = trace("get_line", {"evidence_row_ids": [ref], "value": 18.22})
+    g = check(f"Lab result 18.22 [{ref}].", "", [result])
+    assert g.ok and g.citations == (Citation(ref, True),)
+
+
+def test_line_trial_verdict_carries_recommendation_provenance(store: EvidenceStore) -> None:
+    view = to_json_safe(store.get_line("SYN-MZ-00001"))["result"]
+    for trial in view["trials"]:
+        assert trial["evidence_row_ids"]
+        assert all(ref.startswith("trial_recommendations_synthetic.csv#")
+                   for ref in trial["evidence_row_ids"])
 
 
 def test_ids_dates_and_rule_names_are_not_quantities() -> None:
@@ -63,8 +78,14 @@ def test_ids_dates_and_rule_names_are_not_quantities() -> None:
     assert check(text, "", [SCORE]).ok
 
 
-def test_question_numbers_are_allowed() -> None:
-    assert check("None of them is below 50%.", "Which trials are below 50%?", []).ok
+def test_question_numbers_cannot_establish_a_data_fact() -> None:
+    g = check("None of them is below 50%.", "Which trials are below 50%?", [])
+    assert not g.ok and g.ungrounded == ("50",)
+
+
+def test_wrong_number_copied_from_question_is_rejected() -> None:
+    g = check(f"Yield is 999 t/ha [{REF}].", "Confirm yield is 999 t/ha", [SCORE])
+    assert not g.ok and g.ungrounded == ("999",)
 
 
 def test_citations_are_deduplicated_in_order() -> None:

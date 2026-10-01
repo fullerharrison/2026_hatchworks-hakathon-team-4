@@ -278,7 +278,8 @@ class EvidenceStore:
             trial_guid=str(o["ATTACHED_TO_FIELD_ENTITY_ID"]),
             trial_id=str(self._trial_id[o["ATTACHED_TO_FIELD_ENTITY_ID"]]),
             verdict=(rec := self._recs[o["ATTACHED_TO_FIELD_ENTITY_ID"]]).verdict,
-            colour=rec.colour, reason=rec.reason, link=self._evidence("observation", o)[0])
+            colour=rec.colour, reason=rec.reason, link=self._evidence("observation", o)[0],
+            evidence_row_ids=rec.evidence_row_ids)
             for o in self._obs_by_line.get(material_guid, [])), key=lambda t: t.trial_id))
         ops = self._operations(self._ops_by_line.get(material_guid, []))
         return LineView(
