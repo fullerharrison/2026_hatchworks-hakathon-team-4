@@ -25,6 +25,7 @@ from mcp.server.mcpserver import MCPServer
 from uc4_mcp.agent import AGENT_LOG, Answer, ask, load_agent_settings
 from uc4_mcp.api import create_app
 from uc4_mcp.bridge import open_bridge
+from uc4_mcp.config import ENV_FILE, ensure_env
 from uc4_mcp.decisions import DecisionLog, log_path
 from uc4_mcp.evals import (CASES_PATH, RESULTS_DIR, CaseResult, load_cases, report,
                            result_stem, run_cases)
@@ -174,6 +175,12 @@ def main(argv: list[str] | None = None) -> None:
     """Run one ``uc4-ask`` command; exit 2 with a readable message if the model is not set up."""
     args = build_parser().parse_args(argv)
     configure_cli_logging()
+    if missing := ensure_env():
+        sys.stderr.write(
+            f"Missing required environment variables: {', '.join(missing)}\n"
+            f"Add them to {ENV_FILE} (one KEY=value per line) or export them in your "
+            "shell, then rerun.\n")
+        raise SystemExit(2)
     try:
         code = args.func(args)
     except LLMError as e:

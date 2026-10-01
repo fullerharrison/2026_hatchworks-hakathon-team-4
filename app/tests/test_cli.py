@@ -24,6 +24,7 @@ GOOD = f"SYN-TR-0037 is HOLD: resistant lines 30% < 50% (inferred) [{REF_0037}].
 def use(store: EvidenceStore, monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.setattr(cli, "server", create_server(lambda: store))
     monkeypatch.setattr(cli, "configure_cli_logging", lambda: None)  # keep app/logs clean
+    monkeypatch.setattr(cli, "ensure_env", lambda: [])  # no dependency on a real .env
     yield
 
 

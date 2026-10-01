@@ -51,6 +51,17 @@ ROW_KEYS: dict[str, str] = {
     "recommendations": "TRIAL_GUID",
 }
 
+# Minimum v2 columns consumed by evidence, lifecycle and scoring procedures.
+REQUIRED_COLUMNS: dict[str, set[str]] = {
+    "germplasm": {"MATERIAL_GUID", "MATERIAL_ID", "MATERIAL_TYPE_LID", "STATUS_LID", "REMARK", "CREATE_DATE", "LAST_CHG_DATE"},
+    "trial": {"TRIAL_GUID", "TRIAL_ID", "START_YEAR", "STATUS_LID", "LOCATION_GUID", "REMARK", "CREATE_DATE", "LAST_CHG_DATE"},
+    "observation": {"ID", "ATTACHED_TO_FIELD_ENTITY_ID", "GID", "REPLICATION_NO", "REMARK"},
+    "operations": {"OPERATION_GUID", "TRIAL_GUID", "MATERIAL_GUID", "OPERATION_DATE", "OPERATION_TYPE_LID", "OPERATION_STATUS_LID", "PLOT_NO", "REMARK"},
+    "lab": {"ROWGUID", "MATERIAL_GUID", "TRAIT_GUID", "NUMBER_VALUE", "REMARK", "LAST_CHG_DATE"},
+    "genomics": {"GENOMIC_SAMPLE_GUID", "MATERIAL_GUID", "GENOTYPING_DATE", "GENOMIC_BREEDING_VALUE", "MARKER_DISEASE_RESISTANCE", "MARKER_YIELD_POTENTIAL", "MARKER_DROUGHT_TOLERANCE", "MARKER_MATURITY", "QC_STATUS_LID", "QC_CALL_RATE_PCT", "REMARK", "CREATE_DATE", "LAST_CHG_DATE"},
+    "recommendations": {"TRIAL_GUID", "TRIAL_ID", "YIELD_T_HA", "MOISTURE_PCT", "DISEASE_SCORE", "PLANT_HEIGHT_CM", "FLOWERING_DAYS", "GENOMIC_BREEDING_VALUE_MEAN", "RESISTANT_MATERIAL_PCT", "GENOMICS_QC_PASS_PCT", "TRIAL_RECOMMENDATION", "RECOMMENDATION_RATIONALE", "RULE_VERSION", "IS_SYNTHETIC"},
+}
+
 
 @dataclass(frozen=True)
 class SourceInfo:
@@ -192,6 +203,13 @@ def load_tables(zip_path: Path) -> dict[str, pd.DataFrame]:
             name, key_col = members[stem], ROW_KEYS[key]
             with zf.open(name) as fh:
                 df = pd.read_csv(fh, encoding_errors="replace", dtype={key_col: str})
+            missing = REQUIRED_COLUMNS[key] - set(df.columns)
+            if missing:
+                raise ValueError(
+                    f"Unsupported archive {zip_path.name}: {name} lacks v2 columns "
+                    f"{', '.join(sorted(missing))}. The app supports the v2 archive "
+                    f"{ZIP_NAME}; v3 requires a data migration. Set {ZIP_ENV} accordingly."
+                )
             if len(df) != EXPECTED_ROWS[key]:
                 raise ValueError(f"{stem}: {len(df)} rows, expected {EXPECTED_ROWS[key]}")
             df["_source_file"] = name

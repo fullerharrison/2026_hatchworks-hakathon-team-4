@@ -55,6 +55,19 @@ def test_row_counts(tables: Tables) -> None:
     assert {k: len(df) for k, df in tables.items()} == EXPECTED_ROWS
 
 
+def test_matching_row_counts_do_not_hide_incompatible_schema(zip_path: Path, tmp_path: Path) -> None:
+    target = tmp_path / "unsupported.zip"
+    with zipfile.ZipFile(zip_path) as source, zipfile.ZipFile(target, "w") as output:
+        for name in source.namelist():
+            contents = source.read(name)
+            if member_stem(name) == FILES["observation"]:
+                frame = pd.read_csv(__import__("io").BytesIO(contents)).drop(columns=["GID"])
+                contents = frame.to_csv(index=False).encode()
+            output.writestr(name, contents)
+    with pytest.raises(ValueError, match="lacks v2 columns GID.*v3 requires a data migration"):
+        load_tables(target)
+
+
 @pytest.mark.parametrize("key", list(FILES))
 def test_row_id_unique_non_null_str(tables: Tables, key: str) -> None:
     df = tables[key]

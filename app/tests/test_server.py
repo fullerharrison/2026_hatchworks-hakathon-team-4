@@ -10,6 +10,7 @@ import anyio
 import pytest
 from mcp import Client
 from mcp.server.mcpserver import MCPServer
+from starlette.testclient import TestClient
 
 from uc4_mcp.checks import FLAG_CODES
 from uc4_mcp.models import to_json_safe
@@ -218,3 +219,28 @@ def test_one_log_line_per_call(server: MCPServer, tmp_path: Path) -> None:
     assert len(lines) == 2
     assert "find_trial" in lines[0] and "ok" in lines[0]
     assert "query_trials" in lines[1] and "none" in lines[1]
+
+
+# --- the HTTP transport's /health probe ------------------------------------------------
+
+
+def test_health_route_reports_the_loaded_store(server: MCPServer,
+                                               store: EvidenceStore) -> None:
+    """``GET /health``: the JSON a probe sees without an MCP client; ``/`` stays 404."""
+    client = TestClient(server.streamable_http_app())
+    assert client.get("/").status_code == 404
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json() == {"status": "ok", "server": "uc4-mcp",
+                        "trials": len(store.trial_guids),
+                        "sources": len(store.list_sources()["result"]["files"]),
+                        "extract_date": "2026-09-26 12:00"}
+
+
+def test_health_route_reports_a_store_failure() -> None:
+    """A store that cannot load fails the probe (500) instead of the server."""
+    def fail() -> EvidenceStore:
+        raise RuntimeError("zip missing")
+    r = TestClient(create_server(fail).streamable_http_app()).get("/health")
+    assert r.status_code == 500
+    assert r.json() == {"status": "error", "error": "zip missing"}

@@ -3,6 +3,9 @@
 Tools are thin wrappers: each calls one store method and returns its envelope through
 ``to_json_safe``. Descriptions are the Phase 2 agent's instructions. Never print to stdout:
 it carries the stdio protocol; logging goes to ``app/logs/uc4_mcp.log``.
+
+The HTTP transport also serves ``GET /health`` (JSON) so a probe can see the loaded store
+without an MCP client; ``/mcp`` remains the only other route (``/`` is 404 by design).
 """
 
 from __future__ import annotations
@@ -18,7 +21,10 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 from mcp.types import ToolAnnotations
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
+from uc4_mcp.config import ENV_FILE, load_env_file
 from uc4_mcp.models import to_json_safe
 from uc4_mcp.store import MISSED_FIELDS, QUERY_FLAGS, EvidenceStore
 
@@ -100,9 +106,23 @@ def create_server(get_store: Callable[[], EvidenceStore]) -> MCPServer:
         get_store: Returns the ``EvidenceStore``; tests pass their session store.
 
     Returns:
-        An ``MCPServer`` with the 8 tools and 2 resources.
+        An ``MCPServer`` with the 8 tools, 2 resources and the ``GET /health`` route.
     """
     server = MCPServer("uc4-mcp")
+
+    @server.custom_route("/health", methods=["GET"])
+    async def health(_request: Request) -> JSONResponse:
+        """Report the loaded store: JSON, unauthenticated, mounted beside ``/mcp``."""
+        try:
+            store = get_store()
+            sources = store.list_sources()["result"]
+        except Exception as e:  # any load failure is a 500 probe result, not a crash
+            logger.exception("health check failed")
+            return JSONResponse({"status": "error", "error": str(e)}, status_code=500)
+        return JSONResponse({"status": "ok", "server": "uc4-mcp",
+                             "trials": len(store.trial_guids),
+                             "sources": len(sources["files"]),
+                             "extract_date": sources["extract_date"]})
 
     @server.tool(description=LIST_SOURCES, annotations=READ_ONLY)
     def list_sources() -> dict[str, Any]:
@@ -189,6 +209,8 @@ def main(argv: list[str] | None = None) -> None:
     """Run the server, loading the zip first so a missing archive fails at once."""
     args = parse_args(argv)
     configure_logging()
+    if load_env_file():  # picks up UC4_ZIP and friends; the server needs no keys
+        logger.info("Loaded environment from %s", ENV_FILE)
     try:
         _default_store()
     except FileNotFoundError as e:

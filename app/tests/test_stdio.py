@@ -5,11 +5,14 @@ The environment is passed explicitly: without ``env`` the mcp stdio client forwa
 a dozen variables, dropping ``UV_PROJECT_ENVIRONMENT`` and ``UC4_ZIP``.
 """
 
+import json
 import os
 import shutil
 import socket
 import subprocess
 import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Any
 
@@ -81,8 +84,17 @@ def _wait_for_port(port: int, proc: subprocess.Popen[bytes], timeout: float = 30
     pytest.fail(f"server not listening on {port} after {timeout} s")
 
 
+def _http_get(port: int, path: str) -> tuple[int, bytes]:
+    """Plain HTTP GET, stdlib only; the 404 at ``/`` is an expected status, not an error."""
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}{path}", timeout=10) as r:
+            return r.status, r.read()
+    except urllib.error.HTTPError as e:
+        return e.code, e.read()
+
+
 def test_http_transport() -> None:
-    """The streamable-HTTP URL the README gives n8n."""
+    """The streamable-HTTP URL the README gives n8n, plus its /health probe."""
     port = _free_port()
     proc = subprocess.Popen([script(), "--transport", "http", "--port", str(port)], cwd=REPO,
                             env=dict(os.environ), stdout=subprocess.DEVNULL,
@@ -90,6 +102,12 @@ def test_http_transport() -> None:
     try:
         _wait_for_port(port, proc)
         check(*baseline_and_tools(f"http://127.0.0.1:{port}/mcp"))
+        status, body = _http_get(port, "/health")
+        assert status == 200
+        health = json.loads(body)
+        assert health["status"] == "ok" and health["server"] == "uc4-mcp"
+        assert health["trials"] == 72 and health["sources"] == 7
+        assert _http_get(port, "/")[0] == 404  # / is 404 by design; /mcp and /health are it
     finally:
         proc.terminate()
         proc.wait(timeout=10)
