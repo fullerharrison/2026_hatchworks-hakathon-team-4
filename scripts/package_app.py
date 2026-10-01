@@ -13,8 +13,8 @@ EXPECTED = "c195330223d0e3bb334dc9c2e1f338a37f058f5cb3b564d9d2140c7a5011da46"
 def build():
     files = ["SHARE.md", ".env.example", "Start-Dashboard.cmd", "scripts/package_app.py", SOURCE,
              "app/pyproject.toml", "app/uv.lock", "app/.python-version", "app/agent.toml",
-             "app/README.md", "app/ARCHITECTURE.md", "app/README_v2.md",
-             "app/ARCHITECTURE_v2.md", "app/evals/questions.json", "app/evals/questions_v2.json"]
+             "app/README.md", "app/API.md", "app/ARCHITECTURE.md",
+             "app/evals/questions.json", "app/evals/questions_v2.json"]
     for directory, extensions in [("app/src", {".py", ".html", ".css", ".js"}),
                                    ("app/tests", {".py"})]:
         files.extend(p.relative_to(ROOT).as_posix() for p in (ROOT / directory).rglob("*")

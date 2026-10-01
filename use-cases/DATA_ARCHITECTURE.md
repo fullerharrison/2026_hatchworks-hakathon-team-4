@@ -56,9 +56,9 @@ flowchart LR
     classDef human fill:#dbe9ff,stroke:#1f5fbf,color:#000
 ```
 
-## New findings from this pass
+## Historical findings (29 September 2026)
 
-All of this evidence was measured on 2026-09-29 by opening the zips in memory, read-only.
+These findings describe the earlier deliveries, opened read-only on 2026-09-29. The UC4 rows below apply only to historical v2. For the current candidate dataset, use the [UC4 guide](uc4/README.md) and [data architecture](uc4/DATA_ARCHITECTURE.md).
 
 | UC | Finding | Why it matters |
 | --- | --- | --- |
@@ -70,4 +70,4 @@ All of this evidence was measured on 2026-09-29 by opening the zips in memory, r
 | UC4 | v2 observations hold links, not values; trial genomics aggregates match the linked lines in 0 of 72 trials. | Line-level evidence cannot prove a trial verdict. Flag the gap instead of hiding it. |
 | UC4 | 144 of 216 operations fall outside their trial's start year; all 114 planned operations are already past. | Show operations as context with a date-inconsistency flag. |
 
-The first-pass UC4 findings (one trait per material, 29 of 216 operations sharing an observation, replication labels) described the kickoff archive, which v2 supersedes.
+The first-pass UC4 findings (one trait per material, 29 of 216 operations sharing an observation, replication labels) described the kickoff archive, which v2 superseded. Both are superseded for current UC4 work by the 1 October candidate delivery.

@@ -60,7 +60,7 @@ Measured: 150 recommendations (32 GREEN, 53 AMBER, 65 RED); all 12 audited key r
 
 Validation: `python analysis/uc4_eda/uc4_eda.py`; `python -m pytest -q analysis/uc4_eda -p no:cacheprovider --basetemp analysis/uc4_eda/.test-tmp-20261001/final-check` -> **82 passed**. Current and archived-v3 report links, current guide/source/SME links, embedded figures and source SHA-256 checked; `git diff --check` passed. Initial validation found one test's overly loose alternative-ratio tolerance, corrected to source precision. Two attempts hit Windows temp permissions (shared temp and existing .pytest_cache); final validation used a writable dedicated analysis temp directory. Historical app tests were outside this task's scope.
 
-Evidence: [current briefing](../analysis/uc4_eda/report.html), [replacement analysis](../analysis/uc4_eda/candidate_analysis.py), [tests](../analysis/uc4_eda/test_candidates.py), [source selection](../get_started/README.md), [archived v3](../analysis/uc4_eda/v3/report_v3.html). Source ZIPs remain git-ignored. SHA-256: `c195330223d0e3bb334dc9c2e1f338a37f058f5cb3b564d9d2140c7a5011da46`.
+Evidence: [current briefing](../analysis/uc4_eda/report.html), [replacement analysis](../analysis/uc4_eda/candidate_analysis.py), [tests](../analysis/uc4_eda/test_candidates.py), [source selection](../get_started/README.md). Source ZIPs remain git-ignored. SHA-256: `c195330223d0e3bb334dc9c2e1f338a37f058f5cb3b564d9d2140c7a5011da46`.
 
 
 ## 2026-10-01: candidate application migration

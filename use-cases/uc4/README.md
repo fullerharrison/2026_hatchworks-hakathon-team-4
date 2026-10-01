@@ -2,7 +2,7 @@
 
 The [current data briefing](../../analysis/uc4_eda/report.html) uses **candidate_recommendations_synthetic.zip**, the replacement supplied by the SME on 1 October 2026. It is the fourth local delivery; source remarks call it "integrated V2 (fixed)". Earlier sources and conclusions are superseded for current analysis.
 
-The running [app](../../app/README.md) now uses candidate-level provisional RAG, list filters, contextual breeder decisions and reviewed enrichment. Source snapshots and recommendation revisions preserve historical decision context. The [historical v2 guide](README_v2.md) preserves the former demo contract. See [SME messages](../../team/SME_ANSWERS.md) for delivery history.
+The running [app](../../app/README.md) now uses candidate-level provisional RAG, list filters, contextual breeder decisions and reviewed enrichment. Source snapshots and recommendation revisions preserve historical decision context. See [SME messages](../../team/SME_ANSWERS.md) for delivery history.
 
 ## What the breeder can now inspect
 
@@ -37,7 +37,7 @@ An outcome-compatible rule matches all 150 supplied recommendations, using eithe
 
 1. No usable field data → AMBER.
 2. RED if yield vs checks <95%, disease >6, or fumonisin >4 ppm.
-3. Otherwise GREEN if yield vs checks ≥103%, disease ≤4, moisture ≤23%, germination ≥90%, marker is not SUSCEPTIBLE, and at least two trials are usable.
+3. Otherwise GREEN if yield vs checks ≥103%, disease ≤4, moisture ≤23%, germination ≥90%, marker is RESISTANT or INTERMEDIATE, and at least two trials are usable.
 4. Otherwise AMBER.
 
 Targets and limits appear in the supplied reasons. The complete conjunction, precedence, inclusive boundaries and no-data priority are **inferred**. Moisture >25% and germination <85% do not act as RED knockouts in this snapshot. Genomic value and cold-test vigour require no gate to reproduce the supplied outcomes; confirm their intended role with the SME. These are synthetic demonstration rules, not a production breeding protocol.
@@ -55,4 +55,4 @@ The Python environment needs pandas, matplotlib and pytest. An alternative is `u
 
 Confirm aggregation, exclusions, threshold equality/rounding, and the role of genomic/cold-test metrics. The coordinated candidate app migration uses the same reconstruction and policy implementation as this analysis. Existing human decisions retain their original recommendation context; historical v2 records remain explicitly trial-scoped.
 
-Historical profiles: [v1](../../analysis/uc4_eda/v1/report_v1.html), [v2](../../analysis/uc4_eda/v2/report_v2.html), [v3](../../analysis/uc4_eda/v3/report_v3.html). Retained ZIPs are marked superseded in the [source inventory](../../get_started/README.md); they are not inputs to current analysis.
+Retained ZIPs are marked superseded in the [source inventory](../../get_started/README.md); they are not inputs to current analysis.

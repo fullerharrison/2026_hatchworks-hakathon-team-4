@@ -1,6 +1,6 @@
 # UC4 SME answers
 
-Answers from the UC4 subject-matter expert, Diganta ("Dig") Adhikari, with the date received. Numbers in the 2026-09-29 entry were measured in the [v2 data profile](../analysis/uc4_eda/v2/report_v2.html); numbers in the 2026-09-30 entry in the historical [v3 data profile](../analysis/uc4_eda/v3/report_v3.html) (`analysis/uc4_eda/`). **Inferred** marks our reading of the data, not something the SME stated.
+Answers from the UC4 subject-matter expert, Diganta ("Dig") Adhikari, with the date received. Numbers in the 2026-09-29 entry were measured in the v2 data profile (superseded); numbers in the 2026-09-30 entry in the v3 data profile (superseded). **Inferred** marks our reading of the data, not something the SME stated.
 
 ## 2026-09-29: scoring logic and comparison basis
 
@@ -45,7 +45,7 @@ The file gives **outcomes and reasons in words, not thresholds**. We reverse-eng
 2. **A criterion the rationale never mentions.** Resistant % gates PASS, but the rationale names only yield, moisture, disease and genomic value. Four trials (SYN-TR-0037, 0038, 0046, 0052) read "all four met" and are HOLD.
 3. **The grain is the trial, not the line.** Verdicts are per trial. The brief's persona decides on *lines*, so the demo must explain how a trial verdict applies to the ten lines in it.
 4. **Trial values do not trace back to lines.** v2 observations carry no trait values. Yield, moisture and disease therefore exist only as trial aggregates. The genomics aggregates match none of the 72 trials through the observation links. They match all 72 when trial *k* takes the ten lines `SYN-MZ` block ((*k* − 1) mod 15), a mapping no file records.
-5. **v1 content is gone.** Pedigree, parents, breeding stage and `ADVANCEMENT_DECISION` (the v1 baseline), trait values with quality flags, and lab dates are all absent. The v1 profile is kept in [`analysis/uc4_eda/v1/`](../analysis/uc4_eda/v1/report_v1.html).
+5. **v1 content is gone.** Pedigree, parents, breeding stage and `ADVANCEMENT_DECISION` (the v1 baseline), trait values with quality flags, and lab dates are all absent. The v1 profile has been superseded.
 
 ## Follow-up questions (to send)
 
@@ -62,7 +62,7 @@ The file gives **outcomes and reasons in words, not thresholds**. We reverse-eng
 
 **What was attached:** `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case_09-30-2026.zip`, seven CSVs with the same names and row counts as v2. The EDA reads it by exact name; the app stays on v2 until it is migrated.
 
-**What changed** (full table: [`tables/version_diff.csv`](../analysis/uc4_eda/v3/tables/version_diff.csv)):
+**What changed** (findings from the superseded v3 comparison):
 
 - **Five files were regenerated** under new GUIDs and now link to each other: plots, operations and lab resolve to lines and trials, and parents resolve to lines (all 100%).
 - **Line content is back.** Pedigree, parents, breeding stage, generation and `ADVANCEMENT_DECISION` (ADVANCE 35, HOLD 58, DISCARD 57) are filled. Observations are now per-plot trait values with unit, date, replicate and quality flag (624 ACCEPTED, 81 REVIEW, 15 REJECTED). Lab results are dated; 16 lines have none. These match the v1 counts the [UC4 guide](../use-cases/uc4/README.md) recorded.

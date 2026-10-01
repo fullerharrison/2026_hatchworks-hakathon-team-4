@@ -24,7 +24,7 @@ flowchart LR
 
 `candidates.py` constructs views and implements AND filters. It preserves original source rows and exposes effective calculations alongside active corrections. Candidate recommendations carry snapshot hash, revision ID, rule version, unrounded metrics, criteria, reason, warnings and supplied RAG/reason. Source references retain archive member, primary key and CSV row number. Supplied and calculated RAG can diverge after enrichment; the difference is visible.
 
-The versioned provisional policy gives AMBER first when no usable field trials exist; otherwise RED for yield <95%, disease >6 or fumonisin >4; otherwise GREEN requires yield >=103%, disease <=4, moisture <=23%, germination >=90%, fumonisin <=4, a recognized nonsusceptible marker and at least two usable trials. Remaining candidates are AMBER. Genomic value and cold test remain contextual. Threshold equality, no-data priority and weighting remain inferred policy choices pending SME confirmation.
+The versioned provisional policy gives AMBER first when no usable field trials exist; otherwise RED for yield <95%, disease >6 or fumonisin >4; otherwise GREEN requires yield >=103%, disease <=4, moisture <=23%, germination >=90%, fumonisin <=4, a RESISTANT or INTERMEDIATE marker and at least two usable trials. Remaining candidates are AMBER. Genomic value and cold test remain contextual. Threshold equality, no-data priority and weighting remain inferred policy choices pending SME confirmation.
 
 ## Durable decisions and enrichment
 
@@ -42,4 +42,4 @@ Names are self-declared in this local demo, with no authentication or separate r
 
 `candidate_server.py` exposes candidate lookup, scoring, list queries, policy and source tools. All tools are read-only; old trial-scoring names return migration messages. Candidate and historical agents select instructions from the available tool contracts. Grounding recognizes candidate RAG, breeder actions and source/tool citations. Snapshot/revision context and supplied-versus-calculated results stay distinct in tool output.
 
-Offline tests exercise the baseline, thresholds, filters, API/MCP contracts, stale writes, legacy imports, reviews, shared-check effects and historical modes. Browser tests exercise actual candidate workflows. Live-model tests remain opt-in and use the new candidate evaluation set. See [run and test instructions](README.md).
+Offline tests exercise the baseline, thresholds, filters, API/MCP contracts, stale writes, legacy imports, reviews, shared-check effects and historical modes. Browser tests exercise actual candidate workflows. Live-model tests remain opt-in and use the new candidate evaluation set. See [run and test instructions](README.md) and the [API and MCP reference](API.md).

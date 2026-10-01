@@ -1,6 +1,6 @@
 # UC4 replacement data architecture
 
-This describes the replacement candidate dataset received 1 October 2026, measured in the [current briefing](../../analysis/uc4_eda/report.html). All data are synthetic. The [implemented app architecture](../../app/ARCHITECTURE.md) describes the candidate runtime, reviewed enrichment and historical decision preservation. The former data diagrams are retained in [DATA_ARCHITECTURE_v2.md](DATA_ARCHITECTURE_v2.md).
+This describes the replacement candidate dataset received 1 October 2026, measured in the [current briefing](../../analysis/uc4_eda/report.html). All data are synthetic. The [implemented app architecture](../../app/ARCHITECTURE.md) describes the candidate runtime, reviewed enrichment and historical decision preservation.
 
 ## For the breeder
 

@@ -2,7 +2,7 @@
 
 Run: python analysis/uc4_eda/uc4_eda.py
 Reads only candidate_recommendations_synthetic.zip; writes figures/, tables/ and
-report.html here. Superseded outputs are preserved in v1/, v2/ and v3/.
+report.html here. Only the current generated report and assets are retained.
 """
 
 from __future__ import annotations

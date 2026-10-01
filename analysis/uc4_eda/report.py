@@ -532,8 +532,7 @@ def write_report(path: Path, figs: list[Path], tables: dict[str, pd.DataFrame],
 <p class="note"><b>Inferred, not supplied.</b> The recommendation file states outcomes and a rule
 version, not thresholds. The cut-points on this page are the simplest fixed values that
 reproduce every outcome. Confirm them with the UC4 expert before presenting them as the rule.
-Earlier profiles are kept in <a href="v2/report_v2.html">v2/report_v2.html</a> (29 Sep) and
-<a href="v1/report_v1.html">v1/report_v1.html</a> (kickoff).</p>
+Earlier profiles are superseded; only the current candidate report is retained.</p>
 {meeting_briefing(tables, stages)}
 <section><h2>Key findings</h2><ul class="findings">{items}</ul></section>
 {changes_section(fig, tables)}

@@ -4,6 +4,8 @@ The default app now uses `get_started/candidate_recommendations_synthetic.zip`: 
 
 ## Run
 
+On Windows, double-click `Start-Dashboard.cmd` in the repository root to launch the app and open a browser. For group setup and packaging, see [SHARE.md](../SHARE.md).
+
 From the repository root, with Python 3.12+ and uv:
 
 ```powershell
@@ -48,26 +50,7 @@ No-data candidates stay AMBER. Moisture >25% and germination <85% are warnings, 
 
 ## Interfaces
 
-| Interface | Purpose |
-| --- | --- |
-| `GET /candidates` | AND filters, sorted rows, total, total_available, offset/limit and next_offset |
-| `GET /candidates.csv` | All matching rows, including snapshot and revision identifiers |
-| `GET /candidates/{query}` | Candidate recommendation, source rows, comparisons and histories |
-| `POST /decisions` | Explicit action with actor, reason, context, recommendation_id, previous_decision_id and request_id |
-| `GET /decisions` | Preserved decision events, optionally filtered by candidate query |
-| `POST /enrichment` | Create a contextual or correction draft |
-| `POST /enrichment/{id}/review` | Submit, approve or reject with named actor and reason |
-| `GET /enrichment/{id}/preview` | All affected candidates and before/after measurements |
-| `POST /enrichment/{id}/activate` | Activate against the previewed base_revision |
-| `GET /revisions` | Evidence revision history |
-| `GET /revisions/{id}/candidates/{query}` | Read a candidate in an earlier revision |
-| `POST /revisions/rollback` | Create a new revision copying an earlier revision of the configured archive |
-| `GET /historical-decisions` | Original imported v2 JSONL payloads |
-| `POST /ask` | Grounded candidate questions; 503 when no model is configured |
-
-MCP tools: `list_sources`, `find_candidate`, `get_candidate`, `score_candidate`, `query_candidates`, `get_candidate_rule`, and `baseline_check`. The old `score_trial` and `query_trials` names return explicit migration messages. Resources: `uc4://sources` and `uc4://candidate-rule`. All MCP tools are read-only. `/health` on the MCP port reports source and revision identity; the breeder screen runs on its separate port.
-
-Filter ranges are JSON objects, for example `{"YIELD_VS_CHECK_PCT":{"min":103},"N_TRIALS_USED":{"min":2}}`. API and MCP responses identify pagination explicitly. Invalid filters return an error rather than being silently ignored.
+See the [API and MCP reference](API.md) for routes, tools, filters and pagination. The MCP interface is read-only; decisions and enrichment use explicit HTTP requests.
 
 ## Historical v2
 
@@ -76,7 +59,7 @@ uv run --project app uc4-ask serve --historical-v2 --port 8767
 uv run --project app uc4-mcp --historical-v2
 ```
 
-Historical mode requires the original v2 archive. If `UC4_ZIP` is set, point it at `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case.zip` for that process. Original source files and JSONL logs are preserved. The current app imports `UC4_DECISION_LOG` (default `app/data/decisions.jsonl`) idempotently; it does not invent missing v2 snapshot identity or turn old trial decisions into candidate decisions. [Historical instructions](README_v2.md) and [architecture](ARCHITECTURE_v2.md) describe that version.
+Historical mode requires the original v2 archive. If `UC4_ZIP` is set, point it at `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case.zip` for that process. Original source files and JSONL logs are preserved. The current app imports `UC4_DECISION_LOG` (default `app/data/decisions.jsonl`) idempotently; it does not invent missing v2 snapshot identity or turn old trial decisions into candidate decisions.
 
 ## Verification
 
@@ -87,6 +70,6 @@ python -m pytest -q analysis/uc4_eda/test_candidates.py
 python analysis/uc4_eda/uc4_eda.py
 ```
 
-Analysis requires pandas and matplotlib. On Windows, pass a fresh writable `--basetemp` directory and `-p no:cacheprovider` if the shared pytest temporary directory is inaccessible. Browser checks use installed Chrome. Live-model evaluations are opt-in: `uc4-ask eval` uses the candidate questions; `app/evals/questions_v2.json` retains historical questions.
+The default app suite excludes browser and live-model tests. Analysis requires pandas and matplotlib. On Windows, pass a fresh writable `--basetemp` directory and `-p no:cacheprovider` if the shared pytest temporary directory is inaccessible. Browser checks use installed Chrome. Live-model evaluations are opt-in: `uc4-ask eval` uses the candidate questions; `app/evals/questions_v2.json` retains historical questions.
 
 See [current architecture](ARCHITECTURE.md), [analysis](../analysis/uc4_eda/report.html) and [SME questions](../team/SME_ANSWERS.md). Dataset reproduction confirms implementation consistency, not biological policy approval.
