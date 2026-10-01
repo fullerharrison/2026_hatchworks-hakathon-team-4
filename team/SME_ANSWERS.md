@@ -1,6 +1,6 @@
 # UC4 SME answers
 
-Answers from the UC4 subject-matter expert, Diganta ("Dig") Adhikari, with the date received. Numbers in the 2026-09-29 entry were measured in the [v2 data profile](../analysis/uc4_eda/v2/report_v2.html); numbers in the 2026-09-30 entry in the current [v3 data profile](../analysis/uc4_eda/report.html) (`analysis/uc4_eda/`). **Inferred** marks our reading of the data, not something the SME stated.
+Answers from the UC4 subject-matter expert, Diganta ("Dig") Adhikari, with the date received. Numbers in the 2026-09-29 entry were measured in the [v2 data profile](../analysis/uc4_eda/v2/report_v2.html); numbers in the 2026-09-30 entry in the historical [v3 data profile](../analysis/uc4_eda/v3/report_v3.html) (`analysis/uc4_eda/`). **Inferred** marks our reading of the data, not something the SME stated.
 
 ## 2026-09-29: scoring logic and comparison basis
 
@@ -62,7 +62,7 @@ The file gives **outcomes and reasons in words, not thresholds**. We reverse-eng
 
 **What was attached:** `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case_09-30-2026.zip`, seven CSVs with the same names and row counts as v2. The EDA reads it by exact name; the app stays on v2 until it is migrated.
 
-**What changed** (full table: [`tables/version_diff.csv`](../analysis/uc4_eda/tables/version_diff.csv)):
+**What changed** (full table: [`tables/version_diff.csv`](../analysis/uc4_eda/v3/tables/version_diff.csv)):
 
 - **Five files were regenerated** under new GUIDs and now link to each other: plots, operations and lab resolve to lines and trials, and parents resolve to lines (all 100%).
 - **Line content is back.** Pedigree, parents, breeding stage, generation and `ADVANCEMENT_DECISION` (ADVANCE 35, HOLD 58, DISCARD 57) are filled. Observations are now per-plot trait values with unit, date, replicate and quality flag (624 ACCEPTED, 81 REVIEW, 15 REJECTED). Lab results are dated; 16 lines have none. These match the v1 counts the [UC4 guide](../use-cases/uc4/README.md) recorded.
@@ -86,3 +86,15 @@ The inferred SYNTH_V1 rule still reproduces 72/72, as it must with an unchanged 
 3. How should a line's `ADVANCEMENT_DECISION` relate to the verdicts of the trials it was in?
 4. Should a PLANNED or ACTIVE trial carry a verdict?
 5. What do lab trait `...04`'s `EVENT_*` values mean, and the operation quantity units?
+
+## 2026-10-01: replacement candidate dataset (fourth local delivery)
+
+**Message supplied by the user:** "you all are UC4 right? there was some issue with the files...use this version, erase previous to avoid issue."
+
+**Replacement:** `get_started/candidate_recommendations_synthetic.zip`, eight CSVs. Source remarks say "integrated V2 (fixed)"; the fourth-delivery label is local chronology, not an SME rule version. The team chose to archive/deactivate earlier versions rather than delete historical evidence; the existing app remains a historical v2 demo.
+
+**Measured:** 150 candidate recommendations (32 GREEN, 53 AMBER, 65 RED); 152 germplasm/genomics records including two checks; 1,728 bridge entries across 72 trials; 5,184 observations; 456 lab results; 360 operation updates; six dictionary entries. All 12 audited relationships resolve and 22 identity/chronology checks have zero violations. Two candidates have no field data. Breeder decision/comment fields are blank.
+
+**Inferred and verified:** Replicate means followed by equal-weight trial means reproduce field summaries. Yield vs checks is a ratio of mean yields, not a mean of trial ratios. Excluding five missed-irrigation trials reproduces all 30 candidate exclusion caveats. All field metrics reproduce for 148 tested candidates within displayed precision; lab/genomic metrics and counts reconcile. The compatible candidate RAG rule reproduces 150/150 using both rounded summaries and reconstructed source precision.
+
+**Remaining questions:** Confirm weighting/exclusions, full RAG conjunction/precedence/equality/rounding, the role of genomic value/cold-test vigour, and missing trial master/pedigree/stage metadata. The older follow-up lists above are historical; candidate-level recommendations and the supplied trait dictionary supersede the old trial-grain/lab-dictionary questions. [Full briefing and evidence](../analysis/uc4_eda/report.html).

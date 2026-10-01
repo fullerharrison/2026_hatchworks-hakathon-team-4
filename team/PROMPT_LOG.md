@@ -33,6 +33,12 @@
 
 | 2026-09-30 | Harrison Fuller | Screen and log | demo | GitHub Copilot; Playwright with installed Chrome; Pillow | "Finish the stopped agent's open demo items; start implementation." Verified six trusted mouse/keyboard checks and the unchanged 393-test default suite; recovered the scratch capture script into a self-contained uv command; regenerated six PNGs and an eight-scene, 16-second GIF (297,540 bytes), with two live Ask answers and rehearsal overrides isolated in a temporary log; closed the task evidence | [browser tests](../app/tests/test_browser.py), [capture script](screenshots/capture.py), [GIF](screenshots/phase3_walkthrough.gif), [walkthrough](phase3_walkthrough.md#real-input-checks-2026-09-30) | yes | |
 
+## 2026-09-30 evidence-driven demo review
+
+Retained user requests: "Write tasks and plans to .tasks ... Be evidence driven", "Implement the plan", and "Use sub agents to complete .tasks/uc4-demo-review". Codex root coordinated data_review, app_review and screen_video sub-agents across data, application/MCP, live agent, screen, documentation, videos and rehearsal. Reproduced source/grounding/UI/documentation defects were fixed and rechecked; failed attempts remain in the evidence record.
+
+Results and exact scope: [review index](../.tasks/uc4-demo-review/task.md), [findings](../.tasks/uc4-demo-review/evidence/20260930T225928Z-bbd0c0b/findings.md), [reviewed identity](../.tasks/uc4-demo-review/evidence/20260930T225928Z-bbd0c0b/manifest.md), and [two narrated recordings](../.tasks/uc4-demo-review/evidence/20260930T225928Z-bbd0c0b/videos/index.md). Synthetic v2 remains the app/demo baseline; v3 is separately audited. Numeric/citation guards have disclosed semantic limits, and human live presentation timing remains unmeasured. Local Windows speech supplies disclosed synthetic narration; live Ask answers in the recordings are actual gateway responses.
+
 ## Weekly roll-up (fill in Thursday for the deck)
 
 | Phase | # entries | Best example (link) | Lesson |
@@ -45,3 +51,13 @@
 | test | | | |
 | docs | | | |
 | demo | | | |
+
+## 2026-10-01 replacement UC4 analysis
+
+Retained user requests: "There has been another change from the SME for use-case 4 ... We need new analysis on ... candidate_recommendations_synthetic.zip", "Implement the plan", and "continue". User selected analysis/documentation scope and archive/deactivate of previous versions. Codex inspected the ZIP in memory, preserved v3 outputs and historical guides, switched the current generator to the replacement alone, and produced a standalone HTML briefing, four figures and 15 audit tables. No runtime source-code migration was performed by this task; concurrent workspace changes were preserved.
+
+Measured: 150 recommendations (32 GREEN, 53 AMBER, 65 RED); all 12 audited key relationships resolve; zero violations across 22 consistency checks. All 148 available field summaries reproduce within displayed precision with ratio-of-means yield comparison; counts, lab/genomic values, markers and exclusions also reconcile. Five missed-irrigation trials explain caveats on 30 candidates; two lines have no field data. The compatible RAG rule reproduces 150/150 from both supplied rounded summaries and reconstructed precision. One printed warning rounds disease to 6.0 while its numeric record is above 6.0; all 154 numeric warning comparisons agree with summary and reconstructed values. Aggregation and full scoring policy remain labelled inferred pending SME confirmation.
+
+Validation: `python analysis/uc4_eda/uc4_eda.py`; `python -m pytest -q analysis/uc4_eda -p no:cacheprovider --basetemp analysis/uc4_eda/.test-tmp-20261001/final-check` -> **82 passed**. Current and archived-v3 report links, current guide/source/SME links, embedded figures and source SHA-256 checked; `git diff --check` passed. Initial validation found one test's overly loose alternative-ratio tolerance, corrected to source precision. Two attempts hit Windows temp permissions (shared temp and existing .pytest_cache); final validation used a writable dedicated analysis temp directory. Historical app tests were outside this task's scope.
+
+Evidence: [current briefing](../analysis/uc4_eda/report.html), [replacement analysis](../analysis/uc4_eda/candidate_analysis.py), [tests](../analysis/uc4_eda/test_candidates.py), [source selection](../get_started/README.md), [archived v3](../analysis/uc4_eda/v3/report_v3.html). Source ZIPs remain git-ignored. SHA-256: `c195330223d0e3bb334dc9c2e1f338a37f058f5cb3b564d9d2140c7a5011da46`.

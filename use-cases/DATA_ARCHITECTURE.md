@@ -1,21 +1,21 @@
 # Data architecture: all four use cases
 
-Each use case has a data-architecture page with two layers:
+This checkout contains the UC4 data-architecture page and [implemented runtime architecture](../app/ARCHITECTURE.md). The UC1-UC3 rows below preserve historical design summaries; their diagram files are absent here. The UC4 data page has these layers:
 
-- **Part A, for a novice:** a plain-language story, a "where the data goes" diagram and a "what connects to what" diagram, without column names.
-- **Part B, for an expert:** an entity-relationship model with real columns and measured join rates, the proposed pipeline, the headline interaction as a sequence diagram, and a record lifecycle.
-- **Part C, evidence:** every number in the diagrams, with its source column and measured value.
+- **For the breeder:** how field measurements, checks, lab results and genomics inform a candidate recommendation.
+- **Recorded source relationships:** explicit GUID/entry joins, cardinality safeguards and measured audits.
+- **Analysis flow and migration boundary:** reconstruction, source limitations and differences from the historical app.
 
 | Use case | Page | Data backbone | Biggest data gap |
 | --- | --- | --- | --- |
-| UC1 Plant Capacity | [uc1/DATA_ARCHITECTURE.md](uc1/DATA_ARCHITECTURE.md) | `PO Number` links schedules → logs → pass/fail, in two separate LSV and SSV clusters | No line capacity, customer orders or changeover rules |
-| UC2 Market Intelligence | [uc2/DATA_ARCHITECTURE.md](uc2/DATA_ARCHITECTURE.md) | Market ↔ Sales on Species + Year (236 of 236) + segment **description** | No monthly demand history; units unconfirmed |
-| UC3 Data Integrity | [uc3/DATA_ARCHITECTURE.md](uc3/DATA_ARCHITECTURE.md) | One 545-row account table with 3 unique ID columns | No required-field policy or owner directory |
-| UC4 R&D Unification | [uc4/DATA_ARCHITECTURE.md](uc4/DATA_ARCHITECTURE.md) | v2 archive: `TRIAL_GUID` + `MATERIAL_GUID`, zero orphans; one SME verdict per trial | Verdicts come without thresholds (inferred rule reproduces 72/72); no line-level field values; lab dictionary |
+| UC1 Plant Capacity | Historical summary; page absent | `PO Number` links schedules → logs → pass/fail, in two separate LSV and SSV clusters | No line capacity, customer orders or changeover rules |
+| UC2 Market Intelligence | Historical summary; page absent | Market ↔ Sales on Species + Year (236 of 236) + segment **description** | No monthly demand history; units unconfirmed |
+| UC3 Data Integrity | Historical summary; page absent | One 545-row account table with 3 unique ID columns | No required-field policy or owner directory |
+| UC4 R&D Unification | [uc4/DATA_ARCHITECTURE.md](uc4/DATA_ARCHITECTURE.md) | Replacement: candidate MATERIAL_GUID, explicit replicated-entry bridge and trait dictionary; all 12 audited relationships resolve | Trial master/status/location, confirmed aggregation and threshold boundary policy |
 
 ## Legend
 
-Every diagram uses the same colours.
+The historical data/proposal diagrams use the colours below. The current app architecture labels actual runtime components directly.
 
 ```mermaid
 flowchart LR
@@ -36,7 +36,7 @@ A solid arrow is a join or flow that was measured. A dashed arrow is an input or
 
 ## One pattern shared by all four
 
-All four MVPs have the same shape. Deterministic rules make the decision, a language model only puts recorded reasons into words, and a person approves. The use cases differ in what the engine does and in which inputs are missing.
+The historical proposal shared this shape across four use cases. In the implemented UC4 app, deterministic rules produce a recommendation, the agent retrieves evidence and phrases explanations, and an explicit breeder action records the final choice. The use cases differ in what the engine does and in which inputs are missing.
 
 ```mermaid
 flowchart LR

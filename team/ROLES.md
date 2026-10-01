@@ -4,6 +4,8 @@
 
 ## Rules for every role
 
+This page records the original v2 build-role agreement. The current implemented architecture is in [app/ARCHITECTURE.md](../app/ARCHITECTURE.md), and the executed [demo review](../.tasks/uc4-demo-review/task.md) records current evidence and agent reviewers. The app remains a historical v2 demo. The [replacement candidate analysis](../analysis/uc4_eda/report.html) supersedes previous analysis assumptions; a candidate-level runtime migration is still required. Human team-owner cells remain unassigned here.
+
 1. **Evidence first.** Every claim in the app, deck or one-pager cites a CSV row, a brief/handbook page or a test result. If there is no source, label it **proposal** or **inferred**.
 2. **AI does not decide.** Plain code sets red/amber/green; AI interprets the question and writes the answer *from the retrieved rows*. The breeder makes the final call. [Recommendation](../use-cases/RECOMMENDATION.md#ai-inside-the-product)
 3. **Missing evidence stays visible.** A missing value never passes a criterion. Lab results have no `TRIAL_GUID`, so never attach them to a trial. Trial values cannot be traced to specific lines, so flag that gap rather than hide it. [UC4 guide][uc4]
