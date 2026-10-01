@@ -1,0 +1,23 @@
+check,violations,checked
+recommendations: material GUID agrees with material ID,0,150
+genomics: material GUID agrees with material ID,0,152
+bridge: material GUID agrees with material ID,0,1728
+bridge: material GUID agrees with line GUID,0,1728
+bridge: one TRIAL_ID per TRIAL_GUID,0,72
+bridge: one FIELD_ENTITY_ID per TRIAL_GUID,0,72
+bridge: one TRIAL_GUID per FIELD_ENTITY_ID,0,72
+observation: GID agrees with bridge MATERIAL_GUID,0,5184
+observation: FIELD_ID agrees with bridge TRIAL_GUID,0,5184
+observation: ATTACHED_TO_FIELD_ENTITY_ID agrees with bridge FIELD_ENTITY_ID,0,5184
+observation: REPLICATION_NO_obs agrees with bridge REPLICATION_NO_bridge,0,5184
+observation: trait GUID agrees with trait code,0,5184
+observation: unique trait per entry,0,5184
+observation: three traits per bridge entry,0,1728
+bridge: unique trial/plot/replication,0,1728
+operations: supplied delay equals actual minus planned,0,355
+operations: update precedes actual date,0,355
+operations: missed operation has actual date,0,5
+operations: completed/delayed operation lacks actual date,0,355
+operations: completed operation has nonzero delay,0,344
+operations: delayed operation lacks positive delay,0,11
+lab: unique material/trait,0,456

@@ -84,7 +84,7 @@ def fig_field_reconciliation(fr: pd.DataFrame) -> Path:
             ax.set_ylabel("mean of the trial's plots")
         grid(ax)
     checked = fr[fr["n_plots"] > 0]
-    top = headline(fig, "Trial values do not come from the trial's own plots",
+    top = headline(fig, "Trial values do not match the trial's own plot means",
                    f"Grey line = perfect agreement. {int(checked['match'].sum())} of {len(checked)} "
                    "trial × trait pairs agree within rounding, with or without non-accepted plots.")
     fig.tight_layout(rect=(0, 0, 1, top), w_pad=2)

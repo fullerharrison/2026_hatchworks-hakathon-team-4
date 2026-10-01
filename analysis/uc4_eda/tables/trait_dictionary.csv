@@ -1,0 +1,7 @@
+TRAIT_GUID,TRAIT_CODE,TRAIT_NAME,SOURCE_TABLE,UNIT,SCALE,BETTER_DIRECTION,REMARK,IS_SYNTHETIC,_source_file,_line_no
+11481608-0D4C-551A-AAE6-04E3294EAAF9,YIELD_T_HA,Grain yield at 15.5% moisture,observation,t/ha,continuous,HIGHER,SYNTHETIC — integrated V2 (fixed),True,trait_dictionary_synthetic.csv,2
+8FE1AE1C-37A6-52C2-BBB8-67C8D703D6D9,MOISTURE_PCT,Grain moisture at harvest,observation,%,continuous,LOWER,SYNTHETIC — integrated V2 (fixed),True,trait_dictionary_synthetic.csv,3
+0E2BECE8-AD71-581B-8786-6AFB71F113E7,DISEASE_SCORE,Foliar disease score (NLB / GLS),observation,score,1 = clean ... 9 = severe,LOWER,SYNTHETIC — integrated V2 (fixed),True,trait_dictionary_synthetic.csv,4
+03CDF464-23E4-5854-BF20-9052EC600118,GERMINATION_PCT,Standard germination (ISTA),lab_observations,%,0-100,HIGHER,SYNTHETIC — integrated V2 (fixed),True,trait_dictionary_synthetic.csv,5
+917BCF85-DADC-551D-A630-8A5266247070,COLD_TEST_PCT,Cold-test vigour,lab_observations,%,0-100,HIGHER,SYNTHETIC — integrated V2 (fixed),True,trait_dictionary_synthetic.csv,6
+F8F08501-17DE-54B5-8E85-6C8D90A30B29,FUMONISIN_PPM,Fumonisin (B1+B2) in grain,lab_observations,ppm,continuous,LOWER,SYNTHETIC — integrated V2 (fixed),True,trait_dictionary_synthetic.csv,7

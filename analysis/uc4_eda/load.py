@@ -1,4 +1,7 @@
-"""Read the UC4 synthetic CSVs straight from the supplied zip (never extracted).
+"""Historical v3 loader, retained for regression tests; not the current generator.
+
+Current candidate analysis uses candidate_analysis.load_current and only the
+replacement archive. This module never extracts ZIPs.
 
 v3 is the corrected archive the UC4 SME sent on 2026-09-30 ("a few attributes were
 not interconnected" in v2). It supersedes v2 (2026-09-29, see ``v2/``) and the

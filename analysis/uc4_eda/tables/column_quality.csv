@@ -1,212 +1,164 @@
-table,column,class
-germplasm,LINE1_GUID,All null
-germplasm,MATERIAL_GUID,"Complete, varying"
-germplasm,REMARK,Constant
-germplasm,LINE_CODE_PREFIX_GUID,All null
-germplasm,GMO_LID,Constant
-germplasm,ACQUIRED_FLAG,Constant
-germplasm,PEDIGREE_TAIL,"Complete, varying"
-germplasm,LINE_GUID,"Complete, varying"
-germplasm,GERMPLASM_GEOGRAPHIC_ORIGIN,"Complete, varying"
-germplasm,GENERATION_CODE,"Complete, varying"
-germplasm,POLLINATION_GUID,"Complete, varying"
-germplasm,STACK_GUID,All null
-germplasm,FEMALE_MULTI_PARENT,Constant
-germplasm,MATERIAL_ID,"Complete, varying"
-germplasm,ADMIN_CODE,"Complete, varying"
-germplasm,ABBR_CODE,"Complete, varying"
-germplasm,STATUS_LID,"Complete, varying"
-germplasm,DISCARD_DATE,All null
-germplasm,FEMALE_PARENT_TRIAL_ID,"Complete, varying"
-germplasm,KERNEL_CATEGORY_LID,"Complete, varying"
-germplasm,FEMALE_PARENT_MATERIAL_GUID,Partly missing
-germplasm,LINE2_GUID,All null
-germplasm,ENCUMBRANCE_NAFTA_LID,All null
-germplasm,MINT_VALIDATION_REMARK,All null
-germplasm,ARCHIVED_DATE,All null
-germplasm,MANUAL_ENTERED,Constant
-germplasm,ENCUMBRANCE_APAC_LID,All null
-germplasm,ADVANCEMENT_DECISION,"Complete, varying"
-germplasm,LEVEL2PEDIGREE,"Complete, varying"
-germplasm,HIGHNAME,"Complete, varying"
-germplasm,MALE_PARENT_MATERIAL_GUID,Partly missing
-germplasm,GENETIC_AFFILIATION_GUID,"Complete, varying"
-germplasm,REFERENCE_TO_CONTRACT_LID,All null
-germplasm,GARF_INTENDED_USE_LID,"Complete, varying"
-germplasm,INITIAL_PLOT_ID,All null
-germplasm,CROP_GUID,Constant
-germplasm,LINE4_GUID,All null
-germplasm,LAST_CHG_USER,"Complete, varying"
-germplasm,PRE_LINE_CODE,"Complete, varying"
-germplasm,ROWGUID,"Complete, varying"
-germplasm,MALE_PARENT_TRIAL_ID,"Complete, varying"
-germplasm,BREEDING_GROUP_GUID,"Complete, varying"
-germplasm,ENCUMBRANCE_LATAM_LID,All null
-germplasm,COMPANY_GUID,Constant
-germplasm,DEFAULT_MATERIAL_LOT_GUID,All null
-germplasm,MALE_MULTI_PARENT,All null
-germplasm,FEMALE_PARENT_PLOT_SUBPLOT_GUID,All null
-germplasm,VARIETY_HYBRID_GUID,All null
-germplasm,ENCUMBRANCE_EAME_LID,All null
-germplasm,POLLINATION_TYPE_LID,"Complete, varying"
-germplasm,LAST_CHG_DATE,"Complete, varying"
-germplasm,STAGE_CODE_LID,"Complete, varying"
-germplasm,HARVEST_DATE,"Complete, varying"
-germplasm,MATERIAL_TYPE_LID,Constant
-germplasm,LINE3_GUID,All null
-germplasm,MALE_PARENT_PLOT_SUBPLOT_GUID,All null
-germplasm,PEDIGREE,"Complete, varying"
-germplasm,MINT_VALIDATION_FLAG,Constant
-germplasm,LEVEL1PEDIGREE,"Complete, varying"
-germplasm,CREATE_DATE,"Complete, varying"
-germplasm,RESEARCH_STATION_GUID,"Complete, varying"
-germplasm,PEGASYS_CREATE_DATE,"Complete, varying"
-germplasm,PEGASYS_UPDATE_DATE,"Complete, varying"
-germplasm,PEGASYS_PURGED,Constant
-trial,TRIAL_GUID,"Complete, varying"
-trial,KIKKER_APPROVAL,Partly missing
-trial,EXCLUDE_FROM_ANALYSIS,Constant
-trial,PROTOCOL_SITE_GUID,"Complete, varying"
-trial,PROTOCOL_GUID,"Complete, varying"
-trial,LAST_ANALYZED_DATE,All null
-trial,REMARK,Constant
-trial,BIOPLAN_PI_NUMBER,All null
-trial,USAGE_SYSTEM_LID,Constant
-trial,TRIAL_LINE_CODE,"Complete, varying"
-trial,INITIATOR,"Complete, varying"
-trial,TRIAL_DESCRIPTION,"Complete, varying"
-trial,START_PLOT_NO,Constant
-trial,TRIAL_ID,"Complete, varying"
-trial,COMPANY_COOPERATOR_GUID,All null
-trial,PLOT_PREFIX,"Complete, varying"
-trial,BEGIN_PLOT_NO,Constant
-trial,STATUS_LID,"Complete, varying"
-trial,TRIAL_PLANNING_SET_GUID,All null
-trial,TRIAL_LAST_CHG_DATE,"Complete, varying"
-trial,SEQUENCE,"Complete, varying"
-trial,NO_OF_REPLICATIONS,"Complete, varying"
-trial,USE_FOR_INBREEDING,Constant
-trial,TRIAL_MAPPED,Constant
-trial,TRIAL_TYPE_LID,"Complete, varying"
-trial,START_YEAR,"Complete, varying"
-trial,BEGIN_DATE,"Complete, varying"
-trial,RESPONSIBLE_MATERIAL_STORE_GUID,"Complete, varying"
-trial,CROP_GUID,Constant
-trial,TRIAL_EXPERIMENT_GUID,"Complete, varying"
-trial,LOCATION_GUID,"Complete, varying"
-trial,LAST_CHG_USER,"Complete, varying"
-trial,ROWGUID,"Complete, varying"
-trial,BREEDING_GROUP_GUID,"Complete, varying"
-trial,BEGIN_BASIC_PLAN_NO,"Complete, varying"
-trial,PLANTING_AREA_GUID,"Complete, varying"
-trial,TRIAL_CORE_GUID,"Complete, varying"
-trial,MALE_LINE_GUID,"Complete, varying"
-trial,END_PLOT_NO,"Complete, varying"
-trial,PLANNED_POLLINATIONS_SET_GUID,All null
-trial,MALE_MATERIAL_GUID,"Complete, varying"
-trial,MINT_READY_PROCESSING,Constant
-trial,PLANTING_POPULATION,"Complete, varying"
-trial,MINT_RDYPR_SUBMITTER,"Complete, varying"
-trial,LAST_CHG_DATE,"Complete, varying"
-trial,START_WEEK,"Complete, varying"
-trial,GREENHOUSE_TRIAL,Constant
-trial,TRIAL_DESIGN_GUID,"Complete, varying"
-trial,INTENT_TYPE_LID,Constant
-trial,CREATE_DATE,"Complete, varying"
-trial,TRIAL_ENTRY_DEFAULTS_GUID,"Complete, varying"
-trial,BREEDING_GOAL_GUID,"Complete, varying"
-trial,CREATE_PERSON,"Complete, varying"
-trial,PEGASYS_CREATE_DATE,"Complete, varying"
-trial,PEGASYS_UPDATE_DATE,"Complete, varying"
-trial,PEGASYS_PURGED,Constant
-observation,OBSERVATION_GUID,"Complete, varying"
-observation,TRIAL_GUID,"Complete, varying"
-observation,MATERIAL_GUID,"Complete, varying"
-observation,LOCATION_GUID,"Complete, varying"
-observation,PLOT_NO,"Complete, varying"
-observation,REPLICATION_NO,"Complete, varying"
-observation,TRAIT_CODE,"Complete, varying"
-observation,TRAIT_NAME,"Complete, varying"
-observation,OBSERVATION_VALUE,"Complete, varying"
-observation,OBSERVATION_UOM,"Complete, varying"
-observation,OBSERVATION_DATE,"Complete, varying"
-observation,OBSERVATION_METHOD_LID,"Complete, varying"
-observation,QUALITY_FLAG_LID,"Complete, varying"
-observation,OBSERVER_ID,"Complete, varying"
-observation,REMARK,Constant
-observation,CREATE_DATE,"Complete, varying"
-observation,LAST_CHG_DATE,Constant
-observation,ROWGUID,"Complete, varying"
-observation,SOURCE_SYSTEM,Constant
-observation,IS_SYNTHETIC,Constant
-operations,OPERATION_GUID,"Complete, varying"
-operations,TRIAL_GUID,"Complete, varying"
-operations,MATERIAL_GUID,"Complete, varying"
-operations,LOCATION_GUID,"Complete, varying"
-operations,OPERATION_TYPE_LID,"Complete, varying"
-operations,OPERATION_STATUS_LID,"Complete, varying"
-operations,OPERATION_DATE,"Complete, varying"
-operations,PLOT_NO,"Complete, varying"
-operations,EQUIPMENT_ID,"Complete, varying"
-operations,OPERATOR_ID,"Complete, varying"
-operations,QUANTITY_VALUE,"Complete, varying"
-operations,QUANTITY_UOM,"Complete, varying"
-operations,REMARK,Constant
-operations,CREATE_DATE,"Complete, varying"
-operations,LAST_CHG_DATE,"Complete, varying"
-operations,ROWGUID,"Complete, varying"
-operations,SOURCE_SYSTEM,Constant
-operations,IS_SYNTHETIC,Constant
-lab,INHERITED,"Complete, varying"
-lab,LAST_CHG_DATE,"Complete, varying"
-lab,OBSERVATION_PERSON,"Complete, varying"
-lab,ALPHA_VALUE,Partly missing
-lab,LAST_CHG_USER,"Complete, varying"
-lab,CALCULATED,Constant
-lab,MATERIAL_GUID,"Complete, varying"
-lab,REMARK,Constant
-lab,OBSERVATION_DATE,"Complete, varying"
-lab,DATE_VALUE,All null
-lab,ROWGUID,"Complete, varying"
-lab,TRAIT_GUID,"Complete, varying"
-lab,NUMBER_VALUE,Partly missing
-lab,PEGASYS_CREATE_DATE,"Complete, varying"
-lab,PEGASYS_UPDATE_DATE,"Complete, varying"
-lab,PEGASYS_PURGED,Constant
-genomics,GENOMIC_SAMPLE_GUID,"Complete, varying"
-genomics,MATERIAL_GUID,"Complete, varying"
-genomics,SAMPLE_ID,"Complete, varying"
-genomics,PLATFORM_LID,Constant
-genomics,SAMPLE_TYPE_LID,Constant
-genomics,GENOTYPING_DATE,"Complete, varying"
-genomics,MARKER_DROUGHT_TOLERANCE,"Complete, varying"
-genomics,MARKER_DISEASE_RESISTANCE,"Complete, varying"
-genomics,MARKER_YIELD_POTENTIAL,"Complete, varying"
-genomics,MARKER_MATURITY,"Complete, varying"
-genomics,GENOMIC_BREEDING_VALUE,"Complete, varying"
-genomics,QC_CALL_RATE_PCT,"Complete, varying"
-genomics,QC_STATUS_LID,Constant
-genomics,REMARK,Constant
-genomics,CREATE_DATE,Constant
-genomics,LAST_CHG_DATE,Constant
-genomics,ROWGUID,"Complete, varying"
-genomics,SOURCE_SYSTEM,Constant
-genomics,IS_SYNTHETIC,Constant
-recommendations,TRIAL_GUID,"Complete, varying"
-recommendations,TRIAL_ID,"Complete, varying"
-recommendations,TRIAL_DESCRIPTION,"Complete, varying"
-recommendations,LOCATION_GUID,"Complete, varying"
-recommendations,STATUS_LID,Constant
-recommendations,START_YEAR,"Complete, varying"
-recommendations,YIELD_T_HA,"Complete, varying"
-recommendations,MOISTURE_PCT,"Complete, varying"
-recommendations,DISEASE_SCORE,"Complete, varying"
-recommendations,PLANT_HEIGHT_CM,"Complete, varying"
-recommendations,FLOWERING_DAYS,"Complete, varying"
-recommendations,GENOMIC_BREEDING_VALUE_MEAN,"Complete, varying"
-recommendations,RESISTANT_MATERIAL_PCT,"Complete, varying"
-recommendations,GENOMICS_QC_PASS_PCT,Constant
-recommendations,TRIAL_RECOMMENDATION,"Complete, varying"
-recommendations,RECOMMENDATION_RATIONALE,"Complete, varying"
-recommendations,RULE_VERSION,Constant
-recommendations,IS_SYNTHETIC,Constant
+table,column,missing,distinct
+recommendations,MATERIAL_GUID,0,150
+recommendations,MATERIAL_ID,0,150
+recommendations,HIGHNAME,0,150
+recommendations,N_TRIALS,0,4
+recommendations,N_TRIALS_USED,0,4
+recommendations,YIELD_VS_CHECK_PCT,2,117
+recommendations,DISEASE_SCORE_MEAN,2,128
+recommendations,MOISTURE_PCT_MEAN,2,63
+recommendations,GERMINATION_PCT,0,73
+recommendations,FUMONISIN_PPM,0,107
+recommendations,MARKER_DISEASE_RESISTANCE,0,3
+recommendations,GENOMIC_BREEDING_VALUE,0,124
+recommendations,SYSTEM_RAG,0,3
+recommendations,SYSTEM_REASON,0,113
+recommendations,CAVEATS,120,1
+recommendations,BREEDER_DECISION,150,0
+recommendations,BREEDER_COMMENT,150,0
+recommendations,IS_SYNTHETIC,0,1
+germplasm,LINE1_GUID,152,0
+germplasm,MATERIAL_GUID,0,152
+germplasm,REMARK,0,3
+germplasm,LINE_CODE_PREFIX_GUID,152,0
+germplasm,GMO_LID,152,0
+germplasm,ACQUIRED_FLAG,152,0
+germplasm,PEDIGREE_TAIL,152,0
+germplasm,LINE_GUID,0,152
+germplasm,GERMPLASM_GEOGRAPHIC_ORIGIN,152,0
+germplasm,GENERATION_CODE,152,0
+germplasm,POLLINATION_GUID,152,0
+germplasm,STACK_GUID,152,0
+germplasm,FEMALE_MULTI_PARENT,152,0
+germplasm,MATERIAL_ID,0,152
+germplasm,ADMIN_CODE,152,0
+germplasm,ABBR_CODE,152,0
+germplasm,STATUS_LID,0,1
+germplasm,DISCARD_DATE,152,0
+germplasm,FEMALE_PARENT_TRIAL_ID,152,0
+germplasm,KERNEL_CATEGORY_LID,152,0
+germplasm,FEMALE_PARENT_MATERIAL_GUID,152,0
+germplasm,LINE2_GUID,152,0
+germplasm,ENCUMBRANCE_NAFTA_LID,152,0
+germplasm,MINT_VALIDATION_REMARK,152,0
+germplasm,ARCHIVED_DATE,152,0
+germplasm,MANUAL_ENTERED,152,0
+germplasm,ENCUMBRANCE_APAC_LID,152,0
+germplasm,ADVANCEMENT_DECISION,152,0
+germplasm,LEVEL2PEDIGREE,152,0
+germplasm,HIGHNAME,0,152
+germplasm,MALE_PARENT_MATERIAL_GUID,152,0
+germplasm,GENETIC_AFFILIATION_GUID,152,0
+germplasm,REFERENCE_TO_CONTRACT_LID,152,0
+germplasm,GARF_INTENDED_USE_LID,152,0
+germplasm,INITIAL_PLOT_ID,152,0
+germplasm,CROP_GUID,0,1
+germplasm,LINE4_GUID,152,0
+germplasm,LAST_CHG_USER,152,0
+germplasm,PRE_LINE_CODE,152,0
+germplasm,ROWGUID,0,152
+germplasm,MALE_PARENT_TRIAL_ID,152,0
+germplasm,BREEDING_GROUP_GUID,2,4
+germplasm,ENCUMBRANCE_LATAM_LID,152,0
+germplasm,COMPANY_GUID,152,0
+germplasm,DEFAULT_MATERIAL_LOT_GUID,152,0
+germplasm,MALE_MULTI_PARENT,152,0
+germplasm,FEMALE_PARENT_PLOT_SUBPLOT_GUID,152,0
+germplasm,VARIETY_HYBRID_GUID,152,0
+germplasm,ENCUMBRANCE_EAME_LID,152,0
+germplasm,POLLINATION_TYPE_LID,152,0
+germplasm,LAST_CHG_DATE,152,0
+germplasm,STAGE_CODE_LID,152,0
+germplasm,HARVEST_DATE,152,0
+germplasm,MATERIAL_TYPE_LID,0,1
+germplasm,LINE3_GUID,152,0
+germplasm,MALE_PARENT_PLOT_SUBPLOT_GUID,152,0
+germplasm,PEDIGREE,152,0
+germplasm,MINT_VALIDATION_FLAG,152,0
+germplasm,LEVEL1PEDIGREE,152,0
+germplasm,CREATE_DATE,152,0
+germplasm,RESEARCH_STATION_GUID,152,0
+germplasm,PEGASYS_CREATE_DATE,152,0
+germplasm,PEGASYS_UPDATE_DATE,152,0
+germplasm,PEGASYS_PURGED,0,1
+genomics,GENOMIC_SAMPLE_GUID,0,152
+genomics,MATERIAL_GUID,0,152
+genomics,MATERIAL_ID,0,152
+genomics,SAMPLE_ID,0,152
+genomics,PLATFORM_LID,0,1
+genomics,MARKER_DROUGHT_TOLERANCE,0,3
+genomics,MARKER_DISEASE_RESISTANCE,0,3
+genomics,MARKER_YIELD_POTENTIAL,0,3
+genomics,GENOMIC_BREEDING_VALUE,0,125
+genomics,QC_CALL_RATE_PCT,0,48
+genomics,QC_STATUS_LID,0,1
+genomics,REMARK,0,2
+genomics,IS_SYNTHETIC,0,1
+lab,INHERITED,456,0
+lab,LAST_CHG_DATE,456,0
+lab,OBSERVATION_PERSON,456,0
+lab,ALPHA_VALUE,456,0
+lab,LAST_CHG_USER,456,0
+lab,CALCULATED,456,0
+lab,MATERIAL_GUID,0,152
+lab,REMARK,0,2
+lab,OBSERVATION_DATE,0,216
+lab,DATE_VALUE,456,0
+lab,ROWGUID,0,456
+lab,TRAIT_GUID,0,3
+lab,NUMBER_VALUE,0,386
+lab,PEGASYS_CREATE_DATE,456,0
+lab,PEGASYS_UPDATE_DATE,456,0
+lab,PEGASYS_PURGED,0,1
+observation,ID,0,5184
+observation,OBSERVATION_UUID,0,5184
+observation,OBSERVATION_ID,0,5184
+observation,ATTACHED_TO_FIELD_ENTITY_ID,0,72
+observation,FIELD_ID,0,72
+observation,GID,0,150
+observation,BARCODE,5184,0
+observation,TRIAL_ENTRY_RELATIONSHIP_GUID,0,1728
+observation,RECORD_TYPE,5184,0
+observation,REPLICATION_NO,0,3
+observation,SUBPLOT_TYPE,5184,0
+observation,SUBPLOT_ID,0,3
+observation,SUB_SUBPLOT_ID,5184,0
+observation,REMARK,0,693
+observation,CONTAINER_ID,5184,0
+observation,PLANTS_IN_PLOT,5184,0
+observation,PM_ALT_ID,5184,0
+observation,TRAIT_GUID,0,3
+observation,TRAIT_CODE,0,3
+observation,NUMBER_VALUE,0,693
+operations,ID,0,360
+operations,ATTACHED_TO_FIELD_ENTITY_ID,0,72
+operations,SEEDSDL_UPDATE_DATE,0,214
+operations,OPERATION_TYPE_LID,0,5
+operations,PLANNED_DATE,0,208
+operations,ACTUAL_DATE,5,209
+operations,STATUS_LID,0,3
+operations,DELAY_DAYS,5,8
+operations,RECORDED_VIA,0,5
+operations,REMARK,0,4
+dictionary,TRAIT_GUID,0,6
+dictionary,TRAIT_CODE,0,6
+dictionary,TRAIT_NAME,0,6
+dictionary,SOURCE_TABLE,0,2
+dictionary,UNIT,0,4
+dictionary,SCALE,0,3
+dictionary,BETTER_DIRECTION,0,2
+dictionary,REMARK,0,1
+dictionary,IS_SYNTHETIC,0,1
+bridge,TRIAL_ENTRY_GUID,0,1728
+bridge,TRIAL_GUID,0,72
+bridge,TRIAL_ID,0,72
+bridge,MATERIAL_GUID,0,150
+bridge,MATERIAL_ID,0,150
+bridge,LINE_GUID,0,150
+bridge,FIELD_ENTITY_ID,0,72
+bridge,PLOT_NO,0,24
+bridge,REPLICATION_NO,0,3
+bridge,ENTRY_ROLE_LID,0,2
+bridge,IS_PRIMARY_MALE_MATERIAL,0,2
+bridge,REMARK,0,1
+bridge,IS_SYNTHETIC,0,1

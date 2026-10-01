@@ -1,8 +1,8 @@
-"""UC4 v3 profile: figures, inferred scoring rule, consistency checks, tables and a report.
+"""UC4 current candidate profile; old v3 helpers retained for regression tests.
 
-Run: uv run --no-project --with pandas --with matplotlib python uc4_eda.py
-Reads the supplied v3 zip (and the v2 zip, for the version diff) read-only; writes
-figures/, tables/ and report.html here. Earlier outputs are kept in v1/ and v2/.
+Run: python analysis/uc4_eda/uc4_eda.py
+Reads only candidate_recommendations_synthetic.zip; writes figures/, tables/ and
+report.html here. Superseded outputs are preserved in v1/, v2/ and v3/.
 """
 
 from __future__ import annotations
@@ -77,64 +77,9 @@ def trial_level(t: dict[str, pd.DataFrame]) -> pd.DataFrame:
 
 
 def main() -> None:
-    apply_style()
-    supplied = load_tables(find_zip())
-    links = link_rates(supplied)
-    diff = version_diff(load_tables(find_zip(name=V2_ZIP_NAME)), supplied)
-    t = align(supplied)
-    mat = material_table(t)
-    rec = t["recommendations"]
-    checks = chronology_checks(t)
-    timeline, pm = trial_timeline(t), phase_map(t)
-    field = field_reconciliation(t)
-    figs = [
-        plots.fig_inventory(supplied),
-        plots.fig_rule_traits(rec),
-        plots.fig_rule_paths(rec),
-        plots.fig_categoricals(t),
-        plots.fig_lab(t),
-        plots.fig_genomics(t),
-        plots.fig_reconciliation(t),
-        lifecycle_plots.fig_operations_calendar(t),
-        lifecycle_plots.fig_checks(checks),
-        lifecycle_plots.fig_plant_lifecycle(pm),
-        lifecycle_plots.fig_trial_timelines(t, timeline),
-        evidence_plots.fig_links(links),
-        evidence_plots.fig_field_traits(t["observation"]),
-        evidence_plots.fig_field_reconciliation(field),
-    ]
-    num, cat = numeric_cases(t), ordinal_cases(t)
-    figs.append(fig_binning(num, "fig10a_bins_numeric", "Quartile bins: trial-level traits",
-                            "One value per trial, cut at 0 / .25 / .5 / .75 / 1. "
-                            "Shaded bands alternate between bins.", ncols=4))
-    figs.append(fig_binning(cat, "fig10b_bins_categorical",
-                            "Quantile bins: ordinal columns after rank encoding",
-                            "Three-level markers and verdicts cannot fill four bins. "
-                            "Orange line = two or more quantiles on the same value.", ncols=4))
-    TABLE_DIR.mkdir(exist_ok=True)
-    tables = {
-        "version_diff": diff,
-        "link_rates": links,
-        "field_reconciliation": field,
-        "decision_by_verdict": decision_by_verdict(t),
-        "chronology_checks": checks,
-        "trial_timeline": timeline,
-        "lifecycle_phase_map": pm,
-        "trial_level": trial_level(t),
-        "rule_intervals": threshold_intervals(rec),
-        "genomics_reconciliation": genomics_reconciliation(t),
-        "source_counts": pd.DataFrame(stage_counts(t)).T.rename_axis("source").reset_index(),
-        "numeric_summary": numeric_summary(t),
-        "categorical_summary": categorical_summary(t),
-        "quantile_bins": bins_table(num + cat),
-        "column_quality": column_quality(supplied),
-        "material_level": mat,
-    }
-    for name, df in tables.items():
-        df.to_csv(TABLE_DIR / f"{name}.csv", index=False)
-    out = write_report(HERE / "report.html", figs, tables, mat, stage_counts(t), snapshot_date(t),
-                       header_facts(t))
-    print(f"{len(figs)} figures, {len(tables)} tables -> {out}")
+    """Generate the replacement candidate analysis; legacy helpers remain importable."""
+    from candidate_analysis import main as candidate_main
+    candidate_main()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,155 @@
+MATERIAL_ID,metric,reason_fragment,reason_printed_value,supplied_value,rebuilt_value,threshold,direction,printed_warning_agrees,supplied_warning_agrees,rebuilt_warning_agrees,_source_file,_line_no
+SYN-MZ-00001,MOISTURE_PCT_MEAN,harvest moisture 23.8 (above target 23.0),23.8,23.8,23.766666666666666,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,2
+SYN-MZ-00002,MOISTURE_PCT_MEAN,harvest moisture 25.7 (above limit 25.0),25.7,25.7,25.666666666666668,25.0,above,True,True,True,candidate_recommendations_synthetic.csv,3
+SYN-MZ-00003,DISEASE_SCORE_MEAN,disease score 4.3 (above target 4.0),4.3,4.27,4.266666666666667,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,4
+SYN-MZ-00006,DISEASE_SCORE_MEAN,disease score 4.9 (above target 4.0),4.9,4.87,4.866666666666667,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,7
+SYN-MZ-00007,DISEASE_SCORE_MEAN,disease score 6.6 (above limit 6.0),6.6,6.65,6.65,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,8
+SYN-MZ-00008,DISEASE_SCORE_MEAN,disease score 6.5 (above limit 6.0),6.5,6.55,6.550000000000001,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,9
+SYN-MZ-00009,YIELD_VS_CHECK_PCT,yield vs checks 101.6% (below target 103%),101.6,101.6,101.60628844839371,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,10
+SYN-MZ-00010,DISEASE_SCORE_MEAN,disease score 4.2 (above target 4.0),4.2,4.2,4.2,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,11
+SYN-MZ-00012,DISEASE_SCORE_MEAN,disease score 5.4 (above target 4.0),5.4,5.35,5.35,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,13
+SYN-MZ-00013,DISEASE_SCORE_MEAN,disease score 4.1 (above target 4.0),4.1,4.1,4.1000000000000005,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,14
+SYN-MZ-00014,YIELD_VS_CHECK_PCT,yield vs checks 90.2% (below minimum 95%),90.2,90.2,90.18319505540397,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,15
+SYN-MZ-00015,DISEASE_SCORE_MEAN,disease score 4.4 (above target 4.0),4.4,4.38,4.377777777777777,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,16
+SYN-MZ-00016,YIELD_VS_CHECK_PCT,yield vs checks 90.0% (below minimum 95%),90.0,90.0,89.97161778618732,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,17
+SYN-MZ-00017,YIELD_VS_CHECK_PCT,yield vs checks 94.3% (below minimum 95%),94.3,94.3,94.34736842105264,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,18
+SYN-MZ-00018,DISEASE_SCORE_MEAN,disease score 6.6 (above limit 6.0),6.6,6.56,6.555555555555556,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,19
+SYN-MZ-00019,YIELD_VS_CHECK_PCT,yield vs checks 88.8% (below minimum 95%),88.8,88.8,88.82359006083102,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,20
+SYN-MZ-00019,FUMONISIN_PPM,fumonisin 5.0 (above limit 4.0),5.0,4.95,4.95,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,20
+SYN-MZ-00020,YIELD_VS_CHECK_PCT,yield vs checks 87.7% (below minimum 95%),87.7,87.7,87.67914217960617,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,21
+SYN-MZ-00020,DISEASE_SCORE_MEAN,disease score 6.2 (above limit 6.0),6.2,6.18,6.177777777777777,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,21
+SYN-MZ-00021,YIELD_VS_CHECK_PCT,yield vs checks 91.1% (below minimum 95%),91.1,91.1,91.08273302772322,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,22
+SYN-MZ-00022,DISEASE_SCORE_MEAN,disease score 6.7 (above limit 6.0),6.7,6.71,6.711111111111111,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,23
+SYN-MZ-00023,YIELD_VS_CHECK_PCT,yield vs checks 98.7% (below target 103%),98.7,98.7,98.73746952045515,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,24
+SYN-MZ-00026,YIELD_VS_CHECK_PCT,yield vs checks 100.7% (below target 103%),100.7,100.7,100.66452541809724,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,27
+SYN-MZ-00026,DISEASE_SCORE_MEAN,disease score 5.9 (above target 4.0),5.9,5.86,5.855555555555555,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,27
+SYN-MZ-00026,MOISTURE_PCT_MEAN,harvest moisture 23.7 (above target 23.0),23.7,23.7,23.711111111111112,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,27
+SYN-MZ-00027,FUMONISIN_PPM,fumonisin 5.5 (above limit 4.0),5.5,5.51,5.51,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,28
+SYN-MZ-00029,YIELD_VS_CHECK_PCT,yield vs checks 102.6% (below target 103%),102.6,102.6,102.61990281005706,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,30
+SYN-MZ-00031,YIELD_VS_CHECK_PCT,yield vs checks 95.6% (below target 103%),95.6,95.6,95.61430474433855,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,32
+SYN-MZ-00031,DISEASE_SCORE_MEAN,disease score 5.2 (above target 4.0),5.2,5.18,5.177777777777777,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,32
+SYN-MZ-00034,DISEASE_SCORE_MEAN,disease score 6.7 (above limit 6.0),6.7,6.68,6.677777777777777,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,35
+SYN-MZ-00034,FUMONISIN_PPM,fumonisin 5.1 (above limit 4.0),5.1,5.11,5.11,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,35
+SYN-MZ-00035,YIELD_VS_CHECK_PCT,yield vs checks 93.4% (below minimum 95%),93.4,93.4,93.3704914518463,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,36
+SYN-MZ-00036,YIELD_VS_CHECK_PCT,yield vs checks 92.6% (below minimum 95%),92.6,92.6,92.59874591350018,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,37
+SYN-MZ-00037,YIELD_VS_CHECK_PCT,yield vs checks 100.6% (below target 103%),100.6,100.6,100.56830844662358,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,38
+SYN-MZ-00037,DISEASE_SCORE_MEAN,disease score 4.3 (above target 4.0),4.3,4.29,4.288888888888889,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,38
+SYN-MZ-00038,DISEASE_SCORE_MEAN,disease score 6.1 (above limit 6.0),6.1,6.12,6.122222222222223,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,39
+SYN-MZ-00039,YIELD_VS_CHECK_PCT,yield vs checks 94.2% (below minimum 95%),94.2,94.2,94.16749489982739,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,40
+SYN-MZ-00041,YIELD_VS_CHECK_PCT,yield vs checks 85.2% (below minimum 95%),85.2,85.2,85.19280476868703,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,42
+SYN-MZ-00041,DISEASE_SCORE_MEAN,disease score 6.3 (above limit 6.0),6.3,6.27,6.266666666666667,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,42
+SYN-MZ-00042,YIELD_VS_CHECK_PCT,yield vs checks 94.7% (below minimum 95%),94.7,94.7,94.74072901830458,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,43
+SYN-MZ-00042,DISEASE_SCORE_MEAN,disease score 6.4 (above limit 6.0),6.4,6.44,6.444444444444444,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,43
+SYN-MZ-00043,YIELD_VS_CHECK_PCT,yield vs checks 99.7% (below target 103%),99.7,99.7,99.696739954511,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,44
+SYN-MZ-00043,MOISTURE_PCT_MEAN,harvest moisture 24.5 (above target 23.0),24.5,24.5,24.46666666666667,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,44
+SYN-MZ-00045,YIELD_VS_CHECK_PCT,yield vs checks 100.7% (below target 103%),100.7,100.7,100.74859113466229,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,46
+SYN-MZ-00045,GERMINATION_PCT,germination 82.0% (below minimum 85%),82.0,82.0,82.05,85.0,below,True,True,True,candidate_recommendations_synthetic.csv,46
+SYN-MZ-00046,YIELD_VS_CHECK_PCT,yield vs checks 99.8% (below target 103%),99.8,99.8,99.82336613676507,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,47
+SYN-MZ-00048,DISEASE_SCORE_MEAN,disease score 4.5 (above target 4.0),4.5,4.47,4.466666666666667,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,49
+SYN-MZ-00048,MOISTURE_PCT_MEAN,harvest moisture 23.8 (above target 23.0),23.8,23.8,23.816666666666666,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,49
+SYN-MZ-00048,GERMINATION_PCT,germination 80.0% (below minimum 85%),80.0,80.0,80.01,85.0,below,True,True,True,candidate_recommendations_synthetic.csv,49
+SYN-MZ-00049,MOISTURE_PCT_MEAN,harvest moisture 24.6 (above target 23.0),24.6,24.6,24.58888888888889,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,50
+SYN-MZ-00050,YIELD_VS_CHECK_PCT,yield vs checks 101.7% (below target 103%),101.7,101.7,101.6964335703488,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,51
+SYN-MZ-00050,MOISTURE_PCT_MEAN,harvest moisture 23.3 (above target 23.0),23.3,23.3,23.333333333333332,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,51
+SYN-MZ-00051,DISEASE_SCORE_MEAN,disease score 4.1 (above target 4.0),4.1,4.07,4.066666666666667,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,52
+SYN-MZ-00051,MOISTURE_PCT_MEAN,harvest moisture 23.4 (above target 23.0),23.4,23.4,23.38888888888889,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,52
+SYN-MZ-00052,YIELD_VS_CHECK_PCT,yield vs checks 102.3% (below target 103%),102.3,102.3,102.29484310766507,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,53
+SYN-MZ-00052,MOISTURE_PCT_MEAN,harvest moisture 25.2 (above limit 25.0),25.2,25.2,25.2,25.0,above,True,True,True,candidate_recommendations_synthetic.csv,53
+SYN-MZ-00053,YIELD_VS_CHECK_PCT,yield vs checks 92.3% (below minimum 95%),92.3,92.3,92.30849238129908,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,54
+SYN-MZ-00055,DISEASE_SCORE_MEAN,disease score 4.3 (above target 4.0),4.3,4.31,4.311111111111111,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,56
+SYN-MZ-00056,DISEASE_SCORE_MEAN,disease score 6.2 (above limit 6.0),6.2,6.24,6.2444444444444445,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,57
+SYN-MZ-00057,YIELD_VS_CHECK_PCT,yield vs checks 94.5% (below minimum 95%),94.5,94.5,94.54446559695404,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,58
+SYN-MZ-00058,DISEASE_SCORE_MEAN,disease score 6.3 (above limit 6.0),6.3,6.32,6.322222222222222,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,59
+SYN-MZ-00059,FUMONISIN_PPM,fumonisin 5.0 (above limit 4.0),5.0,4.96,4.96,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,60
+SYN-MZ-00060,DISEASE_SCORE_MEAN,disease score 6.5 (above limit 6.0),6.5,6.52,6.522222222222222,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,61
+SYN-MZ-00061,YIELD_VS_CHECK_PCT,yield vs checks 93.5% (below minimum 95%),93.5,93.5,93.53084775854416,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,62
+SYN-MZ-00063,YIELD_VS_CHECK_PCT,yield vs checks 84.4% (below minimum 95%),84.4,84.4,84.40424204616343,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,64
+SYN-MZ-00064,DISEASE_SCORE_MEAN,disease score 6.8 (above limit 6.0),6.8,6.79,6.788888888888889,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,65
+SYN-MZ-00065,DISEASE_SCORE_MEAN,disease score 6.0 (above limit 6.0),6.0,6.03,6.033333333333334,6.0,above,False,True,True,candidate_recommendations_synthetic.csv,66
+SYN-MZ-00068,YIELD_VS_CHECK_PCT,yield vs checks 92.0% (below minimum 95%),92.0,92.0,91.95495586892561,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,69
+SYN-MZ-00069,DISEASE_SCORE_MEAN,disease score 4.9 (above target 4.0),4.9,4.92,4.922222222222222,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,70
+SYN-MZ-00069,GERMINATION_PCT,germination 81.8% (below minimum 85%),81.8,81.8,81.83,85.0,below,True,True,True,candidate_recommendations_synthetic.csv,70
+SYN-MZ-00070,YIELD_VS_CHECK_PCT,yield vs checks 97.7% (below target 103%),97.7,97.7,97.72911160256756,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,71
+SYN-MZ-00070,DISEASE_SCORE_MEAN,disease score 5.8 (above target 4.0),5.8,5.76,5.7555555555555555,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,71
+SYN-MZ-00070,MOISTURE_PCT_MEAN,harvest moisture 24.4 (above target 23.0),24.4,24.4,24.400000000000002,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,71
+SYN-MZ-00071,DISEASE_SCORE_MEAN,disease score 6.6 (above limit 6.0),6.6,6.63,6.633333333333333,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,72
+SYN-MZ-00072,YIELD_VS_CHECK_PCT,yield vs checks 91.7% (below minimum 95%),91.7,91.7,91.66845378511688,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,73
+SYN-MZ-00075,YIELD_VS_CHECK_PCT,yield vs checks 94.2% (below minimum 95%),94.2,94.2,94.2036553524804,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,76
+SYN-MZ-00077,MOISTURE_PCT_MEAN,harvest moisture 23.5 (above target 23.0),23.5,23.5,23.5,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,78
+SYN-MZ-00079,DISEASE_SCORE_MEAN,disease score 6.5 (above limit 6.0),6.5,6.46,6.455555555555556,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,80
+SYN-MZ-00080,YIELD_VS_CHECK_PCT,yield vs checks 98.2% (below target 103%),98.2,98.2,98.16857333401734,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,81
+SYN-MZ-00080,DISEASE_SCORE_MEAN,disease score 4.1 (above target 4.0),4.1,4.07,4.066666666666667,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,81
+SYN-MZ-00081,DISEASE_SCORE_MEAN,disease score 7.0 (above limit 6.0),7.0,6.96,6.955555555555556,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,82
+SYN-MZ-00082,YIELD_VS_CHECK_PCT,yield vs checks 86.2% (below minimum 95%),86.2,86.2,86.20425158886698,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,83
+SYN-MZ-00083,YIELD_VS_CHECK_PCT,yield vs checks 96.2% (below target 103%),96.2,96.2,96.23946401556084,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,84
+SYN-MZ-00083,DISEASE_SCORE_MEAN,disease score 5.3 (above target 4.0),5.3,5.34,5.344444444444444,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,84
+SYN-MZ-00084,DISEASE_SCORE_MEAN,disease score 5.6 (above target 4.0),5.6,5.59,5.588888888888889,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,85
+SYN-MZ-00086,YIELD_VS_CHECK_PCT,yield vs checks 86.1% (below minimum 95%),86.1,86.1,86.05855855855854,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,87
+SYN-MZ-00087,MOISTURE_PCT_MEAN,harvest moisture 23.3 (above target 23.0),23.3,23.3,23.35,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,88
+SYN-MZ-00089,DISEASE_SCORE_MEAN,disease score 7.5 (above limit 6.0),7.5,7.53,7.533333333333333,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,90
+SYN-MZ-00090,DISEASE_SCORE_MEAN,disease score 6.5 (above limit 6.0),6.5,6.5,6.5,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,91
+SYN-MZ-00091,DISEASE_SCORE_MEAN,disease score 6.2 (above limit 6.0),6.2,6.23,6.2333333333333325,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,92
+SYN-MZ-00092,YIELD_VS_CHECK_PCT,yield vs checks 88.1% (below minimum 95%),88.1,88.1,88.09759314210353,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,93
+SYN-MZ-00093,YIELD_VS_CHECK_PCT,yield vs checks 82.5% (below minimum 95%),82.5,82.5,82.53530450132394,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,94
+SYN-MZ-00094,YIELD_VS_CHECK_PCT,yield vs checks 97.2% (below target 103%),97.2,97.2,97.2197705207414,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,95
+SYN-MZ-00095,YIELD_VS_CHECK_PCT,yield vs checks 102.6% (below target 103%),102.6,102.6,102.61267145656434,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,96
+SYN-MZ-00096,YIELD_VS_CHECK_PCT,yield vs checks 95.8% (below target 103%),95.8,95.8,95.77618114522102,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,97
+SYN-MZ-00097,YIELD_VS_CHECK_PCT,yield vs checks 95.6% (below target 103%),95.6,95.6,95.61500888099468,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,98
+SYN-MZ-00099,YIELD_VS_CHECK_PCT,yield vs checks 102.5% (below target 103%),102.5,102.5,102.49054224464062,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,100
+SYN-MZ-00099,DISEASE_SCORE_MEAN,disease score 4.9 (above target 4.0),4.9,4.9,4.8999999999999995,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,100
+SYN-MZ-00100,YIELD_VS_CHECK_PCT,yield vs checks 91.1% (below minimum 95%),91.1,91.1,91.14123581336696,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,101
+SYN-MZ-00100,FUMONISIN_PPM,fumonisin 6.3 (above limit 4.0),6.3,6.3,6.3,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,101
+SYN-MZ-00101,YIELD_VS_CHECK_PCT,yield vs checks 90.7% (below minimum 95%),90.7,90.7,90.65134907251263,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,102
+SYN-MZ-00102,YIELD_VS_CHECK_PCT,yield vs checks 90.7% (below minimum 95%),90.7,90.7,90.68296795952782,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,103
+SYN-MZ-00104,YIELD_VS_CHECK_PCT,yield vs checks 94.3% (below minimum 95%),94.3,94.3,94.34791496320523,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,105
+SYN-MZ-00105,DISEASE_SCORE_MEAN,disease score 7.2 (above limit 6.0),7.2,7.22,7.216666666666667,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,106
+SYN-MZ-00106,YIELD_VS_CHECK_PCT,yield vs checks 91.6% (below minimum 95%),91.6,91.6,91.58967824147815,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,107
+SYN-MZ-00106,DISEASE_SCORE_MEAN,disease score 8.0 (above limit 6.0),8.0,8.03,8.033333333333331,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,107
+SYN-MZ-00107,YIELD_VS_CHECK_PCT,yield vs checks 93.0% (below minimum 95%),93.0,93.0,93.0015059047317,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,108
+SYN-MZ-00108,YIELD_VS_CHECK_PCT,yield vs checks 93.0% (below minimum 95%),93.0,93.0,92.969802647222,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,109
+SYN-MZ-00109,YIELD_VS_CHECK_PCT,yield vs checks 92.4% (below minimum 95%),92.4,92.4,92.38587137620793,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,110
+SYN-MZ-00111,YIELD_VS_CHECK_PCT,yield vs checks 98.1% (below target 103%),98.1,98.1,98.13703491102645,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,112
+SYN-MZ-00111,MOISTURE_PCT_MEAN,harvest moisture 23.5 (above target 23.0),23.5,23.5,23.46666666666667,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,112
+SYN-MZ-00112,YIELD_VS_CHECK_PCT,yield vs checks 84.7% (below minimum 95%),84.7,84.7,84.70490006783906,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,113
+SYN-MZ-00113,DISEASE_SCORE_MEAN,disease score 6.6 (above limit 6.0),6.6,6.62,6.622222222222223,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,114
+SYN-MZ-00113,FUMONISIN_PPM,fumonisin 5.1 (above limit 4.0),5.1,5.08,5.08,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,114
+SYN-MZ-00114,YIELD_VS_CHECK_PCT,yield vs checks 84.3% (below minimum 95%),84.3,84.3,84.30920708075836,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,115
+SYN-MZ-00115,YIELD_VS_CHECK_PCT,yield vs checks 99.9% (below target 103%),99.9,99.9,99.90323402088106,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,116
+SYN-MZ-00116,YIELD_VS_CHECK_PCT,yield vs checks 100.0% (below target 103%),100.0,100.0,100.01527883880827,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,117
+SYN-MZ-00116,DISEASE_SCORE_MEAN,disease score 5.3 (above target 4.0),5.3,5.34,5.344444444444444,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,117
+SYN-MZ-00118,MOISTURE_PCT_MEAN,harvest moisture 24.1 (above target 23.0),24.1,24.1,24.11111111111111,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,119
+SYN-MZ-00119,GERMINATION_PCT,germination 82.0% (below minimum 85%),82.0,82.0,82.03,85.0,below,True,True,True,candidate_recommendations_synthetic.csv,120
+SYN-MZ-00120,DISEASE_SCORE_MEAN,disease score 5.0 (above target 4.0),5.0,5.0,5.0,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,121
+SYN-MZ-00121,YIELD_VS_CHECK_PCT,yield vs checks 90.3% (below minimum 95%),90.3,90.3,90.31040035537787,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,122
+SYN-MZ-00123,DISEASE_SCORE_MEAN,disease score 6.6 (above limit 6.0),6.6,6.63,6.633333333333333,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,124
+SYN-MZ-00124,DISEASE_SCORE_MEAN,disease score 4.6 (above target 4.0),4.6,4.6,4.6000000000000005,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,125
+SYN-MZ-00126,YIELD_VS_CHECK_PCT,yield vs checks 98.1% (below target 103%),98.1,98.1,98.11022793072593,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,127
+SYN-MZ-00126,DISEASE_SCORE_MEAN,disease score 5.2 (above target 4.0),5.2,5.22,5.222222222222222,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,127
+SYN-MZ-00126,MOISTURE_PCT_MEAN,harvest moisture 26.4 (above limit 25.0),26.4,26.4,26.366666666666664,25.0,above,True,True,True,candidate_recommendations_synthetic.csv,127
+SYN-MZ-00126,GERMINATION_PCT,germination 83.7% (below minimum 85%),83.7,83.7,83.72,85.0,below,True,True,True,candidate_recommendations_synthetic.csv,127
+SYN-MZ-00127,YIELD_VS_CHECK_PCT,yield vs checks 92.8% (below minimum 95%),92.8,92.8,92.79723478879684,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,128
+SYN-MZ-00128,YIELD_VS_CHECK_PCT,yield vs checks 94.4% (below minimum 95%),94.4,94.4,94.35266609058102,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,129
+SYN-MZ-00128,DISEASE_SCORE_MEAN,disease score 7.1 (above limit 6.0),7.1,7.1,7.099999999999999,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,129
+SYN-MZ-00128,FUMONISIN_PPM,fumonisin 4.7 (above limit 4.0),4.7,4.74,4.74,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,129
+SYN-MZ-00129,YIELD_VS_CHECK_PCT,yield vs checks 91.4% (below minimum 95%),91.4,91.4,91.38711612938417,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,130
+SYN-MZ-00129,DISEASE_SCORE_MEAN,disease score 6.9 (above limit 6.0),6.9,6.91,6.911111111111111,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,130
+SYN-MZ-00130,YIELD_VS_CHECK_PCT,yield vs checks 101.2% (below target 103%),101.2,101.2,101.15093001690938,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,131
+SYN-MZ-00130,DISEASE_SCORE_MEAN,disease score 4.2 (above target 4.0),4.2,4.22,4.222222222222222,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,131
+SYN-MZ-00131,DISEASE_SCORE_MEAN,disease score 6.2 (above limit 6.0),6.2,6.2,6.2,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,132
+SYN-MZ-00132,YIELD_VS_CHECK_PCT,yield vs checks 98.4% (below target 103%),98.4,98.4,98.44842833025159,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,133
+SYN-MZ-00132,DISEASE_SCORE_MEAN,disease score 5.5 (above target 4.0),5.5,5.52,5.516666666666666,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,133
+SYN-MZ-00133,YIELD_VS_CHECK_PCT,yield vs checks 91.4% (below minimum 95%),91.4,91.4,91.37115839243499,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,134
+SYN-MZ-00133,DISEASE_SCORE_MEAN,disease score 7.4 (above limit 6.0),7.4,7.38,7.383333333333333,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,134
+SYN-MZ-00134,YIELD_VS_CHECK_PCT,yield vs checks 94.9% (below minimum 95%),94.9,94.9,94.93414387031409,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,135
+SYN-MZ-00136,GERMINATION_PCT,germination 80.3% (below minimum 85%),80.3,80.3,80.34,85.0,below,True,True,True,candidate_recommendations_synthetic.csv,137
+SYN-MZ-00137,YIELD_VS_CHECK_PCT,yield vs checks 96.1% (below target 103%),96.1,96.1,96.0844327176781,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,138
+SYN-MZ-00137,MOISTURE_PCT_MEAN,harvest moisture 24.7 (above target 23.0),24.7,24.7,24.655555555555555,23.0,above,True,True,True,candidate_recommendations_synthetic.csv,138
+SYN-MZ-00138,YIELD_VS_CHECK_PCT,yield vs checks 98.4% (below target 103%),98.4,98.4,98.40633245382587,103.0,below,True,True,True,candidate_recommendations_synthetic.csv,139
+SYN-MZ-00138,DISEASE_SCORE_MEAN,disease score 4.2 (above target 4.0),4.2,4.23,4.233333333333333,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,139
+SYN-MZ-00138,GERMINATION_PCT,germination 86.4% (below target 90%),86.4,86.4,86.41,90.0,below,True,True,True,candidate_recommendations_synthetic.csv,139
+SYN-MZ-00140,YIELD_VS_CHECK_PCT,yield vs checks 91.7% (below minimum 95%),91.7,91.7,91.71112022979071,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,141
+SYN-MZ-00142,YIELD_VS_CHECK_PCT,yield vs checks 93.5% (below minimum 95%),93.5,93.5,93.50308726299109,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,143
+SYN-MZ-00142,FUMONISIN_PPM,fumonisin 7.4 (above limit 4.0),7.4,7.4,7.4,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,143
+SYN-MZ-00143,DISEASE_SCORE_MEAN,disease score 6.5 (above limit 6.0),6.5,6.5,6.5,6.0,above,True,True,True,candidate_recommendations_synthetic.csv,144
+SYN-MZ-00145,YIELD_VS_CHECK_PCT,yield vs checks 89.9% (below minimum 95%),89.9,89.9,89.87625612490658,95.0,below,True,True,True,candidate_recommendations_synthetic.csv,146
+SYN-MZ-00146,DISEASE_SCORE_MEAN,disease score 4.1 (above target 4.0),4.1,4.13,4.133333333333333,4.0,above,True,True,True,candidate_recommendations_synthetic.csv,147

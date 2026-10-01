@@ -1,0 +1,212 @@
+table,column,class
+germplasm,LINE1_GUID,All null
+germplasm,MATERIAL_GUID,"Complete, varying"
+germplasm,REMARK,Constant
+germplasm,LINE_CODE_PREFIX_GUID,All null
+germplasm,GMO_LID,Constant
+germplasm,ACQUIRED_FLAG,Constant
+germplasm,PEDIGREE_TAIL,"Complete, varying"
+germplasm,LINE_GUID,"Complete, varying"
+germplasm,GERMPLASM_GEOGRAPHIC_ORIGIN,"Complete, varying"
+germplasm,GENERATION_CODE,"Complete, varying"
+germplasm,POLLINATION_GUID,"Complete, varying"
+germplasm,STACK_GUID,All null
+germplasm,FEMALE_MULTI_PARENT,Constant
+germplasm,MATERIAL_ID,"Complete, varying"
+germplasm,ADMIN_CODE,"Complete, varying"
+germplasm,ABBR_CODE,"Complete, varying"
+germplasm,STATUS_LID,"Complete, varying"
+germplasm,DISCARD_DATE,All null
+germplasm,FEMALE_PARENT_TRIAL_ID,"Complete, varying"
+germplasm,KERNEL_CATEGORY_LID,"Complete, varying"
+germplasm,FEMALE_PARENT_MATERIAL_GUID,Partly missing
+germplasm,LINE2_GUID,All null
+germplasm,ENCUMBRANCE_NAFTA_LID,All null
+germplasm,MINT_VALIDATION_REMARK,All null
+germplasm,ARCHIVED_DATE,All null
+germplasm,MANUAL_ENTERED,Constant
+germplasm,ENCUMBRANCE_APAC_LID,All null
+germplasm,ADVANCEMENT_DECISION,"Complete, varying"
+germplasm,LEVEL2PEDIGREE,"Complete, varying"
+germplasm,HIGHNAME,"Complete, varying"
+germplasm,MALE_PARENT_MATERIAL_GUID,Partly missing
+germplasm,GENETIC_AFFILIATION_GUID,"Complete, varying"
+germplasm,REFERENCE_TO_CONTRACT_LID,All null
+germplasm,GARF_INTENDED_USE_LID,"Complete, varying"
+germplasm,INITIAL_PLOT_ID,All null
+germplasm,CROP_GUID,Constant
+germplasm,LINE4_GUID,All null
+germplasm,LAST_CHG_USER,"Complete, varying"
+germplasm,PRE_LINE_CODE,"Complete, varying"
+germplasm,ROWGUID,"Complete, varying"
+germplasm,MALE_PARENT_TRIAL_ID,"Complete, varying"
+germplasm,BREEDING_GROUP_GUID,"Complete, varying"
+germplasm,ENCUMBRANCE_LATAM_LID,All null
+germplasm,COMPANY_GUID,Constant
+germplasm,DEFAULT_MATERIAL_LOT_GUID,All null
+germplasm,MALE_MULTI_PARENT,All null
+germplasm,FEMALE_PARENT_PLOT_SUBPLOT_GUID,All null
+germplasm,VARIETY_HYBRID_GUID,All null
+germplasm,ENCUMBRANCE_EAME_LID,All null
+germplasm,POLLINATION_TYPE_LID,"Complete, varying"
+germplasm,LAST_CHG_DATE,"Complete, varying"
+germplasm,STAGE_CODE_LID,"Complete, varying"
+germplasm,HARVEST_DATE,"Complete, varying"
+germplasm,MATERIAL_TYPE_LID,Constant
+germplasm,LINE3_GUID,All null
+germplasm,MALE_PARENT_PLOT_SUBPLOT_GUID,All null
+germplasm,PEDIGREE,"Complete, varying"
+germplasm,MINT_VALIDATION_FLAG,Constant
+germplasm,LEVEL1PEDIGREE,"Complete, varying"
+germplasm,CREATE_DATE,"Complete, varying"
+germplasm,RESEARCH_STATION_GUID,"Complete, varying"
+germplasm,PEGASYS_CREATE_DATE,"Complete, varying"
+germplasm,PEGASYS_UPDATE_DATE,"Complete, varying"
+germplasm,PEGASYS_PURGED,Constant
+trial,TRIAL_GUID,"Complete, varying"
+trial,KIKKER_APPROVAL,Partly missing
+trial,EXCLUDE_FROM_ANALYSIS,Constant
+trial,PROTOCOL_SITE_GUID,"Complete, varying"
+trial,PROTOCOL_GUID,"Complete, varying"
+trial,LAST_ANALYZED_DATE,All null
+trial,REMARK,Constant
+trial,BIOPLAN_PI_NUMBER,All null
+trial,USAGE_SYSTEM_LID,Constant
+trial,TRIAL_LINE_CODE,"Complete, varying"
+trial,INITIATOR,"Complete, varying"
+trial,TRIAL_DESCRIPTION,"Complete, varying"
+trial,START_PLOT_NO,Constant
+trial,TRIAL_ID,"Complete, varying"
+trial,COMPANY_COOPERATOR_GUID,All null
+trial,PLOT_PREFIX,"Complete, varying"
+trial,BEGIN_PLOT_NO,Constant
+trial,STATUS_LID,"Complete, varying"
+trial,TRIAL_PLANNING_SET_GUID,All null
+trial,TRIAL_LAST_CHG_DATE,"Complete, varying"
+trial,SEQUENCE,"Complete, varying"
+trial,NO_OF_REPLICATIONS,"Complete, varying"
+trial,USE_FOR_INBREEDING,Constant
+trial,TRIAL_MAPPED,Constant
+trial,TRIAL_TYPE_LID,"Complete, varying"
+trial,START_YEAR,"Complete, varying"
+trial,BEGIN_DATE,"Complete, varying"
+trial,RESPONSIBLE_MATERIAL_STORE_GUID,"Complete, varying"
+trial,CROP_GUID,Constant
+trial,TRIAL_EXPERIMENT_GUID,"Complete, varying"
+trial,LOCATION_GUID,"Complete, varying"
+trial,LAST_CHG_USER,"Complete, varying"
+trial,ROWGUID,"Complete, varying"
+trial,BREEDING_GROUP_GUID,"Complete, varying"
+trial,BEGIN_BASIC_PLAN_NO,"Complete, varying"
+trial,PLANTING_AREA_GUID,"Complete, varying"
+trial,TRIAL_CORE_GUID,"Complete, varying"
+trial,MALE_LINE_GUID,"Complete, varying"
+trial,END_PLOT_NO,"Complete, varying"
+trial,PLANNED_POLLINATIONS_SET_GUID,All null
+trial,MALE_MATERIAL_GUID,"Complete, varying"
+trial,MINT_READY_PROCESSING,Constant
+trial,PLANTING_POPULATION,"Complete, varying"
+trial,MINT_RDYPR_SUBMITTER,"Complete, varying"
+trial,LAST_CHG_DATE,"Complete, varying"
+trial,START_WEEK,"Complete, varying"
+trial,GREENHOUSE_TRIAL,Constant
+trial,TRIAL_DESIGN_GUID,"Complete, varying"
+trial,INTENT_TYPE_LID,Constant
+trial,CREATE_DATE,"Complete, varying"
+trial,TRIAL_ENTRY_DEFAULTS_GUID,"Complete, varying"
+trial,BREEDING_GOAL_GUID,"Complete, varying"
+trial,CREATE_PERSON,"Complete, varying"
+trial,PEGASYS_CREATE_DATE,"Complete, varying"
+trial,PEGASYS_UPDATE_DATE,"Complete, varying"
+trial,PEGASYS_PURGED,Constant
+observation,OBSERVATION_GUID,"Complete, varying"
+observation,TRIAL_GUID,"Complete, varying"
+observation,MATERIAL_GUID,"Complete, varying"
+observation,LOCATION_GUID,"Complete, varying"
+observation,PLOT_NO,"Complete, varying"
+observation,REPLICATION_NO,"Complete, varying"
+observation,TRAIT_CODE,"Complete, varying"
+observation,TRAIT_NAME,"Complete, varying"
+observation,OBSERVATION_VALUE,"Complete, varying"
+observation,OBSERVATION_UOM,"Complete, varying"
+observation,OBSERVATION_DATE,"Complete, varying"
+observation,OBSERVATION_METHOD_LID,"Complete, varying"
+observation,QUALITY_FLAG_LID,"Complete, varying"
+observation,OBSERVER_ID,"Complete, varying"
+observation,REMARK,Constant
+observation,CREATE_DATE,"Complete, varying"
+observation,LAST_CHG_DATE,Constant
+observation,ROWGUID,"Complete, varying"
+observation,SOURCE_SYSTEM,Constant
+observation,IS_SYNTHETIC,Constant
+operations,OPERATION_GUID,"Complete, varying"
+operations,TRIAL_GUID,"Complete, varying"
+operations,MATERIAL_GUID,"Complete, varying"
+operations,LOCATION_GUID,"Complete, varying"
+operations,OPERATION_TYPE_LID,"Complete, varying"
+operations,OPERATION_STATUS_LID,"Complete, varying"
+operations,OPERATION_DATE,"Complete, varying"
+operations,PLOT_NO,"Complete, varying"
+operations,EQUIPMENT_ID,"Complete, varying"
+operations,OPERATOR_ID,"Complete, varying"
+operations,QUANTITY_VALUE,"Complete, varying"
+operations,QUANTITY_UOM,"Complete, varying"
+operations,REMARK,Constant
+operations,CREATE_DATE,"Complete, varying"
+operations,LAST_CHG_DATE,"Complete, varying"
+operations,ROWGUID,"Complete, varying"
+operations,SOURCE_SYSTEM,Constant
+operations,IS_SYNTHETIC,Constant
+lab,INHERITED,"Complete, varying"
+lab,LAST_CHG_DATE,"Complete, varying"
+lab,OBSERVATION_PERSON,"Complete, varying"
+lab,ALPHA_VALUE,Partly missing
+lab,LAST_CHG_USER,"Complete, varying"
+lab,CALCULATED,Constant
+lab,MATERIAL_GUID,"Complete, varying"
+lab,REMARK,Constant
+lab,OBSERVATION_DATE,"Complete, varying"
+lab,DATE_VALUE,All null
+lab,ROWGUID,"Complete, varying"
+lab,TRAIT_GUID,"Complete, varying"
+lab,NUMBER_VALUE,Partly missing
+lab,PEGASYS_CREATE_DATE,"Complete, varying"
+lab,PEGASYS_UPDATE_DATE,"Complete, varying"
+lab,PEGASYS_PURGED,Constant
+genomics,GENOMIC_SAMPLE_GUID,"Complete, varying"
+genomics,MATERIAL_GUID,"Complete, varying"
+genomics,SAMPLE_ID,"Complete, varying"
+genomics,PLATFORM_LID,Constant
+genomics,SAMPLE_TYPE_LID,Constant
+genomics,GENOTYPING_DATE,"Complete, varying"
+genomics,MARKER_DROUGHT_TOLERANCE,"Complete, varying"
+genomics,MARKER_DISEASE_RESISTANCE,"Complete, varying"
+genomics,MARKER_YIELD_POTENTIAL,"Complete, varying"
+genomics,MARKER_MATURITY,"Complete, varying"
+genomics,GENOMIC_BREEDING_VALUE,"Complete, varying"
+genomics,QC_CALL_RATE_PCT,"Complete, varying"
+genomics,QC_STATUS_LID,Constant
+genomics,REMARK,Constant
+genomics,CREATE_DATE,Constant
+genomics,LAST_CHG_DATE,Constant
+genomics,ROWGUID,"Complete, varying"
+genomics,SOURCE_SYSTEM,Constant
+genomics,IS_SYNTHETIC,Constant
+recommendations,TRIAL_GUID,"Complete, varying"
+recommendations,TRIAL_ID,"Complete, varying"
+recommendations,TRIAL_DESCRIPTION,"Complete, varying"
+recommendations,LOCATION_GUID,"Complete, varying"
+recommendations,STATUS_LID,Constant
+recommendations,START_YEAR,"Complete, varying"
+recommendations,YIELD_T_HA,"Complete, varying"
+recommendations,MOISTURE_PCT,"Complete, varying"
+recommendations,DISEASE_SCORE,"Complete, varying"
+recommendations,PLANT_HEIGHT_CM,"Complete, varying"
+recommendations,FLOWERING_DAYS,"Complete, varying"
+recommendations,GENOMIC_BREEDING_VALUE_MEAN,"Complete, varying"
+recommendations,RESISTANT_MATERIAL_PCT,"Complete, varying"
+recommendations,GENOMICS_QC_PASS_PCT,Constant
+recommendations,TRIAL_RECOMMENDATION,"Complete, varying"
+recommendations,RECOMMENDATION_RATIONALE,"Complete, varying"
+recommendations,RULE_VERSION,Constant
+recommendations,IS_SYNTHETIC,Constant

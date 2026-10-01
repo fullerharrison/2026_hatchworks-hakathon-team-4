@@ -1,15 +1,13 @@
-link,from,to,distinct,resolved,share
-Observation → trial,observation.TRIAL_GUID,trial.TRIAL_GUID,72,72,1.0
-Observation → line,observation.MATERIAL_GUID,germplasm.MATERIAL_GUID,150,150,1.0
-Observation → trial site,observation.LOCATION_GUID,trial.LOCATION_GUID,6,6,1.0
-Operation → trial,operations.TRIAL_GUID,trial.TRIAL_GUID,72,72,1.0
-Operation → line,operations.MATERIAL_GUID,germplasm.MATERIAL_GUID,150,150,1.0
-Lab result → line,lab.MATERIAL_GUID,germplasm.MATERIAL_GUID,134,134,1.0
-Genomics → line,genomics.MATERIAL_GUID,germplasm.MATERIAL_GUID,150,0,0.0
-Recommendation → trial (GUID),recommendations.TRIAL_GUID,trial.TRIAL_GUID,72,0,0.0
-Recommendation → trial (ID),recommendations.TRIAL_ID,trial.TRIAL_ID,72,72,1.0
-Recommendation → trial site,recommendations.LOCATION_GUID,trial.LOCATION_GUID,6,0,0.0
-Female parent → line,germplasm.FEMALE_PARENT_MATERIAL_GUID,germplasm.MATERIAL_GUID,113,113,1.0
-Male parent → line,germplasm.MALE_PARENT_MATERIAL_GUID,germplasm.MATERIAL_GUID,113,113,1.0
-Parent trial → trial,germplasm.FEMALE_PARENT_TRIAL_ID,trial.TRIAL_ID,72,72,1.0
-Trial male line → line,trial.MALE_MATERIAL_GUID,germplasm.MATERIAL_GUID,61,61,1.0
+source,target,distinct,resolved,missing_rows,unresolved
+recommendations.MATERIAL_GUID,germplasm.MATERIAL_GUID,150,150,0,
+genomics.MATERIAL_GUID,germplasm.MATERIAL_GUID,152,152,0,
+lab.MATERIAL_GUID,germplasm.MATERIAL_GUID,152,152,0,
+bridge.MATERIAL_GUID,germplasm.MATERIAL_GUID,150,150,0,
+bridge.LINE_GUID,germplasm.LINE_GUID,150,150,0,
+observation.TRIAL_ENTRY_RELATIONSHIP_GUID,bridge.TRIAL_ENTRY_GUID,1728,1728,0,
+observation.GID,germplasm.MATERIAL_GUID,150,150,0,
+observation.ATTACHED_TO_FIELD_ENTITY_ID,bridge.FIELD_ENTITY_ID,72,72,0,
+observation.FIELD_ID,bridge.TRIAL_GUID,72,72,0,
+operations.ATTACHED_TO_FIELD_ENTITY_ID,bridge.FIELD_ENTITY_ID,72,72,0,
+observation.TRAIT_GUID,dictionary.TRAIT_GUID,3,3,0,
+lab.TRAIT_GUID,dictionary.TRAIT_GUID,3,3,0,

@@ -1,0 +1,9 @@
+criterion,compatible_behavior,evidence_status
+Yield vs checks,RED <95%; GREEN >=103%,95 and 103 stated in reasons; inequality/precedence inferred
+Disease,RED >6; GREEN <=4,6 and 4 stated in reasons; boundary precision unresolved
+Moisture,"GREEN <=23%; >23% AMBER, including >25%",23 and 25 stated; >25 is not a RED knockout in supplied outcomes
+Germination,"GREEN >=90%; <90% AMBER, including <85%",90 and 85 stated; <85 is not a RED knockout in supplied outcomes
+Fumonisin,RED >4 ppm,4 stated in reasons; strict inequality inferred
+Disease marker,SUSCEPTIBLE prevents GREEN,Marker warning stated; GREEN gating inferred
+Usable trials,0 -> AMBER; GREEN needs >=2,No-data/one-trial warnings stated; precedence inferred
+Genomic value / cold test,No gate needed to reproduce outcomes,Absence of an observed effect does not prove these are unused in the intended rule
