@@ -1,6 +1,8 @@
 # uc4-mcp
 
-Read-only MCP server over the UC4 v2 data files. Plan: [phase-1-mcp-data-layer.md](../.tasks/uc4-assistant/phase-1-mcp-data-layer.md).
+> **Current data notice (1 October 2026):** This app is a historical v2 demo. The SME replacement introduces candidate-level GREEN/AMBER/RED and different source schemas. [Current analysis](../analysis/uc4_eda/report.html) describes it; setting UC4_ZIP alone does not migrate this app.
+
+UC4 v2 evidence app: read-only MCP, natural-language answers, breeder screen and explicit human decision log. See [implemented architecture](ARCHITECTURE.md) and [review/readiness](../.tasks/uc4-demo-review/task.md). Original build plan: [phase-1-mcp-data-layer.md](../.tasks/uc4-assistant/phase-1-mcp-data-layer.md).
 
 ## Prerequisites
 
@@ -22,7 +24,7 @@ To make it permanent for your user (so MCP clients launched from anywhere inheri
 [Environment]::SetEnvironmentVariable("UV_PROJECT_ENVIRONMENT", "$env:LOCALAPPDATA\uc4-mcp\.venv", "User")
 ```
 
-Run tests from the repo root. Keep the `app/tests` path: without it pytest also collects `analysis/uc4_eda/`, whose test modules share basenames with ours.
+Run tests from the repo root. Keep the `app/tests` path: without it pytest also collects `analysis/uc4_eda/`, whose test modules share basenames with ours. The default suite excludes browser and live-model checks; run those separately as documented below and in the review tasks.
 
 ```powershell
 uv run --project app pytest -q app/tests
@@ -30,7 +32,7 @@ uv run --project app pytest -q app/tests
 
 ## Data
 
-The tests and server read `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case*.zip`, which is git-ignored (data clearance is still open), so copy it there after cloning. Exactly one archive may match; otherwise, or to use a copy elsewhere, set `UC4_ZIP` to its full path.
+The tests and server default to the exact **v2** filename `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case.zip`, which is git-ignored. Obtain it from the supplied hackathon materials or an authorized teammate and copy it there after cloning. Other archives in the folder do not change the default. `UC4_ZIP` overrides this path explicitly; it does not migrate the app to the replacement candidate schema or historical v3. Incompatible schemas are rejected. The [current candidate analysis](../analysis/uc4_eda/report.html) is not the runtime data source; [v3](../analysis/uc4_eda/v3/report_v3.html) is superseded historical analysis.
 
 ## Run
 
@@ -41,9 +43,15 @@ uv run --project app uc4-mcp                                   # stdio (what MCP
 uv run --project app uc4-mcp --transport http --port 8765      # streamable HTTP at http://127.0.0.1:8765/mcp
 ```
 
+- Both entry points load the git-ignored repo-root `.env` at startup (a shell export wins);
+  `uc4-mcp` has no required variables, `uc4-ask` needs `PORTKEY_API_KEY`.
 - The server loads the zip at startup; a missing zip exits with code 1 and a message naming `UC4_ZIP`.
 - Logs go to `app/logs/uc4_mcp.log`, never stdout (stdout carries the stdio protocol).
 - `--host 0.0.0.0` is only for clients in Docker (see [n8n](#connect-n8n-http)).
+- HTTP serves two routes: the MCP endpoint at `/mcp` and `GET /health` for probes, returning
+  `{"status", "server", "trials", "sources", "extract_date"}` (500 with `{"status": "error"}` if
+  the store cannot load). `/` is 404 by design; there is no screen on this port — the breeder
+  screen is `uc4-ask serve` on 8766.
 
 ## Tools and resources
 
@@ -107,8 +115,10 @@ If Connect fails, read the end of `app/logs/uc4_mcp.log`: a new `uc4-mcp startin
 
 `uc4-ask` answers plain-English questions from the 8 tools above, citing a row
 (`[file#row_id]`) or a whole tool result (`[tool:query_trials]`) for every number. An
-ambiguous ID gets a "which one?" list; an answer with no citation, numbers or verdict/colour
-words that are not in the cited results is rewritten once and otherwise marked unverified.
+ambiguous ID gets a "which one?" list; an answer with no citation, quantities or verdict/colour
+words unsupported by cited results is rewritten once and otherwise marked unverified.
+Numbers copied from a question do not count as factual evidence. These checks do not
+prove semantic attribution or completeness; the review also checks answers against source rows.
 Settings: `app/agent.toml` (model, sampling, round limits; committed). Secrets come from the
 environment only.
 
@@ -118,18 +128,25 @@ Portkey setup: `PORTKEY_API_KEY` is required. The model is a Model Catalog id
 `UC4_LLM_PROVIDER_KEY` is only for routes that need a raw provider key. If the model rejects
 `temperature` or `max_tokens` (some reasoning models), delete that key from `agent.toml`.
 
+Keep the variables in the git-ignored repo-root `.env`; `uc4-ask` loads it at startup, so no
+`--env-file` is needed (a shell export wins over the file):
+
+```
+PORTKEY_API_KEY=<key>                                   # required
+UC4_LLM_MODEL=@<provider-slug>/<model>                   # or model in agent.toml
+UC4_LLM_BASE_URL=https://portkey.syngenta.com/v1         # optional (company gateway)
+```
+
+If `PORTKEY_API_KEY` is missing, `uc4-ask` prints the variable name and the `.env` path and
+exits 2 before running; the model is validated the same way (exit 2, or HTTP 503 per request
+on `serve`).
+
 ```powershell
-$env:PORTKEY_API_KEY = "<key>"                    # required
-$env:UC4_LLM_MODEL = "@<provider-slug>/<model>"   # or model in agent.toml
-# optional: UC4_LLM_BASE_URL (company gateway), PORTKEY_VIRTUAL_KEY / PORTKEY_CONFIG
 uv run --project app uc4-ask ping
 uv run --project app uc4-ask ask "Why is SYN-TR-0037 amber?"
 uv run --project app uc4-ask chat
 uv run --project app uc4-ask eval    # the supported questions; report -> app/evals/results/
 ```
-
-Or keep the variables in the git-ignored repo-root `.env` and let uv load them:
-`uv run --project app --env-file .env uc4-ask serve`.
 
 `chat` quits on an empty line, `quit`, `exit` or Ctrl+Z/EOF. Exit codes: 0 answered or
 clarify, 1 unverified or error, 2 configuration error.
@@ -160,8 +177,8 @@ uv run --project app uc4-ask serve            # then open http://127.0.0.1:8766/
 ```
 
 The server loads the zip first, so a missing archive exits with code 1 and the message from
-the [Data](#data) section; if `get_started/` holds more than one matching archive, set
-`UC4_ZIP` to the one to use (see [Environment](#environment)). It then prints the screen URL
+the [Data](#data) section; other archives in `get_started/` do not affect the exact v2 default. To use a copy
+elsewhere, set `UC4_ZIP` explicitly (see [Data](#data)). It then prints the screen URL
 and the decision log path.
 
 The screen lists the trials with their verdict and reason. Selecting a trial shows the seven
@@ -224,3 +241,9 @@ Results: [walkthrough](../team/phase3_walkthrough.md),
 | `GET /decisions?trial=` | the decisions recorded for a trial |
 | `POST /ask` | the question agent (needs Portkey) |
 | `GET /health` | status, and why the model is not configured |
+
+## Current demo review and videos
+
+Follow the [review task index](../.tasks/uc4-demo-review/task.md) for current evidence, source limitations and readiness. The [implemented architecture](ARCHITECTURE.md) describes the actual stack and data flow. The [two narrated recordings](../.tasks/uc4-demo-review/evidence/20260930T225928Z-bbd0c0b/videos/index.md) supplement the required live event presentation.
+
+Breeder history uses local JSONL. The entered actor is an unauthenticated demo alias; append-only API behavior does not make the file tamper-proof. Technical choices are recorded separately in dated review decisions. Run rehearsals with a fresh `UC4_DECISION_LOG`; do not overwrite the normal history.
