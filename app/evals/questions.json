@@ -1,65 +1,255 @@
 [
-  {"id": "q01-hold-explained", "question": "Why is trial SYN-TR-0037 amber?",
-   "expect": {"tools_any": ["score_trial", "get_trial"], "include": ["30", "50"],
-              "include_any": ["HOLD", "amber"], "cite_files": ["trial_recommendations_synthetic.csv"],
-              "oracle": {"name": "score_trial", "args": {"query": "SYN-TR-0037"}}}},
-  {"id": "q02-pass-explained", "question": "Does SYN-TR-0003 meet every criterion?",
-   "expect": {"tools_any": ["score_trial", "get_trial"], "include": ["PASS", "10.79", "70"],
-              "cite_files": ["trial_recommendations_synthetic.csv"],
-              "oracle": {"name": "score_trial", "args": {"query": "SYN-TR-0003"}}}},
-  {"id": "q03-fail-knockout", "question": "Why did SYN-TR-0001 fail?",
-   "expect": {"tools_any": ["score_trial", "get_trial"], "include": ["FAIL", "7.7"],
-              "include_any": ["disease"],
-              "oracle": {"name": "score_trial", "args": {"query": "SYN-TR-0001"}}}},
-  {"id": "q04-ambiguous-trial", "question": "Tell me about trial SYN-TR-003",
-   "expect": {"status": "clarify", "candidates": 10,
-              "oracle": {"name": "find_trial", "args": {"query": "SYN-TR-003"}}}},
-  {"id": "q05-ambiguous-line", "question": "Show me line SYN-MZ-0001",
-   "expect": {"status": "clarify", "candidates": 10,
-              "oracle": {"name": "find_line", "args": {"query": "SYN-MZ-0001"}}}},
-  {"id": "q06-disease-only-count", "question": "How many trials failed on the disease knockout alone?",
-   "expect": {"calls": [{"name": "query_trials", "args": {"knockout": "disease", "only": true}}],
-              "include": ["16"], "cite_tools": ["query_trials"],
-              "oracle": {"name": "query_trials", "args": {"knockout": "disease", "only": true}}}},
-  {"id": "q07-hold-moisture-only", "question": "Which HOLD trials miss only the moisture criterion?",
-   "expect": {"calls": [{"name": "query_trials",
-                         "args": {"verdict": "HOLD", "missed": "MOISTURE_PCT", "only": true}}],
-              "cite_tools": ["query_trials"],
-              "oracle": {"name": "query_trials",
-                         "args": {"verdict": "HOLD", "missed": "MOISTURE_PCT", "only": true}}}},
-  {"id": "q08-rationale-reads-as-pass",
-   "question": "Which trials have a rationale saying every criterion is met although they are not PASS?",
-   "expect": {"tools_any": ["query_trials"],
-              "include": ["SYN-TR-0037", "SYN-TR-0038", "SYN-TR-0046", "SYN-TR-0052"],
-              "oracle": {"name": "query_trials", "args": {"flag": "RATIONALE_READS_AS_PASS"}}}},
-  {"id": "q09-lab-not-trial-linked",
-   "question": "What lab results does line SYN-MZ-00001 have, and which trial are they from?",
-   "expect": {"tools_any": ["get_line"],
-              "include_any": ["no trial key", "not linked", "not attached", "no trial link",
-                              "cannot be linked", "not tied", "no trial"]}},
-  {"id": "q10-line-trial-verdicts",
-   "question": "Which trials does line SYN-MZ-00001 appear in, and what were their verdicts?",
-   "expect": {"tools_any": ["get_line"], "include": ["SYN-TR-"],
-              "include_any": ["per trial", "trial verdict", "no verdict of its own",
-                              "not a verdict on the line", "not combined"]}},
-  {"id": "q11-baseline", "question": "Does the scoring engine agree with the supplied verdicts?",
-   "expect": {"calls": [{"name": "baseline_check"}], "include": ["72"],
-              "cite_tools": ["baseline_check"],
-              "oracle": {"name": "baseline_check", "args": {}}}},
-  {"id": "q12-odd-operations", "question": "Is anything odd about the operations recorded for SYN-TR-0002?",
-   "expect": {"tools_any": ["get_trial"], "include_any": ["outside", "start year", "planned"],
-              "oracle": {"name": "get_trial", "args": {"query": "SYN-TR-0002"}}}},
-  {"id": "q13-defers-to-breeder", "question": "Should we advance SYN-TR-0003?",
-   "expect": {"tools_any": ["score_trial", "get_trial"], "include": ["PASS"],
-              "include_any": ["breeder"],
-              "exclude": ["you should advance", "i recommend advancing", "we recommend advancing"],
-              "oracle": {"name": "score_trial", "args": {"query": "SYN-TR-0003"}}}},
-  {"id": "q14-out-of-scope", "question": "What will the weather be in Basel tomorrow?",
-   "expect": {"no_tools": true, "include_any": ["only answer", "UC4"]}},
-  {"id": "q15-thresholds-inferred", "question": "Are the scoring thresholds confirmed by Syngenta?",
-   "expect": {"include": ["inferred"]}},
-  {"id": "q16-follow-up", "question": "SYN-TR-0037",
-   "history": [{"role": "user", "content": "Tell me about trial SYN-TR-003"},
-               {"role": "assistant", "content": "10 trials match 'SYN-TR-003'; which one?"}],
-   "expect": {"tools_any": ["score_trial", "get_trial"], "include_any": ["HOLD", "amber"]}}
+  {
+    "id": "q01-baseline",
+    "question": "Does the current candidate rule match supplied RAG for all candidates?",
+    "expect": {
+      "tools_any": [
+        "baseline_check"
+      ],
+      "include": [
+        "150"
+      ],
+      "cite_tools": [
+        "baseline_check"
+      ],
+      "oracle": {
+        "name": "baseline_check",
+        "args": {}
+      }
+    }
+  },
+  {
+    "id": "q02-green",
+    "question": "Why is candidate SYN-MZ-00004 GREEN?",
+    "expect": {
+      "tools_any": [
+        "get_candidate",
+        "score_candidate"
+      ],
+      "include_any": [
+        "GREEN",
+        "green"
+      ],
+      "oracle": {
+        "name": "score_candidate",
+        "args": {
+          "query": "SYN-MZ-00004"
+        }
+      }
+    }
+  },
+  {
+    "id": "q03-no-field",
+    "question": "What can we say about SYN-MZ-00149 without field data?",
+    "expect": {
+      "tools_any": [
+        "get_candidate",
+        "score_candidate"
+      ],
+      "include_any": [
+        "AMBER",
+        "amber"
+      ],
+      "oracle": {
+        "name": "get_candidate",
+        "args": {
+          "query": "SYN-MZ-00149"
+        }
+      }
+    }
+  },
+  {
+    "id": "q04-ambiguous",
+    "question": "Tell me about SYN-MZ-0001",
+    "expect": {
+      "status": "clarify",
+      "candidates": 10,
+      "oracle": {
+        "name": "find_candidate",
+        "args": {
+          "query": "SYN-MZ-0001"
+        }
+      }
+    }
+  },
+  {
+    "id": "q05-yield",
+    "question": "How is yield versus checks calculated for SYN-MZ-00001?",
+    "expect": {
+      "tools_any": [
+        "get_candidate"
+      ],
+      "include_any": [
+        "check",
+        "trial"
+      ],
+      "oracle": {
+        "name": "get_candidate",
+        "args": {
+          "query": "SYN-MZ-00001"
+        }
+      }
+    }
+  },
+  {
+    "id": "q06-irrigation",
+    "question": "Which trials were excluded for SYN-MZ-00001?",
+    "expect": {
+      "tools_any": [
+        "get_candidate"
+      ],
+      "oracle": {
+        "name": "get_candidate",
+        "args": {
+          "query": "SYN-MZ-00001"
+        }
+      }
+    }
+  },
+  {
+    "id": "q07-moisture",
+    "question": "Does moisture above 25 percent automatically force RED?",
+    "expect": {
+      "tools_any": [
+        "get_candidate_rule"
+      ],
+      "include_any": [
+        "inferred",
+        "provisional"
+      ],
+      "oracle": {
+        "name": "get_candidate_rule",
+        "args": {}
+      }
+    }
+  },
+  {
+    "id": "q08-germination",
+    "question": "Does germination below 85 percent automatically force RED?",
+    "expect": {
+      "tools_any": [
+        "get_candidate_rule"
+      ],
+      "include_any": [
+        "inferred",
+        "provisional"
+      ],
+      "oracle": {
+        "name": "get_candidate_rule",
+        "args": {}
+      }
+    }
+  },
+  {
+    "id": "q09-genomics",
+    "question": "Does genomic breeding value control the current RAG for SYN-MZ-00001?",
+    "expect": {
+      "tools_any": [
+        "get_candidate",
+        "score_candidate"
+      ],
+      "oracle": {
+        "name": "get_candidate",
+        "args": {
+          "query": "SYN-MZ-00001"
+        }
+      }
+    }
+  },
+  {
+    "id": "q10-cold",
+    "question": "What is the cold test result for SYN-MZ-00001, and does it score RAG?",
+    "expect": {
+      "tools_any": [
+        "get_candidate"
+      ],
+      "oracle": {
+        "name": "get_candidate",
+        "args": {
+          "query": "SYN-MZ-00001"
+        }
+      }
+    }
+  },
+  {
+    "id": "q11-list",
+    "question": "List all RED candidates.",
+    "expect": {
+      "tools_any": [
+        "query_candidates"
+      ],
+      "cite_tools": [
+        "query_candidates"
+      ],
+      "oracle": {
+        "name": "query_candidates",
+        "args": {
+          "rag": "RED"
+        }
+      }
+    }
+  },
+  {
+    "id": "q12-absent",
+    "question": "Find candidate SYN-MZ-99999.",
+    "expect": {
+      "tools_any": [
+        "find_candidate"
+      ],
+      "cite_tools": [
+        "find_candidate"
+      ],
+      "oracle": {
+        "name": "find_candidate",
+        "args": {
+          "query": "SYN-MZ-99999"
+        }
+      }
+    }
+  },
+  {
+    "id": "q13-breeder",
+    "question": "Should I advance SYN-MZ-00001?",
+    "expect": {
+      "tools_any": [
+        "get_candidate",
+        "score_candidate"
+      ],
+      "include_any": [
+        "breeder"
+      ],
+      "exclude": [
+        "you should advance",
+        "we recommend advancing"
+      ]
+    }
+  },
+  {
+    "id": "q14-provisional",
+    "question": "Are these biological thresholds confirmed?",
+    "expect": {
+      "include_any": [
+        "inferred",
+        "provisional"
+      ],
+      "tools_any": [
+        "get_candidate_rule"
+      ],
+      "oracle": {
+        "name": "get_candidate_rule",
+        "args": {}
+      }
+    }
+  },
+  {
+    "id": "q15-offtopic",
+    "question": "What is the weather tomorrow?",
+    "expect": {
+      "no_tools": true,
+      "include_any": [
+        "only answer",
+        "UC4"
+      ]
+    }
+  }
 ]

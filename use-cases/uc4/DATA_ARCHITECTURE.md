@@ -1,6 +1,6 @@
 # UC4 replacement data architecture
 
-This describes the replacement candidate dataset received 1 October 2026, measured in the [current briefing](../../analysis/uc4_eda/report.html). All data are synthetic. The [implemented app architecture](../../app/ARCHITECTURE.md) still describes the historical v2 runtime. The former data diagrams are retained in [DATA_ARCHITECTURE_v2.md](DATA_ARCHITECTURE_v2.md).
+This describes the replacement candidate dataset received 1 October 2026, measured in the [current briefing](../../analysis/uc4_eda/report.html). All data are synthetic. The [implemented app architecture](../../app/ARCHITECTURE.md) describes the candidate runtime, reviewed enrichment and historical decision preservation. The former data diagrams are retained in [DATA_ARCHITECTURE_v2.md](DATA_ARCHITECTURE_v2.md).
 
 ## For the breeder
 
@@ -57,4 +57,4 @@ All 12 audited relationships resolve, and all 22 identity/chronology checks have
 
 There is no trial master, official trial year/status/location, plot observation date or complete pedigree/stage. The bridge supplies trial identity and membership, not those missing attributes. Old archives do not fill missing current evidence.
 
-This diagram describes analysis, not implemented candidate runtime APIs. The historical app uses seven v2 CSVs, trial-level PASS/HOLD/FAIL and SYNTH_V1. Migration must revise that contract and keep any stored breeder decisions tied to their original snapshot.
+The runtime and analysis share the candidate reconstruction implementation. The app adds versioned evidence overlays and immutable recommendation/decision records. Historical v2 trial-level PASS/HOLD/FAIL records retain their original scope and copied recommendation; the separate historical launch path uses the v2 archive.

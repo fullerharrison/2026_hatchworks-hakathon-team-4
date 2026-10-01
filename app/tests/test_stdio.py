@@ -10,6 +10,7 @@ import os
 import shutil
 import socket
 import subprocess
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -23,13 +24,22 @@ from mcp import Client, StdioServerParameters
 from uc4_mcp.server import parse_args
 
 REPO = Path(__file__).resolve().parents[2]
-BASELINE = {"checked": 72, "matched": 72, "mismatches": []}
-TOOLS = {"list_sources", "find_trial", "find_line", "get_trial", "get_line", "score_trial",
-         "query_trials", "baseline_check"}
+BASELINE = {"checked": 150, "matched": 150, "mismatches": []}
+TOOLS = {"list_sources", "find_candidate", "get_candidate", "score_candidate",
+         "query_candidates", "get_candidate_rule", "score_trial", "query_trials", "baseline_check"}
+
+
+@pytest.fixture(autouse=True)
+def isolated_history(tmp_path, monkeypatch):
+    monkeypatch.setenv("UC4_ZIP", str(REPO / "get_started" / "candidate_recommendations_synthetic.zip"))
+    monkeypatch.setenv("UC4_CANDIDATE_DB", str(tmp_path / "history.sqlite3"))
+    monkeypatch.setenv("UC4_DECISION_LOG", str(tmp_path / "legacy.jsonl"))
+    monkeypatch.setenv("UV_PROJECT_ENVIRONMENT", str(Path(sys.executable).resolve().parents[1]))
+    monkeypatch.setenv("UV_CACHE_DIR", str(tmp_path / "uv-cache"))
 
 
 def script() -> str:
-    path = shutil.which("uc4-mcp")
+    path = shutil.which("uc4-mcp") or str(Path(sys.executable).with_name("uc4-mcp.exe"))
     if path is None:
         pytest.fail("uc4-mcp not on PATH; run the tests with `uv run --project app pytest`",
                     pytrace=False)
@@ -61,7 +71,7 @@ def test_client_command_over_stdio() -> None:
     """The exact command opencode.json and the README give clients."""
     uv = shutil.which("uv")
     assert uv is not None
-    params = StdioServerParameters(command=uv, args=["run", "--project", "app", "uc4-mcp"],
+    params = StdioServerParameters(command=uv, args=["run", "--no-sync", "--project", "app", "uc4-mcp"],
                                    cwd=REPO, env=dict(os.environ))
     check(*baseline_and_tools(params))
 
@@ -105,8 +115,8 @@ def test_http_transport() -> None:
         status, body = _http_get(port, "/health")
         assert status == 200
         health = json.loads(body)
-        assert health["status"] == "ok" and health["server"] == "uc4-mcp"
-        assert health["trials"] == 72 and health["sources"] == 7
+        assert health["status"] == "ok" and health["server"] == "uc4-candidates"
+        assert health["candidates"] == 150 and health["sources"] == 8
         assert _http_get(port, "/")[0] == 404  # / is 404 by design; /mcp and /health are it
     finally:
         proc.terminate()

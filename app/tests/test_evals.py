@@ -15,7 +15,7 @@ from uc4_mcp.grounding import NUMBER, Citation, numbers_in
 from uc4_mcp.server import create_server
 from uc4_mcp.store import EvidenceStore
 
-CASES = load_cases()
+CASES = load_cases(Path(__file__).resolve().parents[1] / "evals" / "questions_v2.json")
 
 
 def test_question_set_is_well_formed() -> None:

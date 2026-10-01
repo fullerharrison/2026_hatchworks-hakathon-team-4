@@ -13,6 +13,7 @@ import argparse
 import json
 import logging
 import sys
+import webbrowser
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -25,8 +26,9 @@ from mcp.server.mcpserver import MCPServer
 from uc4_mcp.agent import AGENT_LOG, Answer, ask, load_agent_settings
 from uc4_mcp.api import create_app
 from uc4_mcp.bridge import open_bridge
-from uc4_mcp.config import ENV_FILE, ensure_env
+from uc4_mcp.config import ENV_FILE, ensure_env, load_env_file
 from uc4_mcp.decisions import DecisionLog, log_path
+from uc4_mcp.candidate_server import default_history
 from uc4_mcp.evals import (CASES_PATH, RESULTS_DIR, CaseResult, load_cases, report,
                            result_stem, run_cases)
 from uc4_mcp.llm import ChatModel, LLMError, PortkeyChat, load_settings, ping
@@ -108,19 +110,50 @@ def cmd_chat(args: argparse.Namespace) -> int:
     return 0
 
 
+class DashboardServer(uvicorn.Server):
+    """Open the dashboard only after the listening socket is ready."""
+
+    async def startup(self, sockets=None) -> None:
+        await super().startup(sockets=sockets)
+        if self.started:
+            host = self.config.host
+            if host in ("0.0.0.0", "::"):
+                host = "127.0.0.1"
+            elif ":" in host:
+                host = f"[{host}]"
+            try:
+                webbrowser.open(f"http://{host}:{self.config.port}/")
+            except webbrowser.Error:
+                print("Open the dashboard URL manually in your browser.", flush=True)
+
+
 def cmd_serve(args: argparse.Namespace) -> int:
     """Serve the breeder screen and API; a missing zip exits 1 before the port opens."""
+    historical = getattr(args, "historical_v2", False) or server is not None
+    print("Loading breeder data...", flush=True)
     try:
-        _default_store()
+        if historical:
+            _default_store()
+        else:
+            default_history()
     except FileNotFoundError as e:
         sys.stderr.write(f"{e}\n")
         return 1
-    log = DecisionLog(log_path())
-    print(f"Breeder screen: http://{args.host}:{args.port}/  (decisions: {log.path})",
-          flush=True)
-    app = create_app(make_model, server, load_agent_settings(),
-                     get_store=_default_store, log=log)
-    uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
+    if historical:
+        log = DecisionLog(log_path())
+        print(f"Breeder screen: http://{args.host}:{args.port}/  (decisions: {log.path})", flush=True)
+        app = create_app(make_model, server, load_agent_settings(),
+                         get_store=_default_store, log=log)
+    else:
+        print(f"Breeder screen: http://{args.host}:{args.port}/  (history: {default_history().path})", flush=True)
+        app = create_app(make_model, None, load_agent_settings())
+    print("Open the Breeder screen URL in your browser. Keep this terminal open; "
+          "press Ctrl+C to stop the server.", flush=True)
+    if getattr(args, "open_browser", False):
+        DashboardServer(uvicorn.Config(app, host=args.host, port=args.port,
+                                       log_level="info")).run()
+    else:
+        uvicorn.run(app, host=args.host, port=args.port, log_level="info")
     return 0
 
 
@@ -159,9 +192,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_ask)
     sub.add_parser("chat", help="interactive; empty line or EOF quits"
                    ).set_defaults(func=cmd_chat)
-    p = sub.add_parser("serve", help="HTTP: breeder screen at /, POST /ask, /trials, /decisions")
+    p = sub.add_parser("serve", help="HTTP: breeder screen at /, POST /ask, /candidates, /decisions")
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--port", type=int, default=8766)
+    p.add_argument("--open-browser", action="store_true", help="open the dashboard after startup")
+    p.add_argument("--historical-v2", action="store_true", help="run the archived trial-scoring demo")
     p.set_defaults(func=cmd_serve)
     p = sub.add_parser("eval", help="run the supported questions against the model")
     p.add_argument("--cases", type=Path, default=CASES_PATH)
@@ -175,7 +210,12 @@ def main(argv: list[str] | None = None) -> None:
     """Run one ``uc4-ask`` command; exit 2 with a readable message if the model is not set up."""
     args = build_parser().parse_args(argv)
     configure_cli_logging()
-    if missing := ensure_env():
+    if args.command == "serve":
+        load_env_file()
+        missing = []
+    else:
+        missing = ensure_env()
+    if missing:
         sys.stderr.write(
             f"Missing required environment variables: {', '.join(missing)}\n"
             f"Add them to {ENV_FILE} (one KEY=value per line) or export them in your "

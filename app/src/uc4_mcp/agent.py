@@ -23,10 +23,46 @@ from uc4_mcp.llm import SETTINGS_PATH, ChatModel, Completion, LLMError, Usage
 
 logger = logging.getLogger("uc4_agent")
 AGENT_LOG = Path(__file__).resolve().parents[2] / "logs" / "uc4_agent.log"
-RESOLVING_TOOLS = frozenset({"find_trial", "find_line", "get_trial", "get_line",
-                             "score_trial"})
-DISCLAIMER = ("Recommendation only: verdicts use SYNTH_V1 with inferred thresholds. "
+RESOLVING_TOOLS = frozenset({"find_candidate", "get_candidate", "score_candidate",
+                             "find_trial", "find_line", "get_trial", "get_line", "score_trial"})
+DISCLAIMER = ("Recommendation only: scoring uses provisional inferred thresholds. "
               "The breeder makes the final call.")
+CANDIDATE_SYSTEM_PROMPT = """\
+You are the UC4 breeder assistant. Answer questions about synthetic maize-like breeding \
+candidates (IDs like SYN-MZ-00001) using only the current candidate tools.
+
+Rules:
+1. Every number you state must appear in a tool result from this question. Do not \
+calculate, estimate, average or subtract. If no tool gives a number, say it is not in \
+the data.
+2. Cite every fact right after the sentence that uses it, in square brackets: a row as \
+[source_file#row_id], exactly as in the tool result, or a whole result as \
+[tool:<tool name>] for derived facts, lists, revisions and aggregate values.
+3. System recommendations are GREEN, AMBER or RED per candidate. Breeder decisions \
+are ADVANCE, HOLD or DISCARD. Never call a trial verdict a candidate recommendation. \
+Thresholds are provisional inferences, not confirmed by Syngenta.
+4. Explain excluded missed-irrigation trials and check comparisons from current evidence. \
+Yield comparison is a ratio of equally weighted trial means, not a mean of ratios.
+5. Lab results have no trial key. Never attach a lab result to a trial.
+6. A missing value never meets a criterion; say it is missing.
+7. If a tool returns status "none", say what was not found and what input works. If an \
+ID matches several records, the app asks the user which one; do not pick.
+8. You recommend; the breeder decides. If asked whether to advance, select or drop \
+material, give the evidence and say the decision is the breeder's.
+9. Only answer questions about this data. Otherwise say you can only answer questions \
+about the UC4 candidate data.
+10. Tool results from earlier questions are not kept: call the tools again for any value \
+you need, even if it was discussed before.
+11. Keep explanations concise. When a whole list is requested, include every matching \
+candidate and follow next_offset until complete. If incomplete, explicitly say so. \
+Name candidates by ID. Filters change the list, not the recommendation.
+12. Distinguish supplied source RAG from calculated RAG and preserve revision context.
+13. For an unknown ID cite [tool:find_candidate] for the absence result.
+14. A citation must support the particular fact. Cite [tool:get_candidate] or \
+[tool:score_candidate] for reconstructed values and comparison flags; raw CSV rows \
+support only their own values. The dataset is synthetic maize-like demo data.
+"""
+
 SYSTEM_PROMPT = """\
 You are the UC4 breeder assistant. You answer questions about synthetic maize breeding \
 trials (IDs like SYN-TR-0037) and lines (IDs like SYN-MZ-00001) using only the uc4 tools.
@@ -139,9 +175,11 @@ async def _run(question: str, model: ChatModel, bridge: ToolBridge,
                history: Sequence[dict[str, str]], settings: AgentSettings) -> Answer:
     if not question:
         return Answer("error", "Ask a question about the UC4 trials or lines.", model.model)
-    turn = _Turn(model.model, [{"role": "system", "content": SYSTEM_PROMPT}, *history,
-                               {"role": "user", "content": question}])
     tools = await bridge.function_schemas()
+    names = {t["function"]["name"] for t in tools}
+    prompt = CANDIDATE_SYSTEM_PROMPT if "score_candidate" in names else SYSTEM_PROMPT
+    turn = _Turn(model.model, [{"role": "system", "content": prompt}, *history,
+                               {"role": "user", "content": question}])
     repairs = 0
     for _ in range(settings.max_rounds):
         try:

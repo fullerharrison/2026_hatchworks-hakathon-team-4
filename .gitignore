@@ -16,3 +16,4 @@ app/data/
 .tasks/uc4-demo-review
 # pytest basetemp scratch (root and per-folder)
 .test-tmp*/
+dist/

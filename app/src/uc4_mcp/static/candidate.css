@@ -1,0 +1,9 @@
+.filter-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.8rem;align-items:end}
+.filter-grid label {display:grid;gap:.2rem}.filter-grid label.inline{display:flex;align-items:center}
+.filter-grid input,.filter-grid select{width:100%;padding:.4rem}
+.actions{display:flex;gap:.6rem;margin-top:1rem;align-items:center}.button{padding:.45rem .9rem;background:#0b5cad;color:white;border-radius:6px;text-decoration:none}
+#ranges button{margin:.3rem}.tag{display:inline-block;background:#e5ecf4;padding:.3rem .5rem;border-radius:5px;margin:.25rem}
+#rows tr{cursor:pointer}#rows tr:hover{background:#eaf1f8}.selected{outline:2px solid #0b5cad}
+pre{white-space:pre-wrap;max-height:30rem;overflow:auto;font-size:.75rem}
+.history-item{border-top:1px solid #c9ccc6;padding:.7rem 0}.history-item p{margin:.3rem 0}
+.history-item button{margin:.25rem}.small{font-size:.85rem;color:#4a4a4a}

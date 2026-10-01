@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UC4 candidate recommendations</title><link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/candidate.css"></head><body>
+<header class="top"><h1>Candidate recommendations</h1>
+<p class="rule-note">Synthetic maize-like demonstration data. GREEN, AMBER and RED use a provisional inferred rule. The breeder makes the advancement decision.</p>
+<p id="revision"></p></header>
+<main>
+<section class="card" aria-label="Candidate filters"><h2>Find candidates</h2>
+<div class="filter-grid"><label>Candidate ID<input id="search" type="search" placeholder="SYN-MZ-00001"></label>
+<label>System RAG<select id="rag"><option value="">All</option><option>GREEN</option><option>AMBER</option><option>RED</option></select></label>
+<label>Breeder choice<select id="decision"><option value="">All</option><option value="UNDECIDED">Undecided</option><option>ADVANCE</option><option>HOLD</option><option>DISCARD</option></select></label>
+<label>Disease marker<select id="marker"><option value="">All</option><option>RESISTANT</option><option>INTERMEDIATE</option><option>SUSCEPTIBLE</option></select></label>
+<label>Excluded trials<select id="excluded"><option value="">All</option><option value="true">At least one</option><option value="false">None</option></select></label>
+<label>Sort by<select id="sort"><option value="material_id">Candidate ID</option><option value="rag">RAG</option><option value="YIELD_VS_CHECK_PCT">Yield vs checks</option><option value="N_TRIALS_USED">Usable trials</option></select></label>
+<label class="inline"><input id="descending" type="checkbox"> Descending</label></div>
+<h3>Trait ranges</h3><div class="filter-grid">
+<label>Trait<select id="metric"><option value="YIELD_VS_CHECK_PCT">Yield vs checks (%)</option><option value="DISEASE_SCORE_MEAN">Disease score</option><option value="MOISTURE_PCT_MEAN">Moisture (%)</option><option value="GERMINATION_PCT">Germination (%)</option><option value="FUMONISIN_PPM">Fumonisin (ppm)</option><option value="N_TRIALS_USED">Usable trials</option><option value="GENOMIC_BREEDING_VALUE">Genomic breeding value</option><option value="COLD_TEST_PCT">Cold test (%)</option></select></label>
+<label>Minimum<input id="min" type="number" step="any"></label><label>Maximum<input id="max" type="number" step="any"></label>
+<button id="add-range" type="button">Add range</button><label class="inline"><input id="include-missing" type="checkbox"> Include missing values</label></div>
+<div id="ranges" aria-live="polite"></div><div class="actions"><button id="reset" type="button">Clear filters</button><a id="export" class="button" href="/candidates.csv">Download CSV</a></div></section>
+<section class="card"><h2 id="count">Candidates</h2><p id="list-error" role="alert"></p>
+<div class="scroll"><table><thead><tr><th>Candidate</th><th>RAG</th><th>Yield vs checks</th><th>Disease</th><th>Usable trials</th><th>Excluded</th><th>Breeder choice</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<section id="detail" class="card" hidden><h2 id="detail-title">Candidate</h2><div id="recommendation" class="banner"></div>
+<p id="source-note"></p><div class="grid"><section><h3>Criteria and measurements</h3><p class="small">Values are rounded for display. Hover a value or open source evidence for full precision; scoring uses unrounded values.</p><div class="scroll"><table><thead><tr><th>Criterion</th><th>Value</th><th>Test</th><th>Met</th></tr></thead><tbody id="criteria"></tbody></table></div><div id="metrics"></div></section>
+<section><h3>Evidence</h3><div id="evidence-summary"></div><details><summary>Source rows and trial comparisons</summary><pre id="evidence"></pre></details></section></div>
+<section class="card"><h3>Record breeder decision</h3><p class="small">Names are self-declared and unverified. System GREEN / AMBER / RED corresponds to ADVANCE / HOLD / DISCARD when identifying an override.</p><form id="decision-form"><div class="filter-grid">
+<label>Your name<input id="actor" required maxlength="80"></label><label>Choice<select id="action" required><option>ADVANCE</option><option>HOLD</option><option>DISCARD</option></select></label>
+<label>Location or meeting<input id="location" required placeholder="Unknown if unavailable"></label>
+<label>Source channel<input id="source-channel" required placeholder="Breeder review"></label>
+<label>Trial/site context (optional)<input id="trial-context"></label></div>
+<label>Why<textarea id="reason" required minlength="5" maxlength="1000"></textarea></label>
+<button type="submit">Record decision</button></form><p id="decision-message" role="alert"></p><h3>Decision history</h3><div id="decision-history"></div></section>
+<section class="card"><h3>Enrich evidence</h3><p>Save a draft, submit it, review the impact, and activate it for a new recommendation revision.</p>
+<form id="enrichment-form"><div class="filter-grid"><label>Type<select id="enrich-kind"><option value="metadata">Context or note</option><option value="correction">Measurement correction</option></select></label>
+<label>Field or source row<select id="enrich-target"></select></label>
+<label>Supersedes earlier enrichment<select id="enrich-supersedes"><option value="">None</option></select></label>
+<label>Value<input id="enrich-value" required></label><label>Unit<input id="enrich-unit" readonly></label>
+<label>Observed at<input id="observed-at" type="datetime-local" required></label>
+<label>Evidence source<input id="enrich-source" required placeholder="Notebook, lab record, etc."></label></div>
+<label>Reason<textarea id="enrich-reason" required minlength="5"></textarea></label><button type="submit">Save draft</button></form>
+<div id="enrichment-message" role="alert"></div><div id="enrichment-history"></div></section></section>
+<section class="card"><h2>Historical context</h2><details id="historical-panel"><summary>Original v2 decisions and evidence revisions</summary><p>Legacy records keep their original trial scope and recommendation copy. Snapshot identity was not recorded by the v2 log and remains unknown.</p><pre id="historical-records"></pre></details></section>
+<section class="card"><h2>Ask about the evidence</h2><form id="ask-form"><label>Question<input id="question" type="text" required maxlength="2000" placeholder="Why is SYN-MZ-00001 GREEN?"></label><button type="submit">Ask</button></form><div id="answer" aria-live="polite"></div></section>
+</main><script src="/static/candidate.js"></script></body></html>

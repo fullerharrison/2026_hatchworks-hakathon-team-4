@@ -14,7 +14,7 @@ from typing import Any
 from mcp import Client
 from mcp.server.mcpserver import MCPServer
 
-from uc4_mcp.server import server as default_server
+from uc4_mcp.candidate_server import server as default_server
 
 
 @dataclass(frozen=True)

@@ -202,6 +202,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--host", default="127.0.0.1",
                         help="HTTP only; 0.0.0.0 for clients in Docker (no authentication)")
     parser.add_argument("--port", type=int, default=8765, help="HTTP only; serves /mcp")
+    parser.add_argument("--historical-v2", action="store_true", help="run archived trial-scoring tools")
     return parser.parse_args(argv)
 
 
@@ -211,14 +212,16 @@ def main(argv: list[str] | None = None) -> None:
     configure_logging()
     if load_env_file():  # picks up UC4_ZIP and friends; the server needs no keys
         logger.info("Loaded environment from %s", ENV_FILE)
+    from uc4_mcp.candidate_server import default_history, server as candidate_server
+    active_server = server if args.historical_v2 else candidate_server
     try:
-        _default_store()
+        _default_store() if args.historical_v2 else default_history()
     except FileNotFoundError as e:
         logger.error("Cannot start: %s", e)
         sys.stderr.write(f"{e}\n")
         raise SystemExit(1) from e
     logger.info("uc4-mcp starting over %s", args.transport)
     if args.transport == "http":
-        server.run("streamable-http", host=args.host, port=args.port)
+        active_server.run("streamable-http", host=args.host, port=args.port)
     else:
-        server.run("stdio")
+        active_server.run("stdio")

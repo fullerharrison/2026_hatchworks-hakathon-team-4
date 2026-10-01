@@ -69,7 +69,13 @@ def create_app(make_model: Callable[[], ChatModel], server: MCPServer | None = N
         get_store: Evidence store for the read and decision routes (None: the default zip).
         log: Decision log (None: the file named by ``log_path()``).
     """
+    if get_store is None and log is None and server is None:
+        from uc4_mcp.candidate_api import create_candidate_app
+        return create_candidate_app(make_model, server, settings)
     get_store = get_store or _default_store
+    if server is None:
+        from uc4_mcp.server import create_server
+        server = create_server(get_store)
     log = log or DecisionLog(log_path())
     app = FastAPI(title="uc4 question agent")
     app.add_middleware(CORSMiddleware, allow_origin_regex=LOCAL_ORIGINS,

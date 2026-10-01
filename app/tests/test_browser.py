@@ -14,6 +14,7 @@ import os
 import shutil
 import socket
 import subprocess
+import sys
 import time
 from collections.abc import Iterator
 from pathlib import Path
@@ -65,13 +66,15 @@ def decision_log(tmp_path_factory: pytest.TempPathFactory) -> Path:
 @pytest.fixture(scope="module")
 def base_url(decision_log: Path) -> Iterator[str]:
     """``uc4-ask serve`` on a free port, with no model configured."""
-    exe = shutil.which("uc4-ask")
+    exe = shutil.which("uc4-ask") or str(Path(sys.executable).with_name("uc4-ask.exe"))
     if exe is None:
         pytest.fail("uc4-ask not on PATH; run with `uv run --project app`", pytrace=False)
     env = {k: v for k, v in os.environ.items() if k not in SECRETS}
+    env.update({k: "" for k in SECRETS})
     env["UC4_DECISION_LOG"] = str(decision_log)
+    env["UC4_ZIP"] = str(REPO / "get_started" / "RE__Hatchworks_Hackathon_-_4th_Use_Case.zip")
     port = _free_port()
-    proc = subprocess.Popen([exe, "serve", "--port", str(port)], cwd=REPO, env=env,
+    proc = subprocess.Popen([exe, "serve", "--historical-v2", "--port", str(port)], cwd=REPO, env=env,
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         _wait_for_port(port, proc)

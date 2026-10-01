@@ -150,7 +150,7 @@ def test_ctrl_c_exits_130_quietly(use: None, monkeypatch: pytest.MonkeyPatch) ->
 
 def test_eval_writes_md_and_json_reports(use: None, monkeypatch: pytest.MonkeyPatch,
                                          tmp_path: Path) -> None:
-    all_cases = json.loads(cli.CASES_PATH.read_text(encoding="utf-8"))
+    all_cases = json.loads((cli.CASES_PATH.parent / "questions_v2.json").read_text(encoding="utf-8"))
     keep = {"q01-hold-explained", "q04-ambiguous-trial"}
     cases = tmp_path / "questions.json"
     cases.write_text(json.dumps([c for c in all_cases if c["id"] in keep]), encoding="utf-8")

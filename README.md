@@ -4,6 +4,9 @@ This workspace holds the source materials and working documentation for the Sept
 
 ## Start here
 
+For the runnable group handoff, see [packaging and launch instructions](SHARE.md).
+On Windows, `Start-Dashboard.cmd` launches the candidate dashboard and opens a browser.
+
 0. New to this? Read the [team recommendation](use-cases/RECOMMENDATION.md) first: which use case to build and how to use AI for both the product and the work.
 1. Read the [participant handbook](get_started/2026_Participant_Handbook.pdf) for dates, judging, and submission requirements.
 2. Read the [use-case briefs](get_started/2026_Use_Case_Briefs.pdf) for the four official challenges; the [kickoff deck](get_started/2026_Kickoff_Deck.pdf) provides a quick overview.
@@ -15,7 +18,7 @@ This workspace holds the source materials and working documentation for the Sept
 - [Build task and phase plans](.tasks/uc4-assistant/task.md): five phases to the demo, each with a checkable exit criterion; [Phase 1](.tasks/uc4-assistant/phase-1-mcp-data-layer.md) is the read-only MCP data-unification layer.
 - [Shared prompt log](team/PROMPT_LOG.md): log every AI prompt we keep; it is our GenDD evidence.
 - [SME answers](team/SME_ANSWERS.md): the 1 October replacement introduces candidate-level GREEN/AMBER/RED, check varieties, an explicit membership bridge and named lab traits. Previous deliveries are superseded for current analysis.
-- [UC4 data briefing](analysis/uc4_eda/report.html): current replacement analysis, with 150 candidates (32 GREEN, 53 AMBER, 65 RED), source reconstruction and scoring audit. Regenerate with `python analysis/uc4_eda/uc4_eda.py`. Superseded profiles: [v1](analysis/uc4_eda/v1/report_v1.html), [v2](analysis/uc4_eda/v2/report_v2.html), [v3](analysis/uc4_eda/v3/report_v3.html). The app is a historical v2 demo; [source inventory](get_started/README.md).
+- [UC4 data briefing](analysis/uc4_eda/report.html): current replacement analysis, with 150 candidates (32 GREEN, 53 AMBER, 65 RED), source reconstruction and scoring audit. Regenerate with `python analysis/uc4_eda/uc4_eda.py`. Superseded profiles: [v1](analysis/uc4_eda/v1/report_v1.html), [v2](analysis/uc4_eda/v2/report_v2.html), [v3](analysis/uc4_eda/v3/report_v3.html). The app now uses candidate-level RAG and versioned decision history; [source inventory](get_started/README.md).
 
 ## Use cases
 
@@ -28,7 +31,7 @@ This workspace holds the source materials and working documentation for the Sept
 
 The [data architecture index](use-cases/DATA_ARCHITECTURE.md) explains the two-level (novice and expert) diagrams and the shared colour legend. It also lists new evidence from the supplied data.
 
-The implemented UC4 app includes read-only MCP tools, a grounded question agent, a breeder screen, and explicit human decision recording. It remains a **historical v2 demo**. Current analysis uses only the replacement candidate dataset, with recorded joins and a different scoring contract. A runtime migration is required before the app can represent current candidate evidence. The breeder makes the final choice.
+The implemented UC4 app now uses the replacement candidate dataset, shared reconstruction and provisional GREEN/AMBER/RED scoring. Breeders can browse or filter all candidates, inspect evidence, record ADVANCE/HOLD/DISCARD decisions with context, and review enrichment before activating new evidence revisions. Original source snapshots and decision context are retained. The breeder makes the final choice; historical v2 remains available through an explicit launch option.
 
 - [Historical v2 demo review and readiness](.tasks/uc4-demo-review/task.md): source-to-screen checks, findings, and rechecks for that snapshot.
 - [Current process and decision records](app/ARCHITECTURE.md): runtime architecture, stack, assumptions, and storage.

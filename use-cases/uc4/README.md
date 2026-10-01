@@ -2,7 +2,7 @@
 
 The [current data briefing](../../analysis/uc4_eda/report.html) uses **candidate_recommendations_synthetic.zip**, the replacement supplied by the SME on 1 October 2026. It is the fourth local delivery; source remarks call it "integrated V2 (fixed)". Earlier sources and conclusions are superseded for current analysis.
 
-The running [app](../../app/README.md) remains a **historical v2 demo** with trial-level scoring. The candidate dataset requires a coordinated runtime migration; this analysis refresh does not migrate it. The [historical v2 guide](README_v2.md) preserves the former demo contract. See [SME messages](../../team/SME_ANSWERS.md) for delivery history.
+The running [app](../../app/README.md) now uses candidate-level provisional RAG, list filters, contextual breeder decisions and reviewed enrichment. Source snapshots and recommendation revisions preserve historical decision context. The [historical v2 guide](README_v2.md) preserves the former demo contract. See [SME messages](../../team/SME_ANSWERS.md) for delivery history.
 
 ## What the breeder can now inspect
 
@@ -53,6 +53,6 @@ python -m pytest -q analysis/uc4_eda -p no:cacheprovider --basetemp analysis/uc4
 
 The Python environment needs pandas, matplotlib and pytest. An alternative is `uv run --no-project --with pandas --with matplotlib --with pytest python` followed by the same script or `-m pytest` arguments. The dedicated workspace temporary directory avoids Windows permissions on the shared pytest temp folder. The current generator reads only the replacement ZIP; legacy regression tests intentionally use historical ZIPs. ZIPs remain git-ignored.
 
-Confirm aggregation, exclusions, threshold equality/rounding, and the role of genomic/cold-test metrics. For app migration, change the source loader, candidate tools and types, evidence joins, screen/grounding, evaluations and decision identity together. Preserve existing human decision records with their original snapshot context.
+Confirm aggregation, exclusions, threshold equality/rounding, and the role of genomic/cold-test metrics. The coordinated candidate app migration uses the same reconstruction and policy implementation as this analysis. Existing human decisions retain their original recommendation context; historical v2 records remain explicitly trial-scoped.
 
 Historical profiles: [v1](../../analysis/uc4_eda/v1/report_v1.html), [v2](../../analysis/uc4_eda/v2/report_v2.html), [v3](../../analysis/uc4_eda/v3/report_v3.html). Retained ZIPs are marked superseded in the [source inventory](../../get_started/README.md); they are not inputs to current analysis.
