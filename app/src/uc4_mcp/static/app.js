@@ -4,7 +4,7 @@
 
 const byId = (id) => document.getElementById(id);
 const SHAPE = { PASS: "●", HOLD: "▲", FAIL: "■" };
-const state = { trial: null, decisions: [], trials: new Map(), chat: [], openSeq: 0 };
+const state = { trial: null, decisions: [], trials: new Map(), chat: [], openSeq: 0, lineSeq: 0 };
 
 function el(tag, props, ...children) {
   const node = document.createElement(tag);
@@ -163,9 +163,12 @@ function renderFlags(t) {
 const field = (rows, name) => (rows.find((r) => r.field === name) || {}).value;
 
 function renderLines(t) {
+  ++state.lineSeq;
   const rows = t.lines.map((l) => {
     const open = () => openLine(l.material_guid);
-    const refs = [ref(l.link)];
+    const gbv = l.genomics.find((r) => r.field === "GENOMIC_BREEDING_VALUE");
+    const resistance = l.genomics.find((r) => r.field === "MARKER_DISEASE_RESISTANCE");
+    const refs = [ref(l.link), ...l.genomics.map(ref)];
     return el("tr", {
       class: "clickable", tabindex: "0", "data-refs": refsAttr(refs),
       onclick: open,
@@ -175,8 +178,8 @@ function renderLines(t) {
       },
     },
     el("td", { text: l.material_id }),
-    withSource(fmt(field(l.genomics, "GENOMIC_BREEDING_VALUE")), refs),
-    el("td", { text: fmt(field(l.genomics, "MARKER_DISEASE_RESISTANCE")) }));
+    withSource(fmt(gbv && gbv.value), gbv ? [ref(gbv)] : []),
+    withSource(fmt(resistance && resistance.value), resistance ? [ref(resistance)] : []));
   });
   show(byId("lines"), th("Material ID", "GBV", "Resistance marker"), el("tbody", {}, rows));
   const select = byId("decision-form").elements.material_guid;
@@ -215,7 +218,10 @@ function renderLinePanel(view) {
 }
 
 async function openLine(guid) {
+  const seq = ++state.lineSeq;
+  const trial = state.trial;
   const res = await api(`/lines/${encodeURIComponent(guid)}`);
+  if (seq !== state.lineSeq || state.trial !== trial) return;
   if (res.data && res.data.status === "ok") renderLinePanel(res.data.result);
   else show(byId("line-panel"), el("p", { class: "error", text: errorMessage(res) }));
 }
@@ -266,6 +272,7 @@ function resetDecisionForm() {
 }
 
 function clearTrial() {
+  ++state.lineSeq;
   state.trial = null;
   state.decisions = [];
   for (const id of ["banner", "criteria", "rationale", "aggregates", "flags", "lines",

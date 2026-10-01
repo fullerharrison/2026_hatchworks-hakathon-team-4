@@ -129,6 +129,28 @@ def test_mouse_click_on_line_row_opens_the_line(page: Page) -> None:
     wait_panel(page, "SYN-MZ-00025")
 
 
+def test_late_line_response_is_discarded_after_trial_switch(page: Page) -> None:
+    held = []
+    page.route("**/lines/*", lambda route: held.append(route))
+    page.locator(ROW).first.locator("td").first.click()
+    page.wait_for_timeout(200)
+    assert held
+    response = held[0].fetch()
+    page.locator("#trial-search").fill("SYN-TR-0003")
+    page.locator("#trial-search").press("Tab")
+    page.wait_for_function("document.querySelector('#banner').textContent.includes('SYN-TR-0003')")
+    held[0].fulfill(response=response)
+    page.wait_for_timeout(200)
+    assert page.locator("#line-panel").inner_text() == ""
+
+
+def test_genomic_value_sources_cite_genomic_rows(page: Page) -> None:
+    row = page.locator(ROW).first
+    for cell in (row.locator("td").nth(1), row.locator("td").nth(2)):
+        cell.locator("button.src").click()
+        assert "genomics_synthetic" in cell.locator(".src-detail").inner_text()
+
+
 def test_enter_and_space_on_focused_line_rows_open_them(page: Page) -> None:
     first_row = "a.matches('#lines tbody tr:nth-child(1)')"
     tab_until(page, first_row)
@@ -146,15 +168,15 @@ def test_enter_and_space_on_focused_line_rows_open_them(page: Page) -> None:
 
 def test_source_toggle_does_not_open_the_row(page: Page) -> None:
     tab_until(page, "a.matches('#lines tbody tr:nth-child(1) button.src')")
-    button = page.locator(ROW).nth(0).locator("button.src")
+    button = page.locator(ROW).nth(0).locator("button.src").first
     page.keyboard.press("Enter")
     assert button.get_attribute("aria-expanded") == "true"
-    assert page.locator(ROW).nth(0).locator(".src-detail").is_visible()
+    assert page.locator(ROW).nth(0).locator(".src-detail").first.is_visible()
     page.keyboard.press(" ")
     assert button.get_attribute("aria-expanded") == "false"
 
-    page.locator(ROW).nth(1).locator("button.src").click()
-    assert page.locator(ROW).nth(1).locator("button.src").get_attribute("aria-expanded") == "true"
+    page.locator(ROW).nth(1).locator("button.src").first.click()
+    assert page.locator(ROW).nth(1).locator("button.src").first.get_attribute("aria-expanded") == "true"
     page.wait_for_timeout(300)  # give a wrongly bubbled open() time to render
     assert panel_title(page) == ""
 
