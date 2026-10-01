@@ -3,9 +3,15 @@ get_started/*.zip
 .venv/
 app/logs/
 __pycache__/
+.pytest_cache/
+.tasks/uc4-demo-review/evidence/**/pytest-tmp/
+# Initial test-run scratch created with an app-relative cache path.
+app/.tasks/uc4-demo-review/evidence/
 .superpowers/
 notes.md
 .env
 
 # Breeder decisions (Phase 3 override log): personal records, like the data.
 app/data/
+.tasks/uc4-demo-review
+analysis/uc4_eda/.test-tmp*/
