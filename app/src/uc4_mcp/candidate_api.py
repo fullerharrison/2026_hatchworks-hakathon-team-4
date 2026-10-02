@@ -21,7 +21,7 @@ from uc4_mcp.candidate_history import CandidateHistory, Conflict
 from uc4_mcp.candidate_server import default_history, create_candidate_server
 from uc4_mcp.llm import ChatModel, LLMError
 from uc4_mcp.models import to_json_safe
-from uc4_mcp.filter_intent import InterpretRequest, ValidateRequest, interpret
+from uc4_mcp.filter_intent import InterpretRequest, ValidateRequest, interpret, unsupported_queue
 
 from uc4_mcp.api import LOCAL_ORIGINS, STATIC_DIR
 
@@ -102,22 +102,31 @@ def create_candidate_app(make_model, server: MCPServer | None = None,
     def history() -> CandidateHistory:
         return get_history()
 
-    def filters(search=None, rag=None, decision=None, marker=None, excluded=None,
-                ranges=None, include_missing=False, sort="material_id", descending=False):
+    def filters(search=None, rag=None, decision=None, review_state="all", marker=None, excluded=None,
+                ranges=None, boundary=None, include_missing=False, sort="material_id", descending=False):
         try:
             parsed = json.loads(ranges) if ranges else {}
+            proximity = json.loads(boundary) if boundary is not None else None
+            if boundary is not None and proximity is None:
+                raise ValueError("Boundary must be an object")
         except json.JSONDecodeError as exc:
-            raise HTTPException(422, f"Invalid ranges: {exc}") from exc
-        return {k: v for k, v in dict(search=search, rag=rag, decision=decision,
-                marker=marker, excluded=excluded, ranges=parsed,
+            raise HTTPException(422, f"Invalid filter JSON: {exc}") from exc
+        return {k: v for k, v in dict(search=search, rag=rag, decision=decision, review_state=review_state,
+                marker=marker, excluded=excluded, ranges=parsed, boundary=proximity,
                 include_missing=include_missing, sort=sort,
                 descending=descending).items() if v is not None}
 
     def matching(**kwargs):
         try:
             h = history()
-            store = h.store()
-            return store, store.query(filters(**kwargs), h.latest())
+            store, latest, generation = h.read_view()
+            all_rows = store.query(latest=latest)
+            overview = dict(total=len(all_rows),
+                rag={rag: sum(r["rag"] == rag for r in all_rows) for rag in ("GREEN", "AMBER", "RED")},
+                reviewed=sum(r["latest_decision"] is not None for r in all_rows),
+                undecided=sum(r["latest_decision"] is None for r in all_rows),
+                latest_override=sum(bool(r["latest_decision"] and r["latest_decision"]["overrides"]) for r in all_rows))
+            return store, store.query(filters(**kwargs), latest), overview, generation
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
 
@@ -156,7 +165,7 @@ def create_candidate_app(make_model, server: MCPServer | None = None,
         if not body.text.strip():
             raise HTTPException(422, "Enter a filter request.")
         try:
-            proposal = await interpret(body.text, make_model())
+            proposal = unsupported_queue(body.text) or await interpret(body.text, make_model())
         except LLMError as exc:
             raise HTTPException(503, str(exc)) from exc
         filter_context(body)
@@ -177,40 +186,41 @@ def create_candidate_app(make_model, server: MCPServer | None = None,
 
     @app.get("/candidates")
     def candidates(search: str | None = None, rag: str | None = None,
-                   decision: str | None = None, marker: str | None = None,
-                   excluded: bool | None = None, ranges: str | None = None,
+                   decision: str | None = None, review_state: str = "all", marker: str | None = None,
+                   excluded: bool | None = None, ranges: str | None = None, boundary: str | None = None,
                    include_missing: bool = False, sort: str = "material_id",
                    descending: bool = False, offset: int = Query(0, ge=0),
                    limit: int = Query(150, ge=1, le=500)):
-        store, rows = matching(search=search, rag=rag, decision=decision, marker=marker,
-                        excluded=excluded, ranges=ranges, include_missing=include_missing,
+        store, rows, overview, generation = matching(search=search, rag=rag, decision=decision, review_state=review_state, marker=marker,
+                        excluded=excluded, ranges=ranges, boundary=boundary, include_missing=include_missing,
                         sort=sort, descending=descending)
         return dict(total=len(rows), total_available=len(store.by_guid), offset=offset, limit=limit,
                     next_offset=offset + limit if offset + limit < len(rows) else None,
                     snapshot_id=store.snapshot_id, revision_id=store.revision_id,
-                    rows=rows[offset:offset + limit])
+                    overview=overview, processing=store.processing(), decision_generation=generation, rows=rows[offset:offset + limit])
 
     @app.get("/candidates.csv")
     def export(search: str | None = None, rag: str | None = None,
-               decision: str | None = None, marker: str | None = None,
-               excluded: bool | None = None, ranges: str | None = None,
+               decision: str | None = None, review_state: str = "all", marker: str | None = None,
+               excluded: bool | None = None, ranges: str | None = None, boundary: str | None = None,
                include_missing: bool = False, sort: str = "material_id", descending: bool = False):
-        store, rows = matching(search=search, rag=rag, decision=decision, marker=marker,
-                        excluded=excluded, ranges=ranges, include_missing=include_missing,
+        store, rows, overview, generation = matching(search=search, rag=rag, decision=decision, review_state=review_state, marker=marker,
+                        excluded=excluded, ranges=ranges, boundary=boundary, include_missing=include_missing,
                         sort=sort, descending=descending)
         output = io.StringIO()
         writer = csv.writer(output)
+        boundary_columns = ["field", "kind", "tolerance", "side", "test", "threshold", "unit", "observed", "signed_margin", "distance", "test_outcome"] if boundary is not None else []
         writer.writerow(["material_id", "material_guid", "rag", "latest_decision",
                          "yield_vs_check_pct", "disease_score_mean", "moisture_pct_mean",
                          "germination_pct", "fumonisin_ppm", "n_trials_used",
-                         "excluded_trials", "snapshot_id", "revision_id"])
+                         "excluded_trials", "snapshot_id", "revision_id"] + ["boundary_" + k for k in boundary_columns])
         for r in rows:
             m = r["metrics"]
             writer.writerow([r["material_id"], r["material_guid"], r["rag"],
                              (r["latest_decision"] or {}).get("action"),
                              *[m[k] for k in ["YIELD_VS_CHECK_PCT", "DISEASE_SCORE_MEAN",
                                 "MOISTURE_PCT_MEAN", "GERMINATION_PCT", "FUMONISIN_PPM", "N_TRIALS_USED"]],
-                             r["excluded_trials"], r["snapshot_id"], r["revision_id"]])
+                             r["excluded_trials"], r["snapshot_id"], r["revision_id"]] + [r["review"]["boundary"][k] for k in boundary_columns])
         return Response(output.getvalue(), media_type="text/csv",
                         headers={"Content-Disposition": "attachment; filename=uc4-candidates.csv"})
 

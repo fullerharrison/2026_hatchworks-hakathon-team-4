@@ -2,6 +2,7 @@
 const glossary = {
  search:"Search the material ID or GUID; a fragment can match several candidates.",
  rag:"System recommendation under the provisional candidate policy. It is separate from supplied RAG and the breeder's choice.",
+ review_state:"Reviewed means a saved decision; Latest override uses the latest decision against its saved recommendation.",
  decision:"The latest recorded breeder action. Undecided means no action has been recorded.",
  marker:"Genomic disease-resistance category; it is not a measured field disease score.",
  excluded:"Trials excluded because irrigation was missed under this dataset's policy.",
@@ -58,31 +59,24 @@ for(const [id,definition] of Object.entries(glossary)){
  const input=$(id);if(input?.closest("label"))addHelp(input.closest("label"),definition);
 }
 const headerFields=["search","rag","YIELD_VS_CHECK_PCT","DISEASE_SCORE_MEAN","N_TRIALS_USED","excluded","decision"];
-document.querySelectorAll("#rows").forEach(body=>body.closest("table").querySelectorAll("th").forEach((th,i)=>addHelp(th,glossary[headerFields[i]])));
+document.querySelectorAll("#rows").forEach(body=>body.closest("table").querySelectorAll("th").forEach((th,i)=>headerFields[i]&&addHelp(th,glossary[headerFields[i]])));
 function formatMetric(field,value){
  if(value===null||value===undefined)return "Unknown";
  if(Array.isArray(value))return value.join(" or ");
  return typeof value==="number" ? value.toLocaleString(undefined,{minimumFractionDigits:field.startsWith("N_TRIALS")?0:2,maximumFractionDigits:field.startsWith("N_TRIALS")?0:2}) : String(value);
 }
-function criterionEvidence(r,field){
- const lab=["GERMINATION_PCT","FUMONISIN_PPM","COLD_TEST_PCT"].includes(field);
- const genomic=["MARKER_DISEASE_RESISTANCE","GENOMIC_BREEDING_VALUE"].includes(field);
- const keys=lab?["lab"]:genomic?["genomics"]:["bridge","observation","operations"];
- return {definition:glossary[field]||"Interpretation needs SME review",revision:r.revision_id,
-  source_rows:Object.fromEntries(keys.map(k=>[k,r.evidence[k]])),dictionary:r.dictionary,
-  trial_comparisons:lab||genomic?undefined:r.trial_comparisons,active_corrections:r.active_corrections};
-}
 function renderFilters(){
  clear("active-filters");
- for(const id of ["search","rag","decision","marker","excluded","include-missing"]){
-  const input=$(id),value=input.type==="checkbox"?(input.checked?"Included":""):input.value;if(!value)continue;
-  const filterNames={search:"Candidate",rag:"System RAG",decision:"Breeder choice",marker:"Disease marker",excluded:"Excluded trials","include-missing":"Missing values"};
-  const chip=element("span",`${filterNames[id]}: ${value} `,$("active-filters"),"tag"),button=element("button","Remove",chip);button.type="button";
-  button.onclick=()=>{if(input.type==="checkbox")input.checked=false;else input.value="";preferences.changed();loadList();};
+ if(typeof boundaryControls!=="undefined")boundaryControls.chip();
+ for(const id of ["search","rag","review_state","decision","marker","excluded","include-missing"]){
+  const input=$(id),value=input.type==="checkbox"?(input.checked?"Included":""):input.value;if(!value||id==="review_state"&&value==="all")continue;
+  const filterNames={search:"Candidate",rag:"System RAG",review_state:"Review state",decision:"Breeder choice",marker:"Disease marker",excluded:"Excluded trials","include-missing":"Missing values"};
+  const chip=element("span",`${filterNames[id]}: ${id==="review_state"?input.selectedOptions[0].textContent:value} `,$("active-filters"),"tag"),button=element("button","Remove",chip);button.type="button";
+  button.onclick=()=>{if(input.type==="checkbox")input.checked=false;else input.value=id==="review_state"?"all":"";preferences.changed();loadList();};
  }
 }
 async function loadRules(){try{
- const rule=await call("/rule"),host=$("rules-content");clear("rules-content");
+ const rule=await call("/rule");boundaryControls.init(rule);const host=$("rules-content");clear("rules-content");
  element("p",`${rule.rule_version} — Provisional, inferred from synthetic evidence`,host);
  for(const [key,title] of [["gates","GREEN requires all"],["knockouts","RED knockouts (only with usable field data)"],["warnings","Warnings only"]]){
   element("h3",title,host);for(const c of rule[key]){const p=element("p",`${labels[c.field]} ${c.test} ${formatMetric(c.field,c.threshold)} ${c.unit}`,host);addHelp(p,glossary[c.field]);}
@@ -111,6 +105,9 @@ function renderDecisionState(){
  const latest=r.decisions.at(-1);
  // Server history order is authoritative, including decisions in the same second.
  const saved=receipt&&!r.decisions.some(d=>d.id===receipt.id)?receipt:latest;
+ renderLatestDecision(r,saved);
+ // A confirmed POST is sufficient to display history while GET is recovering.
+ renderDecisions({...r,decisions:receipt&&!r.decisions.some(d=>d.id===receipt.id)?[...r.decisions,receipt]:r.decisions});
  const editing=saved&&state.decisionEditingFor===saved.id;
  $("decision-saved").hidden=!saved||!!editing;
  $("decision-entry").hidden=!!saved&&!editing;
@@ -123,6 +120,38 @@ function renderDecisionState(){
   element("p",`${saved.timestamp} · Event ${saved.id}`,$("decision-saved-summary"),"small");
   element("p","Name is self-declared and unverified.",$("decision-saved-summary"),"small");
  }
+}
+function renderLatestDecision(r,saved){
+ const summary=$("latest-decision-summary"),actions=$("latest-decision-actions");
+ summary.replaceChildren();actions.replaceChildren();
+ const status=$("latest-decision-status");
+ status.textContent=state.savingDecision&&state.savingDecisionFor===r.material_guid?"Saving decision...":state.detailRefreshFailed
+  ?(saved?"Decision saved. History refresh failed; retry to load current history.":"Candidate refresh failed; retry to load current history.")
+  :state.loadingDetail?"Refreshing candidate and history...":"";
+ if(saved){
+  element("strong",`Breeder ${saved.action} · ${saved.overrides?"Override":"Matches saved system action"}`,summary);
+  element("span",` · Recorded by ${saved.actor} · ${saved.timestamp}`,summary);
+  const reason=element("details","",summary);
+  element("summary",`Reason: ${saved.reason.length>120?saved.reason.slice(0,120)+"…":saved.reason}`,reason);
+  if(saved.reason.length>120)element("p",saved.reason,reason);
+  element("p",`Saved system ${saved.recommendation.rag} · Decision revision ${saved.recommendation.revision_id}`,summary,"small");
+  if(saved.recommendation.recommendation_id!==r.recommendation_id)
+   element("p","Earlier evidence: this decision used a different recommendation. Its override status uses the saved system recommendation.",summary,"small");
+  uiButton(actions,"View decision history",()=>selectCandidateTab("history",true));
+  uiButton(actions,"View saved recommendation",()=>openReader(`${saved.material_id} - recorded recommendation`,host=>{
+   definitionList(host,{event_id:saved.id,...saved.recommendation});
+   uiButton(host,"Browse original evidence",async()=>{
+    const originalHost=openReader(`${saved.material_id} - original evidence`,body=>element("p","Loading original evidence...",body));
+    try{const original=await call("/revisions/"+encodeURIComponent(saved.recommendation.revision_id)+"/candidates/"+encodeURIComponent(saved.material_guid));
+     originalHost.replaceChildren();renderCandidateEvidence(originalHost,original);
+    }catch(e){originalHost.textContent="Original evidence unavailable. The saved recommendation remains available. "+e.message;}
+   });
+  }));
+ }else element("p","Breeder Undecided · No saved decision. Drafts are not recorded decisions.",summary);
+ if(state.detailRefreshFailed)uiButton(actions,"Retry history refresh",async()=>{
+  const refreshed=await loadDetail(r.material_guid);
+  if(refreshed===true&&state.selected===r.material_guid)$("decision-message").textContent="History refreshed. Saved decisions are shown below.";
+ });
 }
 $("another-decision").onclick=()=>{
  if(state.savingDecision||state.loadingDetail)return;
@@ -180,9 +209,13 @@ $("record-decision").onclick=async()=>{
  }
  const request=state.detailRequest;
  state.savingDecision=true;$("record-decision").disabled=true;$("edit-decision").disabled=true;
+ state.savingDecisionFor=body.query;
+ renderDecisionState();
  try{
  const saved=await post("/decisions",{...body,request_id:review.id});
   decisionReceipts.set(body.query,saved);
+  // Queue recovery is independent of candidate/history recovery.
+  loadList();
   if(state.selected===body.query&&(!state.loadingDetail||[body.query,saved.material_id].includes(state.detailTarget))){
    resetDecisionDraft();
    const receipt=`Decision recorded: ${saved.id} / ${saved.timestamp}`;
@@ -191,7 +224,7 @@ $("record-decision").onclick=async()=>{
    if(state.candidateTab==="decision")$("decision-saved-title").focus();
    const refreshed=await loadDetail(body.query);
    if(state.selected===body.query){
-    $("decision-message").textContent=receipt+(refreshed===false?" - History refresh failed. Reload to view the saved event.":"");
+    $("decision-message").textContent=receipt+(refreshed===false?" - History refresh failed. Use Retry history refresh to load current history.":"");
    }
   }
  }catch(err){
@@ -209,6 +242,7 @@ $("record-decision").onclick=async()=>{
   }
  }finally{
  state.savingDecision=false;$("record-decision").disabled=!!state.loadingDetail;$("edit-decision").disabled=false;
+ state.savingDecisionFor=null;
   renderDecisionState();
  }
 };
@@ -226,7 +260,12 @@ function selectCandidateTab(name,focus=false){
   $(tab.getAttribute("aria-controls")).hidden=!selected;
  }
  if(focus)$("tab-"+name).focus();
- if(!$("detail").hidden)window.scrollTo({top:Math.max(0,window.scrollY+$("detail").getBoundingClientRect().top-(mobile.matches?0:$("ask-home").offsetHeight)-12),behavior:"instant"});
+ if(!$("detail").hidden){
+  const host=mobile.matches?$("page-content"):window;
+  const top=mobile.matches?host.scrollTop+$("detail").getBoundingClientRect().top-host.getBoundingClientRect().top
+   :window.scrollY+$("detail").getBoundingClientRect().top-$("ask-home").offsetHeight;
+  host.scrollTo({top:Math.max(0,top-12),behavior:"instant"});
+ }
 }
 const candidateTabs=[...document.querySelectorAll('[role="tab"]')];
 candidateTabs.forEach((tab,index)=>{
@@ -236,12 +275,13 @@ candidateTabs.forEach((tab,index)=>{
   if(next!==null){e.preventDefault();selectCandidateTab(candidateTabs[next].id.slice(4),true);}
  };
 });
-function placeAsk(){if(!mobile.matches&&$("ask-dialog").open)$("ask-dialog").close();(mobile.matches?$("ask-mobile"):$("ask-home")).appendChild($("ask-panel"));}
+function placeAsk(){if(!mobile.matches&&$("ask-dialog").open)$("ask-dialog").close();(mobile.matches?$("ask-mobile"):$("ask-home")).appendChild($("ask-panel"));if(state.detail)selectCandidateTab(state.candidateTab||"evidence");}
 mobile.addEventListener("change",placeAsk);placeAsk();
 function navigationOffsets(){
  const askHeight=mobile.matches?0:$("ask-home").offsetHeight;
  document.documentElement.style.setProperty("--ask-height",`${askHeight}px`);
  document.documentElement.style.scrollPaddingTop=`${askHeight+$("candidate-navigation").offsetHeight+12}px`;
+ $("page-content").style.scrollPaddingTop=`${$("candidate-navigation").offsetHeight+12}px`;
 }
 const navigationObserver=new ResizeObserver(navigationOffsets);
 navigationObserver.observe($("ask-home"));navigationObserver.observe($("candidate-navigation"));

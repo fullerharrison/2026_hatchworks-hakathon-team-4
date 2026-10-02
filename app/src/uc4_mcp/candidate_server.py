@@ -75,6 +75,8 @@ def create_candidate_server(get_history=default_history, *, pinned_store=None):
                          marker: str | None = None, decision: str | None = None,
                          ranges: dict[str, dict[str, float]] | None = None,
                          include_missing: bool = False, excluded: bool | None = None,
+                         boundary: dict[str, Any] | None = None, sort: str = "material_id",
+                         descending: bool = False,
                          offset: int = 0, limit: int = 150) -> dict[str, Any]:
         history = get_history()
         try:
@@ -83,11 +85,12 @@ def create_candidate_server(get_history=default_history, *, pinned_store=None):
             store = evidence_store()
             rows = store.query({k: v for k, v in dict(rag=rag, search=search,
                       marker=marker, decision=decision, ranges=ranges,
-                      include_missing=include_missing, excluded=excluded).items() if v is not None}, history.latest())
+                      include_missing=include_missing, excluded=excluded, boundary=boundary,
+                      sort=sort, descending=descending).items() if v is not None}, history.latest())
         except ValueError as exc:
             return {"status": "none", "message": str(exc)}
         summaries = [{k: r[k] for k in ("material_id", "material_guid", "rag", "reason", "metrics",
-                     "excluded_trials", "latest_decision")} for r in rows[offset:offset + limit]]
+                     "excluded_trials", "latest_decision", "review")} for r in rows[offset:offset + limit]]
         return {"status": "ok", "result": {"total": len(rows), "rows": summaries,
                 "snapshot_id": store.snapshot_id, "revision_id": store.revision_id,
                 "next_offset": offset + limit if offset + limit < len(rows) else None}}

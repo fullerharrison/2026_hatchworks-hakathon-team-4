@@ -14,6 +14,139 @@ REPO = Path(__file__).resolve().parents[2]
 BROWSER_CHANNEL = None if os.environ.get("UC4_BROWSER_CHANNEL", "chromium") == "chromium" else "chrome"
 
 
+def apply_boundary(page, field="MOISTURE_PCT_MEAN", tolerance="1", kind="green_gate", side="both"):
+    page.locator("#advanced-filters").evaluate("el=>el.open=true")
+    page.locator("#boundary-kind").select_option(kind)
+    page.locator("#boundary-field").select_option(field)
+    page.locator("#boundary-tolerance").fill(tolerance)
+    page.locator("#boundary-side").select_option(side)
+    page.locator("#boundary-form").get_by_role("button", name="Apply", exact=True).click()
+
+
+def test_meeting2_boundary_apply_clear_remember_reset_export(screen):
+    page, folder = screen
+    expect = playwright.expect
+    expect(page.locator("#boundary-tolerance")).to_have_value("")
+    assert page.locator('#sort option[value="boundary_distance"]').count() == 0
+    apply_boundary(page)
+    expect(page.locator("#boundary-band")).to_contain_text("Inclusive band: 22 to 24")
+    expect(page.locator("#active-filters")).to_contain_text("Near Moisture")
+    page.locator("#sort").select_option("boundary_distance")
+    expected = page.request.get(page.url + 'candidates', params={"boundary":json.dumps(dict(field="MOISTURE_PCT_MEAN",kind="green_gate",tolerance=1,side="both")),"sort":"boundary_distance"}).json()
+    expect(page.locator("#rows tr")).to_have_count(expected["total"])
+    expect(page.locator("#rows td:first-child")).to_have_text([r["material_id"] for r in expected["rows"]])
+    expect(page.locator("#rows")).to_contain_text("distance")
+    with page.expect_download() as download:
+        page.locator("#export").click()
+    download.value.save_as(folder / "boundary.csv")
+    import csv
+    with (folder / "boundary.csv").open() as handle:
+        exported = list(csv.DictReader(handle))
+    assert [r['material_id'] for r in exported] == [r['material_id'] for r in expected['rows']]
+    page.locator("#preferences-panel summary").click()
+    page.locator("#remember-view").check()
+    page.reload()
+    expect(page.locator("#sort")).to_have_value("boundary_distance")
+    expect(page.locator("#active-filters")).to_contain_text("Near Moisture")
+    page.locator("#advanced-filters").evaluate("el=>el.open=true")
+    page.locator("#boundary-clear").click()
+    expect(page.locator("#rows tr")).to_have_count(150)
+    expect(page.locator("#sort")).to_have_value("material_id")
+    apply_boundary(page, "DISEASE_SCORE_MEAN", "0", "red_knockout", "fails")
+    expect(page.locator("#boundary-side option[value=meets]")).to_have_text("Triggers knockout test")
+    page.locator("#reset").click()
+    expect(page.locator("#rows tr")).to_have_count(150)
+    assert page.evaluate("state.boundary") is None
+    assert page.request.get(page.url + "decisions").json() == []
+
+
+def test_meeting2_boundary_typed_clarification_and_replacement(screen):
+    page, folder = screen
+    expect = playwright.expect
+    apply_boundary(page)
+    page.locator("#sort").select_option("boundary_distance")
+    page.locator("#filter-request").fill("GREEN and near the moisture threshold")
+    page.locator("#filter-interpret").click()
+    expect(page.locator("#filter-intent-status")).to_contain_text("Near a rule boundary")
+    expect(page.locator("#filter-preview")).to_be_hidden()
+    assert page.evaluate("state.boundary") is not None
+    preview_filters(page)
+    page.locator("#filter-apply").click()
+    expect(page.locator("#sort")).to_have_value("material_id")
+    expect(page.locator("#active-filters")).not_to_contain_text("Near Moisture")
+    assert page.evaluate("state.boundary") is None
+
+
+def test_meeting2_decisive_evidence_drafts_captured_revision_and_mobile(screen):
+    page, folder = screen
+    expect = playwright.expect
+    page.locator("#rows tr").first.click()
+    expect(page.locator("#decisive-review")).to_contain_text("Moisture (%): 23.77")
+    expect(page.locator("#decisive-review")).to_contain_text("Usable trials: 1")
+    assert not page.locator("#all-criteria").evaluate("el=>el.open")
+    select_section(page, "decision")
+    page.locator("#reason").fill("Keep this unsaved boundary review")
+    select_section(page, "evidence")
+    apply_boundary(page)
+    captured = page.evaluate("({revision:state.detail.revision_id,material:state.detail.material_guid})")
+    page.locator("#decisive-review .decisive-criterion").filter(has_text="Moisture").get_by_role("button", name="View evidence").click()
+    expect(page.locator("#evidence-dialog-body")).to_contain_text("23.766666666666666")
+    expect(page.locator("#evidence-dialog-body")).to_contain_text("equally weight usable trial means")
+    expect(page.locator(".source-table")).not_to_contain_text("(Check)")
+    # Activate a revision while the captured dialog is open, then refresh the underlying selection.
+    draft = page.request.post(page.url+"enrichment", data=dict(query=captured["material"],kind="metadata",field="NOTE",value="Captured revision test",actor="Ada",reason="Record revision context",observed_at="2026-10-02",source="Notebook")).json()
+    for action in ("submit", "approve"):
+        assert page.request.post(page.url+"enrichment/"+draft["id"]+"/review",data=dict(action=action,actor="Ada",reason="Verified context")).ok
+    activated = page.request.post(page.url+"enrichment/"+draft["id"]+"/activate",data=dict(base_revision=captured["revision"],actor="Ada",reason="Activate revision context")).json()
+    page.evaluate("async () => {await loadDetail(state.selected);}")
+    assert page.evaluate("state.detail.revision_id") == activated["revision_id"]
+    expect(page.locator("#evidence-dialog-body")).to_contain_text(captured["revision"])
+    expect(page.locator("#evidence-dialog-body")).not_to_contain_text(activated["revision_id"])
+    page.locator("#evidence-dialog").screenshot(path=str(folder / "boundary-evidence-desktop.png"))
+    page.set_viewport_size({"width":390,"height":844})
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    assert page.locator("#evidence-dialog").evaluate("el=>el.scrollWidth <= el.clientWidth")
+    page.locator("#evidence-dialog").screenshot(path=str(folder / "boundary-evidence-mobile.png"))
+    page.locator("#evidence-close").click()
+    expect(page.locator("#reason")).to_have_value("Keep this unsaved boundary review")
+    assert page.evaluate("state.boundary") is not None
+    # An underlying candidate change must also leave an open captured dialog intact.
+    page.locator("#decisive-review .decisive-criterion").filter(has_text="Moisture").get_by_role("button", name="View evidence").click()
+    page.evaluate("async () => {await loadDetail('SYN-MZ-00002');}")
+    expect(page.locator("#evidence-dialog-title")).to_contain_text("SYN-MZ-00001")
+    expect(page.locator("#evidence-dialog-body")).not_to_contain_text("SYN-MZ-00002")
+    page.locator("#evidence-dialog-body").get_by_role("button",name="View complete source evidence").click()
+    expect(page.locator("#evidence-dialog-title")).to_contain_text("SYN-MZ-00001")
+    page.locator("#evidence-back").click()
+    expect(page.locator("#evidence-dialog-title")).to_contain_text("Moisture")
+
+
+def test_meeting2_decisive_outcomes_and_boundary_layout(screen):
+    page, folder = screen
+    expect = playwright.expect
+    rows = page.request.get(page.url+"candidates").json()["rows"]
+    cases = [next(r for r in rows if r["rag"] == rag) for rag in ("GREEN","AMBER","RED")]
+    cases.append(next(r for r in rows if r["metrics"]["N_TRIALS_USED"] == 0))
+    for row in cases:
+        page.evaluate("async id=>await loadDetail(id)", row["material_id"])
+        detail = page.request.get(page.url+"candidates/"+row["material_id"]).json()
+        expected = detail["review"]["decisive_assessments"]
+        expect(page.locator("#decisive-review .decisive-criterion")).to_have_count(len(expected))
+        if row["metrics"]["N_TRIALS_USED"] == 0:
+            expect(page.locator("#decisive-review")).to_contain_text("AMBER takes precedence")
+        elif row["rag"] == "GREEN":
+            expect(page.locator("#decisive-review")).to_contain_text("All provisional GREEN criteria met")
+    apply_boundary(page)
+    for width, height in ((1366,768),(390,844)):
+        page.set_viewport_size({"width":width,"height":height})
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+        page.locator("#boundary-form").screenshot(path=str(folder/f"boundary-controls-{width}.png"))
+        page.locator("#boundary-clear").click()
+        expect(page.locator("#rows tr")).to_have_count(150)
+        apply_boundary(page)
+        expect(page.locator("#active-filters")).to_contain_text("Near Moisture")
+
+
 def select_section(page, name):
     page.locator('#tab-' + name).click()
 
@@ -140,11 +273,15 @@ def candidate_browser():
 
 
 @pytest.fixture
-def screen(tmp_path, candidate_browser):
+def screen(tmp_path, candidate_browser, request):
     with candidate_demo_server(tmp_path, archive=REPO / "get_started/candidate_recommendations_synthetic.zip") as runtime:
         (tmp_path / "runtime.json").write_text(json.dumps({"startup_seconds":runtime.startup_seconds,
             "readiness":"HTTP /health checked", "database":str(runtime.history.path)}), encoding="utf-8")
         context = candidate_browser.new_context(viewport={"width":1440, "height":1100})
+        # Existing workflows exercise controls inside the newly collapsed panel.
+        # P1 layout tests exercise the real, initially collapsed presentation.
+        if not request.node.name.startswith('test_meeting2_'):
+            context.add_init_script("document.addEventListener('DOMContentLoaded',()=>{document.querySelector('#advanced-filters').open=true;})")
         context.set_default_navigation_timeout(60000)
         try:
             page = context.new_page()
@@ -234,6 +371,8 @@ def test_candidate_filter_decision_review_and_history(screen):
     assert activation.value.ok
     expect(page.locator("#enrichment-history")).to_contain_text("ACTIVATED")
     expect(page.locator("#decision-history")).to_contain_text("baseline:")
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Earlier evidence:')
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder ADVANCE · Override')
     select_section(page, "history")
     page.get_by_role("button", name="View original recommendation and evidence", exact=True).click()
     expect(page.locator("#evidence-dialog-body")).to_contain_text("baseline:")
@@ -430,6 +569,7 @@ def test_four_source_cases_match_api_assessments(screen):
         expect(page.locator('#rows tr')).to_contain_text(material)
         page.locator('#rows tr').click()
         expect(page.locator('#detail-title')).to_contain_text(material)
+        page.locator("#all-criteria summary").click() if not page.locator("#all-criteria").evaluate("el=>el.open") else None
         for index,a in enumerate(detail['assessments']):
             row=page.locator('#criteria > tr').nth(index)
             expect(row).to_contain_text(a['status'])
@@ -456,6 +596,7 @@ def test_evidence_dialog_filters_source_rows_and_preserves_draft(screen):
     select_section(page, "decision")
     page.locator('#reason').fill('Keep this unsaved decision draft')
     select_section(page, 'evidence')
+    page.locator('#all-criteria summary').click()
     row=page.locator('#criteria > tr').nth(2)
     expect(row).to_contain_text('0.77 pp above maximum')
     row.get_by_role('button',name='View evidence',exact=True).click()
@@ -464,7 +605,8 @@ def test_evidence_dialog_filters_source_rows_and_preserves_draft(screen):
     expect(page.locator('.source-table tbody tr')).not_to_have_count(0)
     for text in page.locator('.source-table tbody tr td:nth-child(3)').all_text_contents():
         assert text=='Moisture'
-    expect(page.locator('.source-table')).to_contain_text('Check')
+    expect(page.locator('.source-table')).to_contain_text('Candidate')
+    expect(page.locator('.source-table')).not_to_contain_text('(Check)')
     page.locator('.source-table details summary').first.click()
     expect(page.locator('.source-table')).to_contain_text('Source row')
     page.screenshot(path=str(folder/'source-dialog-desktop.png'))
@@ -522,6 +664,7 @@ def test_answer_popup_formats_text_safely_and_mobile_citation_back(screen):
 
 
 def save_preferences(page, name="Breeder Ada", location="Review meeting", channel="Breeder review"):
+    page.locator('#advanced-filters').evaluate('(node) => node.open = true')
     page.locator('#preferences-panel').evaluate('(node) => node.open = true')
     page.locator('#preference-name').fill(name)
     page.locator('#preference-location').fill(location)
@@ -1088,6 +1231,16 @@ def test_manual_saved_receipt_survives_history_refresh_failure(screen):
     expect(page.locator('#decision-message')).to_contain_text('Decision recorded:')
     expect(page.locator('#decision-message')).to_contain_text('History refresh failed')
     assert len(page.request.get(page.url+'decisions').json()) == 1
+    expect(page.locator('#latest-decision-status')).to_contain_text('Decision saved. History refresh failed')
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder ADVANCE')
+    select_section(page, 'history')
+    expect(page.locator('#decision-history')).to_contain_text('Recorded by Manual Ada')
+    page.unroute('**/candidates/*')
+    page.get_by_role('button', name='Retry history refresh', exact=True).click()
+    expect(page.locator('#latest-decision-status')).to_have_text('')
+    expect(page.locator('#decision-message')).to_have_text('History refreshed. Saved decisions are shown below.')
+    expect(page.locator('#decision-history .history-item')).to_have_count(1)
+    assert len(page.request.get(page.url+'decisions').json()) == 1
 
 def test_manual_stale_revision_requires_fresh_review(screen):
     page, _ = screen
@@ -1284,4 +1437,573 @@ def test_saved_state_uses_history_order_not_receipt_timestamp(screen):
     select_section(page, 'decision')
     expect(page.locator('#decision-saved-summary')).to_contain_text(latest['id'])
     expect(page.locator('#decision-saved-summary strong')).to_have_text('Recorded by Other breeder')
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder HOLD · Matches saved system action')
     expect(page.locator('#another-decision')).to_be_enabled()
+
+
+@pytest.mark.parametrize('mobile', [False, True])
+def test_latest_decision_red_override_navigation_reload_and_matching_action(screen, mobile):
+    page, folder = screen
+    expect = playwright.expect
+    if mobile:
+        page.set_viewport_size({'width':390, 'height':844})
+    page.locator('#rag').select_option('RED')
+    expect(page.locator('#rows tr')).to_have_count(65)
+    page.locator('#rows tr').first.click()
+    expect(page.locator('#detail')).to_be_visible()
+    material = page.evaluate('state.detail.material_id')
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder Undecided')
+    select_section(page, 'decision')
+    page.locator('#actor').fill('Override Ada')
+    page.locator('#action').select_option('ADVANCE')
+    reason = '<script>unsafe()</script> ' + 'Review all available evidence. ' * 12
+    page.locator('#reason').fill(reason)
+    page.locator('#review-decision').click()
+    assert page.request.get(page.url+'decisions').json() == []
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder Undecided')
+    page.locator('#record-decision').click()
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder ADVANCE \u00b7 Override')
+    first = page.request.get(page.url+'decisions').json()[0]
+    assert first['recommendation']['rag'] == 'RED' and first['overrides']
+    expect(page.locator('#candidate-status')).to_have_text('System recommendation: RED')
+    for tab in ['history','evidence','enrichment','decision']:
+        select_section(page, tab)
+        expect(page.locator('#latest-decision-summary')).to_be_visible()
+        expect(page.locator('#latest-decision-summary')).to_contain_text(first['timestamp'])
+        expect(page.locator('#latest-decision-summary')).to_contain_text('Recorded by Override Ada')
+    page.locator('#latest-decision-summary summary').click()
+    expect(page.locator('#latest-decision-summary p').filter(has_text=reason)).to_be_visible()
+    page.locator('#latest-decision').screenshot(path=str(folder/'latest-decision.png'))
+    page.get_by_role('button', name='View saved recommendation', exact=True).click()
+    expect(page.locator('#evidence-dialog-body')).to_contain_text(first['recommendation']['recommendation_id'])
+    page.get_by_role('button', name='Browse original evidence', exact=True).click()
+    expect(page.locator('#evidence-dialog-body')).to_contain_text('Original values are shown at full precision')
+    page.locator('#evidence-close').click()
+    page.locator('#rows tr').nth(1).click()
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder Undecided')
+    page.locator('#rows tr').filter(has_text=material).click()
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder ADVANCE \u00b7 Override')
+    page.reload()
+    expect(page.locator('#rows tr')).to_have_count(150)
+    page.locator('#rows tr').filter(has_text=material).click()
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder ADVANCE \u00b7 Override')
+    select_section(page, 'decision')
+    page.locator('#another-decision').click()
+    page.locator('#actor').fill('Matching Bob')
+    page.locator('#action').select_option('DISCARD')
+    page.locator('#reason').fill('Discard after further review')
+    page.locator('#review-decision').click()
+    page.locator('#record-decision').click()
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder DISCARD \u00b7 Matches saved system action')
+    row = page.locator('#rows tr').filter(has_text=material)
+    expect(row).to_contain_text('DISCARD')
+    expect(row).not_to_contain_text('Override')
+    select_section(page, 'history')
+    expect(page.locator('#decision-history .history-item')).to_have_count(2)
+    events = page.request.get(page.url+'decisions').json()
+    assert len(events) == 2 and events[0] == first
+    assert events[1]['previous_decision_id'] == first['id'] and not events[1]['overrides']
+
+
+def test_latest_decision_retains_override_after_rag_correction(screen):
+    page, _ = screen
+    expect = playwright.expect
+    prepare_manual_decision(page)
+    page.locator('#review-decision').click()
+    page.locator('#record-decision').click()
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder ADVANCE \u00b7 Override')
+    first = page.request.get(page.url+'decisions').json()[0]
+    original = page.request.get(page.url+'candidates/SYN-MZ-00001').json()
+    trait = next(x for x in original['dictionary'] if x['TRAIT_CODE'] == 'FUMONISIN_PPM')
+    row = next(x for x in original['evidence']['lab'] if x['TRAIT_GUID'] == trait['TRAIT_GUID'])
+    response = page.request.post(page.url+'enrichment', data={
+        'query':first['material_guid'], 'kind':'correction', 'table':'lab',
+        'row_id':row['row_id'], 'field':'NUMBER_VALUE', 'value':10, 'unit':trait['UNIT'],
+        'actor':'Reviewer', 'reason':'Correct hypothetical lab transcription',
+        'observed_at':'2026-10-01', 'source':'Test lab worksheet'})
+    assert response.ok
+    draft = response.json()
+    for action in ('submit','approve'):
+        assert page.request.post(page.url+'enrichment/'+draft['id']+'/review',
+            data={'action':action,'actor':'Reviewer','reason':'Verified lab worksheet'}).ok
+    assert page.request.post(page.url+'enrichment/'+draft['id']+'/activate',
+        data={'base_revision':original['revision_id'],'actor':'Reviewer','reason':'Activate lab correction'}).ok
+    page.locator('#rows tr').first.click()
+    expect(page.locator('#candidate-status')).to_have_text('System recommendation: RED')
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Earlier evidence:')
+    expect(page.locator('#rag-overview button[data-value="RED"]')).to_contain_text('66')
+    expect(page.locator('#rag-overview button[data-value="AMBER"]')).to_contain_text('52')
+    expect(page.locator('#review-overview button[data-value="latest_override"]')).to_contain_text('1')
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Saved system AMBER')
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder ADVANCE \u00b7 Override')
+    page.get_by_role('button', name='View saved recommendation', exact=True).click()
+    expect(page.locator('#evidence-dialog-body')).to_contain_text(first['recommendation']['recommendation_id'])
+    with page.expect_response(lambda r:'/revisions/baseline' in r.url) as response:
+        page.get_by_role('button', name='Browse original evidence', exact=True).click()
+    assert response.value.json()['rag'] == 'AMBER'
+    assert page.request.get(page.url+'decisions').json() == [first]
+
+
+def test_confirmed_receipt_survives_delayed_detail_and_candidate_switch(screen):
+    page, _ = screen
+    expect = playwright.expect
+    prepare_manual_decision(page)
+    page.locator('#review-decision').click()
+    held = []
+    guid = page.evaluate('state.detail.material_guid')
+    page.route('**/candidates/*', lambda route: held.append(route)
+               if route.request.url.endswith(guid) else route.continue_())
+    page.locator('#record-decision').click()
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Recorded by Manual Ada')
+    expect(page.locator('#decision-history .history-item')).to_have_count(1)
+    first = page.request.get(page.url+'decisions').json()[0]
+    page.wait_for_function('state.loadingDetail')
+    page.locator('#rows tr').nth(1).click()
+    expect(page.locator('#detail-title')).to_contain_text('SYN-MZ-00002')
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder Undecided')
+    assert held
+    held[0].fulfill(response=held[0].fetch())
+    expect(page.locator('#detail-title')).to_contain_text('SYN-MZ-00002')
+    expect(page.locator('#latest-decision-summary')).not_to_contain_text('Manual Ada')
+    page.unroute('**/candidates/*')
+    page.locator('#rows tr').first.click()
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Recorded by Manual Ada')
+    assert page.request.get(page.url+'decisions').json() == [first]
+
+
+@pytest.mark.parametrize('width,height,scale', [(1366,768,1),(390,844,1),(683,384,2)])
+def test_meeting2_overview_initial_layout_and_keyboard(screen, width, height, scale):
+    page, folder = screen
+    expect = playwright.expect
+    page.set_viewport_size({'width':width,'height':height})
+    if scale == 2:
+        page.context.new_cdp_session(page).send('Emulation.setDeviceMetricsOverride',
+            {'width':width,'height':height,'deviceScaleFactor':2,'mobile':False})
+    expect(page.locator('#overview-total')).to_have_text('150 candidates (checks excluded)')
+    assert not page.locator('#advanced-filters').evaluate('(node)=>node.open')
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    if width == 1366:
+        expect(page.locator('#overview')).to_be_in_viewport()
+        expect(page.locator('#count')).to_be_in_viewport()
+        expect(page.locator('#rows tr').first).to_be_in_viewport()
+    red = page.locator('#rag-overview button[data-value="RED"]')
+    red.focus()
+    page.keyboard.press('Enter')
+    expect(page.locator('#rows tr')).to_have_count(65)
+    expect(red).to_have_attribute('aria-pressed','true')
+    expect(red).to_contain_text('65')
+    expect(page.locator('#rag-overview button[data-value="GREEN"]')).to_contain_text('32')
+    if width < 768:
+        launcher = page.locator('#ask-launcher').bounding_box()
+        content = page.locator('#page-content').bounding_box()
+        assert content['y'] + content['height'] <= launcher['y']
+        page.locator('#review-overview button[data-value="latest_override"]').focus()
+        box = page.locator('#review-overview button[data-value="latest_override"]').bounding_box()
+        assert box['y'] + box['height'] <= launcher['y']
+    page.screenshot(path=str(folder/'overview-layout.png'))
+
+
+def test_meeting2_queue_clicks_filters_export_and_preferences(screen):
+    page, folder = screen
+    expect = playwright.expect
+    expect(page.locator('#rows tr')).to_have_count(150)
+    original = page.request.get(page.url+'candidates/SYN-MZ-00001').json()
+    body = dict(query=original['material_guid'], action='ADVANCE', actor='Queue reviewer',
+        reason='Advance after all evidence reviewed', context={'location':'Unknown','source_channel':'Test'},
+        recommendation_id=original['recommendation_id'], previous_decision_id=None, request_id='queue-first')
+    first = page.request.post(page.url+'decisions',data=body).json()
+    page.locator('#refresh-view').click()
+    reviewed = page.locator('#review-overview button[data-value="reviewed"]')
+    expect(reviewed).to_contain_text('1')
+    page.locator('#review-overview button[data-value="latest_override"]').click()
+    expect(page.locator('#rows tr')).to_have_count(1)
+    expect(page.locator('#review_state')).to_have_value('latest_override')
+    expect(page.locator('#active-filters')).to_contain_text('Latest decision is an override')
+    with page.expect_download() as download:
+        page.locator('#export').click()
+    download.value.save_as(folder/'overrides.csv')
+    assert [line.split(',')[0] for line in (folder/'overrides.csv').read_text().splitlines()[1:]] == [original['material_id']]
+    page.locator('#rag-overview button[data-value="RED"]').click()
+    expect(page.locator('#rows tr')).to_have_count(0)
+    expect(page.locator('#empty-results')).to_be_visible()
+    page.locator('#rag-overview button[data-value=""]').click()
+    expect(page.locator('#rows tr')).to_have_count(1)
+    expect(page.locator('#review_state')).to_have_value('latest_override')
+    page.locator('#rows tr').first.click()
+    expect(page.locator('#latest-decision-summary')).to_contain_text('Queue reviewer')
+    select_section(page,'decision')
+    page.locator('#another-decision').click()
+    page.locator('#actor').fill('Later reviewer')
+    page.locator('#action').select_option('HOLD')
+    page.locator('#reason').fill('Hold pending another trial')
+    page.locator('#review-decision').click()
+    page.locator('#record-decision').click()
+    expect(page.locator('#review-overview button[data-value="latest_override"]')).to_contain_text('0')
+    expect(page.locator('#rows tr')).to_have_count(0)
+    expect(reviewed).to_contain_text('1')
+    page.locator('#review_state').select_option('reviewed')
+    expect(page.locator('#rows tr')).to_have_count(1)
+    page.locator('#advanced-filters summary').first.click()
+    save_preferences(page)
+    page.locator('#remember-view').check()
+    page.reload()
+    expect(page.locator('#review_state')).to_have_value('reviewed')
+    expect(page.locator('#rows tr')).to_have_count(1)
+    stored = page.evaluate('JSON.parse(localStorage.getItem("uc4.preferences"))')
+    assert stored['view']['filters']['review_state'] == 'reviewed'
+    del stored['view']['filters']['review_state']
+    page.evaluate('(saved)=>localStorage.setItem("uc4.preferences",JSON.stringify(saved))', stored)
+    page.reload()
+    expect(page.locator('#review_state')).to_have_value('all')
+    expect(page.locator('#rows tr')).to_have_count(150)
+    page.locator('#review_state').select_option('undecided')
+    expect(page.locator('#rows tr')).to_have_count(149)
+    page.locator('#reset').click()
+    expect(page.locator('#rows tr')).to_have_count(150)
+    assert len(page.request.get(page.url+'decisions').json()) == 2
+
+
+def test_meeting2_overview_pagination_generation_retry_and_failed_refresh(screen):
+    page, _ = screen
+    expect = playwright.expect
+    calls = []
+    mismatch = [True]
+    def paginated(route):
+        response = route.fetch()
+        data = response.json()
+        if 'offset=' not in route.request.url:
+            calls.append('first')
+            data['rows'] = data['rows'][:20]
+            data['next_offset'] = 20
+        elif mismatch[0]:
+            data['decision_generation'] += 1
+            mismatch[0] = False
+        route.fulfill(response=response,json=data)
+    page.route('**/candidates?*',paginated)
+    page.locator('#refresh-view').click()
+    expect(page.locator('#overview-status')).to_have_text('')
+    expect(page.locator('#rows tr')).to_have_count(150)
+    assert len(calls) == 2
+    page.unroute('**/candidates?*')
+    page.route('**/candidates?*',lambda route:route.abort())
+    page.locator('#refresh-view').click()
+    expect(page.locator('#overview-status')).to_contain_text('may be stale')
+    expect(page.locator('#rows tr')).to_have_count(150)
+    page.unroute('**/candidates?*')
+    page.locator('#refresh-view').click()
+    expect(page.locator('#overview-status')).to_have_text('')
+
+
+def test_meeting2_queue_changes_preserve_draft_and_reject_typed_queue(screen):
+    page, _ = screen
+    expect = playwright.expect
+    prepare_manual_decision(page)
+    page.locator('#review-overview button[data-value="reviewed"]').click()
+    expect(page.locator('#rows tr')).to_have_count(0)
+    expect(page.locator('#reason')).to_have_value('Advance after reviewing all available trials')
+    page.locator('#advanced-filters summary').first.click()
+    page.locator('#filter-request').fill('Show latest overrides')
+    page.locator('#filter-interpret').click()
+    expect(page.locator('#filter-intent-status')).to_contain_text('Review state controls')
+    expect(page.locator('#filter-preview')).to_be_hidden()
+    expect(page.locator('#review_state')).to_have_value('reviewed')
+    expect(page.locator('#reason')).to_have_value('Advance after reviewing all available trials')
+    page.locator('#advanced-filters summary').first.click()
+    page.locator('#review-overview button[data-value="all"]').click()
+    expect(page.locator('#rows tr')).to_have_count(150)
+    assert page.request.get(page.url+'decisions').json() == []
+
+
+def test_meeting2_overview_discards_old_response_and_requires_stable_pages(screen):
+    page, _ = screen
+    expect = playwright.expect
+    held = []
+    page.route('**/candidates?*rag=RED*',lambda route:held.append(route))
+    page.locator('#rag-overview button[data-value="RED"]').click()
+    page.locator('#rag-overview button[data-value="GREEN"]').click()
+    expect(page.locator('#rows tr')).to_have_count(32)
+    assert held
+    held[0].fulfill(response=held[0].fetch())
+    expect(page.locator('#rows tr')).to_have_count(32)
+    expect(page.locator('#rag-overview button[data-value="GREEN"]')).to_have_attribute('aria-pressed','true')
+    page.unroute('**/candidates?*rag=RED*')
+    calls = []
+    def unstable(route):
+        response = route.fetch()
+        data = response.json()
+        if 'offset=' not in route.request.url:
+            calls.append('first')
+            data['rows'] = data['rows'][:10]
+            data['next_offset'] = 10
+        else:
+            data['revision_id'] = 'changed-revision'
+        route.fulfill(response=response,json=data)
+    page.route('**/candidates?*',unstable)
+    page.locator('#refresh-view').click()
+    expect(page.locator('#overview-status')).to_contain_text('Refresh to load a consistent view')
+    assert len(calls) == 2
+    expect(page.locator('#rows tr')).to_have_count(32)
+    page.unroute('**/candidates?*')
+    page.locator('#refresh-view').click()
+    expect(page.locator('#overview-status')).to_have_text('')
+    expect(page.locator('#rows tr')).to_have_count(32)
+
+
+
+def test_meeting2_typed_apply_clears_queue_and_manual_queue_invalidates_preview(screen):
+    page, _ = screen
+    expect = playwright.expect
+    page.locator('#advanced-filters summary').first.click()
+    page.locator('#review_state').select_option('undecided')
+    expect(page.locator('#rows tr')).to_have_count(150)
+    preview_filters(page)
+    page.locator('#review_state').select_option('reviewed')
+    expect(page.locator('#filter-preview')).to_be_hidden()
+    expect(page.locator('#rows tr')).to_have_count(0)
+    preview_filters(page)
+    page.locator('#filter-apply').click()
+    expect(page.locator('#filter-preview')).to_be_hidden()
+    expect(page.locator('#review_state')).to_have_value('all')
+    expect(page.locator('#rag')).to_have_value('AMBER')
+    expected = page.request.get(page.url+'candidates',params={
+        'rag':'AMBER','ranges':json.dumps({'N_TRIALS_USED':{'min':3}})}).json()['total']
+    expect(page.locator('#rows tr')).to_have_count(expected)
+
+
+@pytest.mark.parametrize("width,height", [(1366,768), (390,844)])
+def test_meeting2_processing_disclosure_cached_refresh_and_layout(screen, width, height):
+    page, folder = screen
+    expect = playwright.expect
+    page.set_viewport_size({"width":width,"height":height})
+    disclosure = page.locator("#processing-details")
+    assert not disclosure.evaluate("node=>node.open")
+    disclosure.locator("summary").focus()
+    page.keyboard.press("Enter")
+    expect(page.locator("#processing-content")).to_contain_text("Measured local reconstruction and recommendation creation")
+    expect(disclosure).to_contain_text("150 candidates; 2 distinct check varieties")
+    expect(disclosure).to_contain_text("5,184 supplied rows")
+    before = page.locator("#processing-content").text_content()
+    with page.expect_response(lambda r:'/candidates' in r.url):
+        page.locator("#refresh-view").click()
+    expect(page.locator("#processing-status")).to_have_text("")
+    assert page.locator("#processing-content").text_content() == before
+    assert disclosure.evaluate("node=>node.open")
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    assert disclosure.evaluate("node=>node.scrollWidth <= node.clientWidth")
+    if width > 1200:
+        assert page.locator("#overview").evaluate("node=>getComputedStyle(node).position") == "sticky"
+    else:
+        launcher = page.locator("#ask-launcher").bounding_box()
+        content = page.locator("#page-content").bounding_box()
+        assert content["y"]+content["height"] <= launcher["y"]
+    disclosure.screenshot(path=str(folder/f"processing-{width}.png"))
+
+
+def test_meeting2_processing_unavailable_short_duration_and_stale_failure(screen):
+    page, folder = screen
+    expect = playwright.expect
+    page.locator("#processing-details summary").click()
+    payload = page.request.get(page.url+"candidates").json()
+    payload["processing"]["measurement"]["elapsed_seconds"] = .001
+    page.route("**/candidates?**", lambda route:route.fulfill(json=payload))
+    page.locator("#refresh-view").click()
+    expect(page.locator("#processing-content")).to_contain_text("less than 0.01 seconds")
+    payload["processing"]["measurement"] = None
+    page.locator("#refresh-view").click()
+    expect(page.locator("#processing-content")).to_contain_text("recommendation creation: unavailable")
+    expect(page.locator("#processing-content")).to_contain_text("Measured at (UTC): unavailable")
+    previous = page.locator("#processing-content").text_content()
+    page.unroute("**/candidates?**")
+    page.route("**/candidates?**", lambda route:route.fulfill(status=503,json={"detail":"Refresh unavailable"}))
+    page.locator("#refresh-view").click()
+    expect(page.locator("#processing-status")).to_contain_text("may be stale")
+    assert page.locator("#processing-content").text_content() == previous
+    page.locator("#processing-details").screenshot(path=str(folder/"processing-stale.png"))
+
+
+def test_meeting2_processing_correction_activation_and_late_response(screen):
+    page, folder = screen
+    expect = playwright.expect
+    page.locator("#processing-details summary").click()
+    baseline = page.request.get(page.url+"candidates").json()
+    original = page.request.get(page.url+"candidates/SYN-MZ-00001").json()
+    trait = next(t for t in original["dictionary"] if t["TRAIT_CODE"] == "FUMONISIN_PPM")
+    row = next(r for r in original["evidence"]["lab"] if r["TRAIT_GUID"] == trait["TRAIT_GUID"])
+    draft = page.request.post(page.url+"enrichment", data=dict(query=original["material_guid"],
+        kind="correction",table="lab",row_id=row["row_id"],field="NUMBER_VALUE",value=10,
+        unit=trait["UNIT"],actor="Ada",reason="Correct lab transcription",observed_at="2026-10-01",source="Notebook")).json()
+    for action in ("submit","approve"):
+        assert page.request.post(page.url+"enrichment/"+draft["id"]+"/review",
+            data=dict(action=action,actor="Ada",reason="Verified notebook evidence")).ok
+    activated = page.request.post(page.url+"enrichment/"+draft["id"]+"/activate",
+        data=dict(base_revision=original["revision_id"],actor="Ada",reason="Activate correction")).json()
+    # Hold an obsolete response, then accept the current revision's response first.
+    page.evaluate("""payload => {
+        const original = window.fetch; let held = false;
+        window.fetch = (url,options) => {
+            if(url.split('?')[0]==='/candidates' && !held){ held=true;
+                return new Promise(resolve=>{window.finishOldProcessing=()=>resolve(new Response(JSON.stringify(payload),{status:200}));});
+            }
+            return original(url,options);
+        };
+    }""", baseline)
+    page.locator("#refresh-view").click()
+    page.locator("#refresh-view").click()
+    expect(page.locator("#processing-content")).to_contain_text(activated["revision_id"])
+    expect(page.locator("#processing-content")).to_contain_text("1 active corrections; 0 contextual additions")
+    expect(page.locator('#rag-overview button[data-value="RED"]')).to_contain_text('66')
+    current = page.locator("#processing-content").text_content()
+    page.evaluate("async () => {window.finishOldProcessing(); await new Promise(resolve=>setTimeout(resolve,0));}")
+    page.wait_for_function("state.listRequest >= 3")
+    assert page.locator("#processing-content").text_content() == current
+    assert page.request.get(page.url+"candidates").json()["processing"]["sources"] == baseline["processing"]["sources"]
+    page.locator("#processing-details").screenshot(path=str(folder/"processing-activated.png"))
+
+
+@pytest.mark.parametrize("next_action", ["recover", "filter", "reset", "selection", "toggle", "forget"])
+def test_preferences_pending_boundary_policy_failure(screen, next_action):
+    page, _ = screen
+    expect = playwright.expect
+    save_preferences(page)
+    page.locator('#remember-view').check()
+    page.locator('#rows tr').first.click()
+    expect(page.locator('#detail')).to_be_visible()
+    page.locator('#search').fill('SYN-MZ')
+    apply_boundary(page)
+    page.locator('#sort').select_option('boundary_distance')
+    page.wait_for_function('JSON.parse(localStorage.getItem("uc4.preferences")).view.filters.sort === "boundary_distance"')
+    saved = page.evaluate('JSON.parse(localStorage.getItem("uc4.preferences"))')
+    page.route('**/rule', lambda route: route.fulfill(status=503, json={"detail":"Policy unavailable"}))
+    page.reload()
+    expect(page.locator('#detail')).to_be_visible()
+    expect(page.locator('#actor')).to_have_value('Breeder Ada')
+    expect(page.locator('#location')).to_have_value('Review meeting')
+    expect(page.locator('#source-channel')).to_have_value(saved['defaults']['sourceChannel'])
+    expect(page.locator('#search')).to_have_value('SYN-MZ')
+    expect(page.locator('#sort')).to_have_value('material_id')
+    expect(page.locator('#boundary-controls')).to_have_attribute('disabled', '')
+    expect(page.locator('#boundary-tolerance')).to_be_disabled()
+    expect(page.locator('#preferences-status')).to_contain_text('Reload after policy recovery')
+    assert page.evaluate('state.boundary') is None
+    assert page.evaluate('state.selected') == saved['view']['selected']
+    page.evaluate('async()=>{await loadList();await loadDetail(state.selected);await loadList();}')
+    assert page.evaluate('JSON.parse(localStorage.getItem("uc4.preferences"))') == saved
+    page.locator('#preferences-panel').evaluate('node=>node.open=true')
+    page.locator('#preference-name').fill('Updated Ada')
+    page.locator('#preferences-form').get_by_role('button', name='Save preferences', exact=True).click()
+    assert page.evaluate('JSON.parse(localStorage.getItem("uc4.preferences")).view') == saved['view']
+    if next_action == 'recover':
+        page.unroute('**/rule')
+        page.reload()
+        expect(page.locator('#sort')).to_have_value('boundary_distance')
+        expect(page.locator('#active-filters')).to_contain_text('Near Moisture')
+        assert page.evaluate('state.boundary') == saved['view']['boundary']
+    elif next_action == 'forget':
+        page.locator('#forget-preferences').click()
+        assert page.evaluate('localStorage.getItem("uc4.preferences")') is None
+    else:
+        if next_action == 'filter':
+            page.locator('#rag').select_option('GREEN')
+        elif next_action == 'reset':
+            page.locator('#reset').click()
+        elif next_action == 'selection':
+            page.locator('#rows tr').nth(1).click()
+            expect(page.locator('#detail-title')).to_contain_text('SYN-MZ-00002')
+        else:
+            page.locator('#remember-view').uncheck()
+            page.locator('#remember-view').check()
+        page.wait_for_function('JSON.parse(localStorage.getItem("uc4.preferences")).view.boundary === null')
+        page.unroute('**/rule')
+        page.reload()
+        expect(page.locator('#sort')).to_have_value('material_id')
+        assert page.evaluate('state.boundary') is None
+
+
+@pytest.mark.parametrize("failure", ["detail", "both", "delayed-navigation"])
+def test_confirmed_decision_refreshes_queue_independently(screen, failure):
+    page, _ = screen
+    expect = playwright.expect
+    prepare_manual_decision(page)
+    guid = page.evaluate('state.selected')
+    page.locator('#review-overview button[data-value="undecided"]').click()
+    expect(page.locator('#rows tr')).to_have_count(150)
+    select_section(page, 'decision')
+    page.locator('#review-decision').click()
+    held = []
+    def recover_detail(route):
+        if failure == 'delayed-navigation':
+            held.append(route)
+        else:
+            route.fulfill(status=503, json={"detail":"History unavailable"})
+    page.route('**/candidates/' + guid, recover_detail)
+    if failure == 'both':
+        page.route('**/candidates?*', lambda route: route.fulfill(status=503, json={"detail":"Queue unavailable"}))
+    page.locator('#record-decision').evaluate('(button)=>{button.click();button.click();}')
+    expect(page.locator('#decision-message')).to_contain_text('Decision recorded:')
+    if failure == 'both':
+        expect(page.locator('#overview-status')).to_contain_text('Counts and results may be stale')
+        expect(page.locator('#decision-message')).to_contain_text('History refresh failed')
+        expect(page.locator('#decision-saved-summary')).to_contain_text('Manual Ada')
+    else:
+        expect(page.locator('#review-overview button[data-value="reviewed"]')).to_contain_text('1')
+        expect(page.locator('#review-overview button[data-value="undecided"]')).to_contain_text('149')
+        expect(page.locator('#review-overview button[data-value="latest_override"]')).to_contain_text('1')
+        expect(page.locator('#rows tr')).to_have_count(149)
+        assert 'SYN-MZ-00001' not in page.locator('#rows td:first-child').all_text_contents()
+        if failure == 'detail':
+            expect(page.locator('#decision-message')).to_contain_text('History refresh failed')
+            expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder ADVANCE')
+        else:
+            assert len(held) == 1
+            page.locator('#rows tr').first.click()
+            expect(page.locator('#detail-title')).to_contain_text('SYN-MZ-00002')
+            held[0].fulfill(response=held[0].fetch())
+            page.wait_for_function('!state.savingDecision')
+            expect(page.locator('#detail-title')).to_contain_text('SYN-MZ-00002')
+            expect(page.locator('#decision-message')).to_be_empty()
+            expect(page.locator('#rows tr')).to_have_count(149)
+            page.unroute('**/candidates/' + guid)
+            page.evaluate('(guid)=>loadDetail(guid)', guid)
+            expect(page.locator('#decision-saved-summary')).to_contain_text('Manual Ada')
+    assert len(page.request.get(page.url + 'decisions').json()) == 1
+
+
+@pytest.mark.parametrize("record", ["malformed", "old", "forget-tab"])
+def test_preferences_policy_unavailable_compatibility(screen, record):
+    page, _ = screen
+    expect = playwright.expect
+    save_preferences(page)
+    page.locator('#remember-view').check()
+    page.locator('#search').fill('SYN-MZ-00001')
+    expect(page.locator('#rows tr')).to_have_count(1)
+    if record == 'malformed':
+        page.evaluate("""()=>{const s=JSON.parse(localStorage.getItem('uc4.preferences'));
+            s.view.boundary={field:'MOISTURE_PCT_MEAN',kind:'green_gate',tolerance:-1,side:'both'};
+            localStorage.setItem('uc4.preferences',JSON.stringify(s));}""")
+    elif record == 'old':
+        page.evaluate("""()=>{const s=JSON.parse(localStorage.getItem('uc4.preferences'));
+            delete s.view.boundary;delete s.view.filters.review_state;
+            localStorage.setItem('uc4.preferences',JSON.stringify(s));}""")
+    else:
+        apply_boundary(page)
+    page.route('**/rule', lambda route: route.fulfill(status=503, json={'detail':'Policy unavailable'}))
+    page.reload()
+    if record == 'malformed':
+        expect(page.locator('#rows tr')).to_have_count(150)
+        expect(page.locator('#preferences-status')).to_contain_text('could not be restored')
+        expect(page.locator('#preference-name')).to_have_value('')
+    elif record == 'old':
+        expect(page.locator('#rows tr')).to_have_count(1)
+        expect(page.locator('#preference-name')).to_have_value('Breeder Ada')
+        expect(page.locator('#review_state')).to_have_value('all')
+    else:
+        expect(page.locator('#preferences-status')).to_contain_text('Saved proximity is inactive')
+        other = page.context.new_page()
+        other.goto(page.url)
+        expect(other.locator('#count')).to_contain_text('Candidates:')
+        other.locator('#preferences-panel').evaluate('node=>node.open=true')
+        other.locator('#forget-preferences').click()
+        expect(page.locator('#preferences-status')).to_contain_text('forgotten in another tab')
+        page.evaluate('async()=>{await loadList();}')
+        assert page.evaluate('localStorage.getItem("uc4.preferences")') is None
+        other.close()

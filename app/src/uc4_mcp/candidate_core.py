@@ -49,6 +49,7 @@ def load_current(path: Path = ZIP_PATH, *, strict_counts: bool = True) -> dict[s
             if df[pk].isna().any() or df[pk].duplicated().any():
                 raise ValueError(f"{name}: null or duplicate primary key {pk}")
             df["_source_file"] = name
+            df.attrs["source_file"] = name
             df["_line_no"] = range(2, len(df) + 2)
             tables[key] = df
     return tables

@@ -43,6 +43,15 @@ def test_example_matches_manual_query_without_writes(setup):
     assert edited.status_code == 200 and edited.json()['total'] <= manual['total']
 
 
+@pytest.mark.parametrize('text', ['Show reviewed candidates','Show decided candidates','Show latest overrides'])
+def test_new_queues_require_manual_controls_without_model_call(setup, text):
+    history, model, client, context = setup
+    result = client.post('/filters/interpret', json={**context,'text':text})
+    assert result.status_code == 200 and result.json()['status'] == 'clarification'
+    assert 'Review state controls' in result.json()['clarification']
+    assert result.json()['filters'] is None and not model.seen and not history.decisions()
+
+
 @pytest.mark.parametrize('filters', [
     {'rag':'BLUE'}, {'action':'ADVANCE'}, {'sort':'rag'},
     {'ranges':{'UNKNOWN':{'min':1, 'unit':'%'}}},

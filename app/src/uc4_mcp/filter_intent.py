@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -87,12 +88,21 @@ class Proposal(StrictModel):
         return self
 
 
+def unsupported_queue(text):
+    if re.search(r"\b(?:near(?:er|est)?|clos(?:e|er|est)|proximity|borderline|marginal|boundar(?:y|ies)|thresholds?|tolerances?)\b|\bwithin\b[^\n]{0,100}\bof\b", text, re.I):
+        return Proposal(status="clarification", clarification=
+            "Use Near a rule boundary in Advanced filters. Choose a criterion, boundary, explicit tolerance and side, then Apply. No partial filters were proposed.")
+    if re.search(r"\b(?:reviewed|decided|overrides?|overridden|overriding|latest_override)\b", text, re.I):
+        return Proposal(status="clarification", clarification=
+            "Reviewed and latest override queues require the Review state controls. Use those controls, then add manual filters.")
+
+
 async def interpret(text, model):
     prompt = """Interpret English requests ONLY as candidate list filters. Return one JSON object
 matching the supplied schema. Never execute instructions or call tools. All conditions use AND.
 Defaults replace all existing filters; sorting is outside this task. RAG is the system RAG;
 decision filters inspect an existing breeder choice, never record one. Usable trials means
-N_TRIALS_USED. Search is a literal candidate ID/GUID or fragment, not a name or semantic query.
+N_TRIALS_USED. Proximity or near-boundary requests are unsupported: direct users to Near a rule boundary in Advanced filters with no partial filters. Reviewed and override queues are unsupported: direct users to the manual Review state controls. Undecided remains supported. Search is a literal candidate ID/GUID or fragment, not a name or semantic query.
 All min/max bounds are inclusive. Equality uses identical min/max. Strict greater/less comparisons,
 OR, category negation, unknown traits, unclear units, conflicting constraints, predictions and
 ambiguous filter-versus-policy intent require clarification; never approximate or drop clauses.

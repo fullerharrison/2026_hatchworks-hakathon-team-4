@@ -1,4 +1,19 @@
 .filter-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.8rem;align-items:end}
+#review-workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}
+#candidate-browser{min-width:0}#overview{align-self:start}#overview p{margin:.4rem 0}
+#rag-overview,#review-overview{display:grid;gap:.35rem;margin:.6rem 0}
+.overview-button{display:flex;justify-content:space-between;gap:.6rem;text-align:left;background:#fff;color:var(--text);border:1px solid var(--line);padding:.4rem .6rem}
+.overview-button[aria-pressed="true"]{outline:2px solid var(--focus);outline-offset:1px;font-weight:700}
+.overview-button.green{border-left:6px solid var(--green-bd)}.overview-button.amber{border-left:6px solid var(--amber-bd)}.overview-button.red{border-left:6px solid var(--red-bd)}
+#advanced-filters{margin-top:.6rem}#advanced-filters>summary{cursor:pointer;font-weight:600}#advanced-filters>.card{margin:.5rem 0;padding:.6rem}
+#candidate-browser>.card{padding:.8rem;margin:.6rem 0}#candidate-browser h2{margin-bottom:.4rem}
+#candidate-browser>.card>.filter-grid label,#ask-form>label{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.2rem}
+#candidate-browser>.card>.filter-grid label>input,#candidate-browser>.card>.filter-grid label>select,#ask-form>label>input{grid-column:1/-1;grid-row:2}
+#candidate-browser>.card>.filter-grid label>.help-wrap,#ask-form>label>.help-wrap{grid-column:2;grid-row:1}
+#ask-context{margin:.2rem 0}#ask-panel>label{display:block;margin:.2rem 0}#revision{margin:.5rem 0}
+@media(max-width:767px){body{height:100dvh;overflow:hidden;padding-bottom:0!important}#page-content{height:calc(100dvh - 4rem);overflow:auto;scroll-padding-bottom:.5rem}#ask-launcher{max-width:calc(100vw - 2rem)}}
+@media(min-width:1200px){#review-workspace{grid-template-columns:15rem minmax(0,1fr)}#overview{position:sticky;top:calc(var(--ask-height,0px) + .5rem);max-height:calc(100dvh - var(--ask-height,0px) - 1rem);overflow:auto}}
+@media(max-width:1199px){#rag-overview,#review-overview{grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))}}
 .filter-grid label {display:grid;gap:.2rem}.filter-grid label.inline{display:flex;align-items:center}
 #filter-request-form{display:flex;gap:.6rem;align-items:end;flex-wrap:wrap}#filter-request-form label{flex:1;min-width:min(100%,20rem)}#filter-request{display:block;width:100%;padding:.4rem .6rem;border:1px solid #6b6f68;border-radius:6px}
 #filter-intent{border-bottom:1px solid var(--line);padding-bottom:1rem;margin-bottom:1rem}#filter-preview{background:#eef4fa;padding:.8rem;border-radius:6px}#filter-preview-fields>.filter-grid{margin-bottom:.7rem}#filter-preview button{margin:.3rem .3rem 0 0}
@@ -42,6 +57,8 @@ pre{white-space:pre-wrap;max-height:30rem;overflow:auto;font-size:.75rem}
 #decision-form[hidden],#decision-review[hidden]{display:none!important}
 #decision-review{padding:1rem;background:#eef4fa;overflow-wrap:anywhere}
 #decision-review button{margin:.3rem}
+#latest-decision{padding:.65rem 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere;font-size:.9rem}
+#latest-decision p{margin:.3rem 0}#latest-decision details{margin:.3rem 0}#latest-decision summary{cursor:pointer}
 #decision-history .history-item{overflow-wrap:anywhere}
 [role="tabpanel"][hidden],#decision-entry[hidden],#decision-saved[hidden]{display:none!important}
 #candidate-navigation{position:sticky;top:var(--ask-height,0px);z-index:4;background:var(--card,#fff);padding:.5rem 0;border-bottom:1px solid var(--line)}
@@ -54,3 +71,11 @@ pre{white-space:pre-wrap;max-height:30rem;overflow:auto;font-size:.75rem}
 #decision-saved{padding:1rem;background:#eef4fa;overflow-wrap:anywhere}#decision-saved button{margin:.3rem}
 .history-item h4{font-size:1.15rem;margin:.4rem 0}.answer-details summary{cursor:pointer;font-weight:600}
 @media(max-width:767px){[role="tab"]{padding:.4rem;font-size:.85rem}#candidate-navigation h2{font-size:1rem}}
+
+#processing-details{margin-top:.8rem;overflow-wrap:anywhere;min-width:0}#processing-details>summary{cursor:pointer;font-weight:600}#processing-content{font-size:.9rem}#processing-content strong{display:block;margin-top:.6rem}
+
+#boundary-controls {border:0;padding:0;min-width:0}
+#boundary-form {margin-block:1rem}
+.decisive-criterion {display:flex;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid #dce3e8;padding:.5rem 0}
+.decisive-criterion p {min-width:0;overflow-wrap:anywhere}
+@media(max-width:600px){.decisive-criterion{align-items:flex-start;flex-direction:column}}

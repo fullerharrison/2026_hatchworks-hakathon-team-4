@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 import math
+import datetime as dt
+import time
+from types import MappingProxyType
 from typing import Any
 
 import pandas as pd
@@ -26,6 +29,53 @@ UNITS = {"YIELD_VS_CHECK_PCT": "%", "DISEASE_SCORE_MEAN": "score", "MOISTURE_PCT
 
 def policy_tests(specs):
     return [dict(field=f, test=op, threshold=v, unit=UNITS[f]) for f, op, v in specs]
+
+
+def validate_boundary(boundary):
+    if boundary is None:
+        return None
+    if not isinstance(boundary, dict) or set(boundary) != {"field", "kind", "tolerance", "side"}:
+        raise ValueError("Boundary requires field, kind, tolerance and side only")
+    specs = {"green_gate": GATES, "red_knockout": KNOCKOUTS}
+    if not all(isinstance(boundary[k], str) for k in ("field", "kind", "side")) or boundary["kind"] not in specs or boundary["side"] not in {"both", "meets", "fails"}:
+        raise ValueError("Unsupported boundary kind or side")
+    selected = next((x for x in specs[boundary["kind"]] if x[0] == boundary["field"]), None)
+    if selected is None:
+        raise ValueError("Unsupported numeric policy boundary")
+    tolerance = boundary["tolerance"]
+    if isinstance(tolerance, bool) or not isinstance(tolerance, (int, float)) or not math.isfinite(tolerance) or tolerance < 0:
+        raise ValueError("Boundary tolerance must be a finite nonnegative number")
+    if selected[0] == "N_TRIALS_USED" and not float(tolerance).is_integer():
+        raise ValueError("Usable trial tolerance must be an integer")
+    return dict(boundary, test=selected[1], threshold=selected[2], unit=UNITS[selected[0]])
+
+
+def assessment(field, value, op, threshold):
+    known = value is not None
+    passed = known and {">=": lambda: value >= threshold, "<=": lambda: value <= threshold,
+                       ">": lambda: value > threshold, "<": lambda: value < threshold,
+                       "in": lambda: value in threshold}[op]()
+    return dict(field=field, value=value, test=op, threshold=threshold, unit=UNITS.get(field, "category"),
+                margin=value - threshold if known and op != "in" else None,
+                status="unknown" if not known else "meets" if passed else "fails", passed=bool(passed))
+
+
+def review_data(rec, boundary=None):
+    gates = [assessment(c["field"], c["value"], c["test"], c["threshold"]) for c in rec["criteria"]]
+    knockouts = [assessment(f, rec["metrics"][f], op, limit) for f, op, limit in KNOCKOUTS]
+    triggers = [c for c in knockouts if c["passed"]]
+    no_data = rec["metrics"]["N_TRIALS_USED"] == 0
+    decisive = [c for c in gates if c["field"] == "N_TRIALS_USED"] if no_data else triggers or [c for c in gates if not c["passed"]] or gates
+    result = dict(green_counts={s: sum(c["status"] == s for c in gates) for s in ("meets", "fails", "unknown")},
+                  gates=gates, triggered_knockout_fields=[c["field"] for c in triggers],
+                  knockout_precedence_applies=bool(triggers) and not no_data, no_usable_field_data=no_data,
+                  decisive_assessments=decisive)
+    if boundary:
+        c = assessment(boundary["field"], rec["metrics"][boundary["field"]], boundary["test"], boundary["threshold"])
+        result["boundary"] = dict(boundary, observed=c["value"], signed_margin=c["margin"],
+                                  distance=abs(c["margin"]) if c["margin"] is not None else None,
+                                  test_outcome=c["status"])
+    return result
 LABELS = {"YIELD_VS_CHECK_PCT": "Yield versus checks", "DISEASE_SCORE_MEAN": "Disease score",
           "MOISTURE_PCT_MEAN": "Moisture", "GERMINATION_PCT": "Germination", "FUMONISIN_PPM": "Fumonisin",
           "N_TRIALS_USED": "Usable trials", "MARKER_DISEASE_RESISTANCE": "Disease resistance marker"}
@@ -68,6 +118,7 @@ class CandidateStore:
                 frame.loc[frame[KEYS[item["table"]]].astype(str) == item["row_id"], item["field"]] = item["value"]
         checks = consistency(self.tables)
         self.source_warnings = to_json_safe(checks[checks.violations > 0].to_dict("records"))
+        started = time.perf_counter()
         self.rec, self.means, self.reconciliation = reconstruct(self.tables)
         effective = self.rec.copy()
         for col in SCORING_FIELDS:
@@ -76,6 +127,48 @@ class CandidateStore:
         effective["rag"] = candidate_rule(effective)
         self.effective = effective
         self.by_guid = {r["MATERIAL_GUID"]: self._recommendation(r) for r in effective.to_dict("records")}
+        elapsed = time.perf_counter() - started
+        self.build_diagnostics = MappingProxyType(dict(
+            elapsed_seconds=elapsed if math.isfinite(elapsed) and elapsed >= 0 else None,
+            measured_at=dt.datetime.now(dt.UTC).isoformat(),
+            scope="reconstruction_scoring_recommendation_creation", runtime="local_revision_build",
+            snapshot_id=snapshot_id, revision_id=revision_id))
+
+    def processing(self):
+        """Runtime disclosure only; never part of a recommendation or its identity."""
+        families = [
+            ("Field observations and trial membership", ("observation", "bridge")),
+            ("Operations", ("operations",)), ("Lab", ("lab",)),
+            ("Genomics", ("genomics",)), ("Material metadata", ("germplasm",)),
+            ("Trait definitions", ("dictionary",)), ("Supplied recommendations", ("recommendations",))]
+        sources = []
+        for family, keys in families:
+            tables = []
+            for key in keys:
+                frame = self.base_tables[key]
+                filename = frame.attrs.get("source_file")
+                if filename is None and len(frame):
+                    filename = str(frame.iloc[0]["_source_file"])
+                tables.append(dict(table=key, source_file=filename, supplied_rows=len(frame)))
+            sources.append(dict(family=family, tables=tables))
+        diagnostics = getattr(self, "build_diagnostics", None)
+        measurement = dict(diagnostics) if diagnostics else None
+        if measurement:
+            elapsed = measurement.get("elapsed_seconds")
+            if (isinstance(elapsed, bool) or not isinstance(elapsed, (int, float)) or
+                    not math.isfinite(elapsed) or elapsed < 0 or
+                    (measurement.get("snapshot_id"), measurement.get("revision_id")) !=
+                    (self.snapshot_id, self.revision_id)):
+                measurement = None
+        # Superseding an overlay changes a field; it does not add another source row.
+        corrections = {(x["table"], x["row_id"], x["field"]) for x in self.overlays if x["kind"] == "correction"}
+        additions = {(x["table"], x["row_id"], x["field"], x["id"] if x["field"] == "NOTE" else None)
+                     for x in self.overlays if x["kind"] == "metadata"}
+        bridge = self.base_tables["bridge"]
+        return dict(snapshot_id=self.snapshot_id, revision_id=self.revision_id, measurement=measurement,
+                    sources=sources, candidate_count=len(self.by_guid),
+                    check_variety_count=int(bridge.loc[bridge.ENTRY_ROLE_LID == "CHECK", "MATERIAL_GUID"].nunique()),
+                    active_corrections=len(corrections), contextual_additions=len(additions))
 
     def _recommendation(self, row):
         metrics = {k: row.get(k) for k in SCORING_FIELDS}
@@ -161,16 +254,76 @@ class CandidateStore:
             status="Unknown" if c["value"] is None else "Meets gate" if c["passed"] else "Outside GREEN target")
             for c in rec["criteria"]]
         rec["policy"] = self.rule()
+        rec["review"] = review_data(rec)
+        rec["criterion_evidence"] = self.criterion_evidence(rec, entries, comparison_entries, fields)
         return {"status": "ok", "result": rec}
+
+    def criterion_evidence(self, rec, entries, comparison_entries, fields):
+        """Capture effective and original sources from this immutable revision."""
+        result = {}
+        trait_map = {"YIELD_VS_CHECK_PCT": "YIELD_T_HA", "DISEASE_SCORE_MEAN": "DISEASE_SCORE",
+                     "MOISTURE_PCT_MEAN": "MOISTURE_PCT"}
+        for metric in SCORING_FIELDS:
+            trait = trait_map.get(metric, metric)
+            dictionary = self.tables["dictionary"]
+            definitions = dictionary[dictionary.TRAIT_CODE == trait]
+            if metric.startswith("N_TRIALS"):
+                masks = {"bridge": self.tables["bridge"].TRIAL_ENTRY_GUID.isin(entries.TRIAL_ENTRY_GUID)}
+                explanation = "Count distinct observed candidate trials in reconstructed trial means; usable trials exclude missed irrigation. Membership alone does not add an observed trial."
+            elif metric in trait_map:
+                members = comparison_entries if metric == "YIELD_VS_CHECK_PCT" else entries
+                masks = {"bridge": self.tables["bridge"].TRIAL_ENTRY_GUID.isin(members.TRIAL_ENTRY_GUID),
+                         "observation": self.tables["observation"].TRIAL_ENTRY_RELATIONSHIP_GUID.isin(members.TRIAL_ENTRY_GUID) & (self.tables["observation"].TRAIT_CODE == trait)}
+                explanation = ("Mean replications within each trial; equally weight usable trial means. Yield versus checks is 100 times the ratio of overall candidate mean yield to overall CHECK-role mean yield, not the mean of trial ratios."
+                               if metric == "YIELD_VS_CHECK_PCT" else "Mean replications within each trial, then equally weight usable trial means. Excluded trials remain visible but do not contribute.")
+            elif metric in {"GERMINATION_PCT", "FUMONISIN_PPM", "COLD_TEST_PCT"}:
+                masks = {"lab": (self.tables["lab"].MATERIAL_GUID == rec["material_guid"]) & self.tables["lab"].TRAIT_GUID.isin(definitions.TRAIT_GUID)}
+                explanation = "Selected material's laboratory value linked through the trait dictionary. No trial relationship is supplied."
+            else:
+                masks = {"genomics": self.tables["genomics"].MATERIAL_GUID == rec["material_guid"]}
+                explanation = f"Selected material's genomic record, field {metric}." + (" Context only under this policy." if metric == "GENOMIC_BREEDING_VALUE" else " Category participates in the GREEN gate.")
+            field_metric = metric in trait_map or metric.startswith("N_TRIALS")
+            if field_metric:
+                masks["operations"] = self.tables["operations"].ATTACHED_TO_FIELD_ENTITY_ID.isin(fields) & (self.tables["operations"].OPERATION_TYPE_LID == "IRRIGATION")
+            sources, corrections = {}, []
+            for table, mask in masks.items():
+                originals = {str(x[KEYS[table]]): x for x in self.base_tables[table].to_dict("records")}
+                rows = source_records(self.tables[table][mask], table)
+                for row in rows:
+                    trial = row.get("FIELD_ID") or row.get("TRIAL_GUID")
+                    if table == "operations":
+                        memberships = entries[entries.FIELD_ENTITY_ID == row["ATTACHED_TO_FIELD_ENTITY_ID"]]
+                        trial = memberships.TRIAL_GUID.iloc[0] if len(memberships) else None
+                    if trial is not None:
+                        trial_means = self.means[self.means.TRIAL_GUID == trial]
+                        row["EXCLUDED_IRRIGATION_MISSED"] = bool(trial_means.EXCLUDED_IRRIGATION_MISSED.any())
+                    changes = [x for x in self.overlays if x["kind"] == "correction" and x["table"] == table and x["row_id"] == row["row_id"]
+                               and (table != "genomics" or x["field"] == metric)]
+                    row["original_values"] = {x["field"]: to_json_safe(originals[row["row_id"]][x["field"]]) for x in changes}
+                    row["latest_corrections"] = {x["field"]: x for x in changes}
+                    row["revision_id"] = self.revision_id
+                    corrections.extend(changes)
+                sources[table] = rows
+            comparisons = self.means[self.means.TRIAL_GUID.isin(entries.TRIAL_GUID) &
+                                     ((self.means.MATERIAL_GUID == rec["material_guid"]) |
+                                      ((self.means.ENTRY_ROLE_LID == "CHECK") & (metric == "YIELD_VS_CHECK_PCT")))] if field_metric else pd.DataFrame()
+            result[metric] = to_json_safe(dict(material_guid=rec["material_guid"], material_id=rec["material_id"],
+                snapshot_id=self.snapshot_id, revision_id=self.revision_id, field=metric, calculation=explanation,
+                source_rows=sources, dictionary=source_records(definitions, "dictionary"),
+                trial_comparisons=comparisons.to_dict("records"), active_corrections=corrections))
+        return result
 
     def query(self, filters: dict | None = None, latest: dict | None = None):
         filters, latest = filters or {}, latest or {}
         if not isinstance(filters, dict):
             raise ValueError("Filters must be an object")
-        allowed = {"search", "rag", "decision", "marker", "excluded", "ranges", "include_missing", "sort", "descending"}
+        allowed = {"search", "rag", "decision", "review_state", "marker", "excluded", "ranges", "include_missing", "sort", "descending", "boundary"}
         if set(filters) - allowed:
             raise ValueError("Unknown filters: " + ", ".join(set(filters) - allowed))
         ranges = filters.get("ranges") or {}
+        boundary = validate_boundary(filters.get("boundary"))
+        if filters.get("sort") == "boundary_distance" and boundary is None:
+            raise ValueError("Distance sorting requires an active boundary")
         if not isinstance(ranges, dict):
             raise ValueError("Ranges must be an object keyed by metric")
         if set(ranges) - set(METRICS):
@@ -186,11 +339,26 @@ class CandidateStore:
             raise ValueError("Unknown RAG")
         if filters.get("decision") and filters["decision"] not in [*ACTIONS.values(), "UNDECIDED"]:
             raise ValueError("Unknown decision")
+        review = filters.get("review_state", "all")
+        if review not in {"all", "reviewed", "undecided", "latest_override"}:
+            raise ValueError("Unknown review state")
         if filters.get("marker") and filters["marker"] not in {"RESISTANT", "INTERMEDIATE", "SUSCEPTIBLE"}:
             raise ValueError("Unknown disease marker")
         rows = []
         for original in self.by_guid.values():
             r = dict(original, latest_decision=latest.get(original["material_guid"]))
+            r["review"] = review_data(r, boundary)
+            if boundary:
+                context = r["review"]["boundary"]
+                if context["distance"] is None or context["distance"] > boundary["tolerance"]:
+                    continue
+                if boundary["side"] != "both" and boundary["side"] != context["test_outcome"]:
+                    continue
+            saved = r["latest_decision"]
+            if (review == "reviewed" and saved is None or
+                review == "undecided" and saved is not None or
+                review == "latest_override" and not (saved and saved["overrides"])):
+                continue
             if filters.get("search") and filters["search"].lower() not in (r["material_id"] + r["material_guid"]).lower():
                 continue
             if filters.get("rag") and r["rag"] != filters["rag"]:
@@ -212,12 +380,15 @@ class CandidateStore:
             if keep:
                 rows.append(r)
         sort = filters.get("sort", "material_id")
-        if sort not in ["material_id", "rag", *METRICS]:
+        if sort not in ["material_id", "rag", "boundary_distance", *METRICS]:
             raise ValueError("Unsupported sort column")
         def key(r):
             v = r.get(sort) if sort in r else r["metrics"].get(sort)
             return (v is None, v if v is not None else 0, r["material_id"])
-        rows.sort(key=key, reverse=bool(filters.get("descending")))
+        if sort == "boundary_distance":
+            rows.sort(key=lambda r: ((-1 if filters.get("descending") else 1) * r["review"]["boundary"]["distance"], r["material_id"]))
+        else:
+            rows.sort(key=key, reverse=bool(filters.get("descending")))
         return rows
 
     def rule(self):

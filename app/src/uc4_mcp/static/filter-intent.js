@@ -85,7 +85,9 @@ const filterIntent = (() => {
    const filters = result.filters;
    clearTimeout(state.timer); ++state.listRequest;
    for(const id of Object.keys(names))$(id).value = id === "excluded" ? (filters[id] === null ? "" : String(filters[id])) : filters[id];
+   $("review_state").value = "all";
    $("include-missing").checked = filters.include_missing;
+   boundaryControls.clear();
    state.ranges = Object.fromEntries(Object.entries(filters.ranges).map(([metric, bounds]) =>
     [metric, Object.fromEntries(["min", "max"].filter(k => bounds[k] !== null).map(k => [k, bounds[k]]))]));
    preferences.changed(); ranges(); await loadList();

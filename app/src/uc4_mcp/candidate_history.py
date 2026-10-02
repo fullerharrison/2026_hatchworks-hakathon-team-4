@@ -132,8 +132,12 @@ class CandidateHistory:
                 result.by_guid = {r["material_guid"]: json.loads(r["payload"]) for r in saved}
             else:
                 self._save_recommendations(db, result)
+        return self._cache_store(result)
+
+    def _cache_store(self, result):
+        """Publish only after the enclosing database transaction has committed."""
         with self._cache_lock:
-            self._stores[revision] = result
+            result = self._stores.setdefault(result.revision_id, result)
             while len(self._stores) > 8:
                 self._stores.pop(next(iter(self._stores)), None)
         return result
@@ -174,6 +178,16 @@ class CandidateHistory:
 
     def latest(self):
         return {r["material_guid"]: r for r in self.decisions()}
+
+    def read_view(self):
+        """Pin evidence and decision order in one read transaction; no new storage."""
+        with self._db() as db:
+            db.execute("BEGIN")
+            revision = self._active(db)
+            rows = db.execute("SELECT rowid,payload FROM decisions ORDER BY rowid").fetchall()
+        events = [json.loads(row["payload"]) for row in rows]
+        return (self.store(revision), {e["material_guid"]: e for e in events},
+                rows[-1]["rowid"] if rows else 0)
 
     def decide(self, *, query, action, actor, reason, context, recommendation_id,
                previous_decision_id, request_id):
@@ -397,6 +411,7 @@ class CandidateHistory:
             self._enrichment_event(db, item_id, "activate", actor, reason)
             db.execute("UPDATE enrichment SET status='activated',activated_revision=? WHERE id=?", (revision, item_id))
             db.execute("UPDATE state SET value=? WHERE key='active_revision'", (revision,))
+        self._cache_store(candidate_store)
         return dict(revision_id=revision, preview=preview)
 
     def rollback(self, target_revision: str, actor: str, reason: str):
@@ -417,6 +432,7 @@ class CandidateHistory:
                                        for guid, rec in target.by_guid.items()}
             self._save_recommendations(db, candidate_store)
             db.execute("UPDATE state SET value=? WHERE key='active_revision'", (new,))
+        self._cache_store(candidate_store)
         return dict(revision_id=new, copied_from=target_revision)
 
     def revisions(self):

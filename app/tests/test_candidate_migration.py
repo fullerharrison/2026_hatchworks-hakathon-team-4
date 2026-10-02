@@ -40,6 +40,57 @@ def test_candidate_baseline_filters_and_source_evidence(history):
     assert all(row["source_file"] and row["line_no"] >= 2 for row in detail["evidence"]["observation"])
 
 
+def test_overview_review_queues_export_and_latest_event(history):
+    client = TestClient(create_candidate_app(lambda: None, get_history=lambda: history))
+    initial = client.get('/candidates').json()
+    assert initial['overview'] == dict(total=150, rag={'GREEN':32, 'AMBER':53, 'RED':65},
+                                      reviewed=0, undecided=150, latest_override=0)
+    rec = history.store().resolve('SYN-MZ-00001')['result']
+    args = dict(query=rec['material_id'], action='ADVANCE', actor='Ada', reason='Reviewed all evidence',
+                context={'location':'Unknown','source_channel':'Test'},
+                recommendation_id=rec['recommendation_id'], previous_decision_id=None, request_id='overview-first')
+    first = history.decide(**args)
+    after = client.get('/candidates', params={'rag':'RED'}).json()
+    assert after['overview']['rag'] == initial['overview']['rag']
+    assert after['overview']['reviewed'] == after['overview']['latest_override'] == 1
+    assert after['overview']['undecided'] == 149
+    assert after['revision_id'] == initial['revision_id']
+    assert after['decision_generation'] != initial['decision_generation']
+    for review in ('reviewed','undecided','latest_override'):
+        params = {'review_state':review, 'rag':'AMBER'}
+        rows = client.get('/candidates', params=params).json()['rows']
+        exported = client.get('/candidates.csv', params=params).text
+        assert {line.split(',')[0] for line in exported.splitlines()[1:]} == {r['material_id'] for r in rows}
+    assert client.get('/candidates', params={'review_state':'reviewed','decision':'UNDECIDED'}).json()['total'] == 0
+    assert client.get('/candidates', params={'review_state':'invalid'}).status_code == 422
+    assert client.get('/candidates.csv', params={'review_state':'invalid'}).status_code == 422
+    for offset in (0,20,140):
+        page = client.get('/candidates', params={'offset':offset,'limit':20}).json()
+        assert page['overview'] == after['overview'] and page['decision_generation'] == after['decision_generation']
+    history.decide(**(args | {'action':'HOLD','previous_decision_id':first['id'],'request_id':'overview-second'}))
+    last = client.get('/candidates').json()
+    assert last['overview']['reviewed'] == 1 and last['overview']['latest_override'] == 0
+    assert len(history.decisions()) == 2
+    assert client.get('/candidates', params={'review_state':'latest_override'}).json()['total'] == 0
+
+
+def test_read_view_pins_revision_before_concurrent_activation(history, monkeypatch):
+    original = history.active_revision()
+    draft = history.draft(query='SYN-MZ-00001', kind='metadata', field='NOTE', value='New context',
+        actor='Ada', reason='Capture new evidence', observed_at='2026-10-01', source='Notebook')
+    for action in ('submit','approve'):
+        history.review(draft['id'], action, 'Ada', 'Checked new context')
+    real_store = history.store
+    def activate_before_store(revision):
+        monkeypatch.setattr(history, 'store', real_store)
+        history.activate(draft['id'], original, 'Ada', 'Activate new context')
+        return real_store(revision)
+    monkeypatch.setattr(history, 'store', activate_before_store)
+    pinned, latest, generation = history.read_view()
+    assert pinned.revision_id == original and history.active_revision() != original
+    assert latest == {} and generation == 0
+
+
 def test_api_lists_all_filters_exports_and_retires_trial_route(history):
     client = TestClient(create_candidate_app(lambda: None, get_history=lambda: history))
     body = client.get("/candidates").json()

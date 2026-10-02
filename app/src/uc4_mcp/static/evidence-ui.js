@@ -2,7 +2,7 @@
 // Readable, text-only evidence views. Objects stay data; never display serialized JSON.
 const readerStack=[];
 let readerOpener=null;
-const fieldNames={MOISTURE_PCT:"Moisture",YIELD_T_HA:"Yield",DISEASE_SCORE:"Disease score",source_file:"Source file",_source_file:"Source file",row_id:"Source row",line_no:"File line",_line_no:"File line",
+const fieldNames={MOISTURE_PCT:"Moisture",YIELD_T_HA:"Yield",DISEASE_SCORE:"Disease score",source_file:"Source file",_source_file:"Source file",EXCLUDED_IRRIGATION_MISSED:"Excluded: irrigation missed",original_values:"Original corrected values",latest_corrections:"Latest applicable corrections",row_id:"Source row",line_no:"File line",_line_no:"File line",
  NUMBER_VALUE:"Observed value",TRAIT_CODE:"Trait",TRAIT_GUID:"Trait identifier",MATERIAL_ID:"Candidate",MATERIAL_GUID:"Material identifier",
  TRIAL_ID:"Trial",TRIAL_GUID:"Trial identifier",ENTRY_ROLE_LID:"Entry role",REPLICATION_NO:"Replication",UNIT:"Unit",
  recommendation_id:"Recommendation reference",revision_id:"Evidence revision",snapshot_id:"Source snapshot",rule_version:"Policy",
@@ -69,13 +69,13 @@ function marginDescription(c){
  if(c.margin===null)return c.value===null?"Missing evidence":"Category test";
  if(c.margin===0)return "At threshold";
  const distance=formatMetric(c.field,Math.abs(c.margin)),unit=c.unit==="%"?"pp":c.unit;
- return `${distance} ${unit} ${c.margin>0?"above":"below"} ${c.test===">="?"minimum":"maximum"}`;
+ return `${distance} ${unit} ${c.margin>0?"above":"below"} ${c.test===">="?"minimum":c.test==="<="?"maximum":"threshold"}`;
 }
 function sourceRows(host,rows,r){
  if(!rows.length){element("p","No source rows available for this criterion.",host);return;}
  const wrap=element("div","",host,"source-scroll");wrap.tabIndex=0;wrap.setAttribute("role","region");wrap.setAttribute("aria-label","Source observations");
  const table=element("table","",wrap,"source-table"),thead=element("thead","",table),head=element("tr","",thead);
- for(const title of ["Material / role","Trial","Measurement","Original value","Unit","Source record"])element("th",title,head).scope="col";
+ for(const title of ["Material / role","Trial","Measurement","Effective value","Unit","Source record"])element("th",title,head).scope="col";
  const body=element("tbody","",table);
  for(const original of rows){
   const entry=(r.evidence?.bridge||[]).find(b=>b.TRIAL_ENTRY_GUID===original.TRIAL_ENTRY_RELATIONSHIP_GUID);
@@ -86,7 +86,8 @@ function sourceRows(host,rows,r){
    readableLabel(original.TRAIT_CODE||trait?.TRAIT_CODE||original.OPERATION_TYPE_LID||"Record"),original.NUMBER_VALUE??original.GENOMIC_BREEDING_VALUE??original.STATUS_LID,
    original.UNIT||trait?.UNIT||"Not supplied"]){element("td",plainValue(value),row);}
   const cell=element("td","",row);const details=element("details","",cell);element("summary",original.source_file||"Source details",details);
-  definitionList(details,{row_id:original.row_id,line_no:original.line_no});
+  definitionList(details,{row_id:original.row_id,line_no:original.line_no,revision_id:original.revision_id});
+  if(Object.keys(original.original_values||{}).length){definitionList(details,{original_values:original.original_values,latest_corrections:original.latest_corrections});details.open=true;}
   const extra=element("details","",details);element("summary","All original fields",extra);definitionList(extra,original);
  }
 }
@@ -101,20 +102,22 @@ function renderCandidateEvidence(host,r){
  const dictionary=element("details","",host,"record-card");element("summary","Trait definitions and units",dictionary);renderData(dictionary,r.dictionary||[]);
 }
 function openCriterionEvidence(r,c){
+ const payload=r.criterion_evidence[c.field];
  openReader(`${r.material_id} - ${labels[c.field]||c.field}`,host=>{
-  element("p",glossary[c.field]||"Interpretation needs SME review.",host);
-  definitionList(host,{revision_id:r.revision_id,rule_version:r.rule_version,observed_value:c.value,unit:c.unit,comparison:c.test,threshold:c.threshold,assessment:c.status,distance_to_threshold:marginDescription(c)});
-  element("p","Observed value and source rows retain full precision. Displayed distance is rounded; scoring uses the unrounded value.",host,"small");
-  const payload=criterionEvidence(r,c.field);
-  const traitCode={YIELD_VS_CHECK_PCT:"YIELD_T_HA",MOISTURE_PCT_MEAN:"MOISTURE_PCT",DISEASE_SCORE_MEAN:"DISEASE_SCORE"}[c.field]||c.field;
-  for(const [name,all] of Object.entries(payload.source_rows)){
-   const rows=["observation","lab"].includes(name)?all.filter(x=>(x.TRAIT_CODE||(r.dictionary||[]).find(d=>d.TRAIT_GUID===x.TRAIT_GUID)?.TRAIT_CODE)===traitCode):all;
+  definitionList(host,{material_id:payload.material_id,snapshot_id:payload.snapshot_id,revision_id:payload.revision_id,
+   observed_value:c.value,unit:c.unit,comparison:c.test,threshold:c.threshold,assessment:c.status,margin:c.margin});
+  element("p",payload.calculation,host);
+  element("p","Effective values retain full precision. Original corrected values and the latest correction provenance are shown with each source row.",host,"small");
+  for(const [name,rows] of Object.entries(payload.source_rows)){
    const section=element("details","",host,"record-card");element("summary",`${readableLabel(name)} (${rows.length})`,section);
-   if(["observation","lab","genomics"].includes(name))section.open=true;
+   section.open=["observation","lab","genomics"].includes(name);
    if(["observation","lab"].includes(name))sourceRows(section,rows,r);else renderData(section,rows);
   }
-  if(payload.trial_comparisons){const d=element("details","",host,"record-card");element("summary","Trial comparisons and exclusions",d);renderData(d,payload.trial_comparisons);}
-  const d=element("details","",host,"record-card");element("summary","Active corrections",d);renderData(d,r.active_corrections||[]);
+  const trials=element("details","",host,"record-card");element("summary","Trial comparisons and exclusions",trials);
+  renderData(trials,payload.trial_comparisons);
+  const traits=element("details","",host,"record-card");element("summary","Matching trait definitions",traits);renderData(traits,payload.dictionary);
+  const corrections=element("details","",host,"record-card");element("summary","Correction history (including superseded)",corrections);renderData(corrections,payload.active_corrections);
+  uiButton(host,"View complete source evidence",()=>openReader(`${r.material_id} - complete source evidence`,body=>renderCandidateEvidence(body,r)));
  });
 }
 const toolTitles={get_candidate:"Candidate evidence",score_candidate:"Candidate assessment",get_candidate_rule:"Provisional policy",query_candidates:"Matching candidates",list_sources:"Source files",find_candidate:"Candidate identity"};
