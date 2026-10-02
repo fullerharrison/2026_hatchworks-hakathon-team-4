@@ -4,7 +4,9 @@
 The user requested preservation and a task-only commit, followed by temporary
 file cleanup. Synthetic WAVs, labels, hashes, raw results, logs, reports and
 research tooling are retained. Installed dependencies, model downloads, caches
-and pytest scratch files are disposable and removed after the artifact commit.
+and pytest scratch files were removed after artifact commit `475c736`.
+The [cleanup receipt](results/closure-2026-10-01.md#cleanup-receipt) records 16
+removed directories, 55 unchanged artifact hashes and zero task temp residue.
 Commands below are historical reconstruction guidance, not authorized next steps;
 the archived environment/model paths need not exist after cleanup.
 
