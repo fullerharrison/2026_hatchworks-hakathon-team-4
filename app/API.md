@@ -103,6 +103,8 @@ at a time while keeping manual evidence review available.
 (`ready` or `clarification`), `filters` (null for clarification), `clarification`
 and the snapshot/revision context. No list state or history is written.
 
+Prediction/forecast requests and yield percentage-point changes return actionable `clarification` with null `filters` before model access, including requests mixed with otherwise supported filters. These requests cannot be represented by the list-filter contract. The clarification path works without model configuration and never proposes partial filters. Supported list requests continue through model interpretation and strict proposal validation.
+
 `POST /filters/validate` accepts the same context plus edited `filters`; it returns
 validated filters, matching `total`, and context. The browser applies the returned
 filters only after an explicit Apply click, using existing `/candidates` and CSV

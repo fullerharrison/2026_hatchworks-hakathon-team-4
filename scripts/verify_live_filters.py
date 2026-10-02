@@ -28,6 +28,7 @@ try:
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.goto(runtime.url)
             expect(page.locator("#rows tr")).to_have_count(150)
+            page.locator("#advanced-filters > summary").click()
             page.locator("#filter-request").fill("Show AMBER candidates with at least three usable trials")
             with page.expect_response(lambda response: response.url.endswith("/filters/interpret"), timeout=90000) as response:
                 page.locator("#filter-interpret").click()

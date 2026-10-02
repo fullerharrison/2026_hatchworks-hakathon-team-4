@@ -32,10 +32,14 @@ flowchart LR
 | `candidate_history.py` | Snapshot copies, SQLite recommendations, revisions, decision/enrichment events and legacy imports |
 | `candidate_api.py` | Dashboard routes, validation, explicit writes, CSV, filter proposals and scoped Ask |
 | `candidate_server.py` | Read-only MCP contracts over current or pinned candidate evidence |
+| `filter_intent.py` | Strict typed list-filter proposals; deterministic clarification for manual-only queues, predictions, forecasts and yield percentage-point ambiguity before model access |
 | `agent.py`, `bridge.py`, `grounding.py`, `llm.py` | Tool orchestration, citation verification and configured gateway access |
 | `demo_runtime.py` | Isolated loopback server, owned socket, HTTP readiness and bounded shutdown for verification |
+| `static/answer-state.js`, `static/style.css` | Shared Vegetable palette and text-only answer-state presentation across candidate and historical trial screens |
 
 `uc4-ask serve` serves the dashboard/API on loopback port 8766. `uc4-mcp` independently exposes stdio or HTTP MCP (default HTTP port 8765). Both load the root `.env`; existing environment values win. `app/agent.toml` supplies model/agent defaults. Core workflows need no model configuration. Health exposes source/revision identity and configured model; it does not contact the gateway.
+
+The frontend completion cue requires backend status `answered` and nonempty response text. It identifies the submitted question and captured evidence context; it does not change grounding or recommendation semantics. Pending submissions clear the cue, and request sequence guards prevent stale responses from replacing newer presentation state. Answer styling belongs to the answer section inside the evidence reader, so source navigation remains separate. Shared brand tokens leave the semantic red, amber and green tokens unchanged.
 
 ## Evidence and provisional policy
 

@@ -85,6 +85,7 @@ try:
             expect(page.locator('#detail-title')).to_contain_text('SYN-MZ-00001')
             detail=page.request.get(url+'candidates/SYN-MZ-00001', max_retries=2).json()
             assert detail['rag']=='AMBER' and detail['metrics']['N_TRIALS_USED']==1
+            action('Expand all criteria',lambda:page.locator('#all-criteria > summary').click())
             moisture_index=next(i for i,c in enumerate(detail['assessments']) if c['field']=='MOISTURE_PCT_MEAN')
             row=page.locator('#criteria > tr').nth(moisture_index)
             action('Inspect moisture source and full precision',lambda:row.get_by_role('button',name='View evidence',exact=True).click())
@@ -110,6 +111,8 @@ try:
             report['ask']={k:answer[k] for k in ('status','text','citations','context','problems') if k in answer}
             report['ask_completed_seconds']=round(time.monotonic()-start,2)
             if answer.get('status')=='answered' and any(c['found'] for c in answer.get('citations',[])):
+                expect(page.locator('#answer')).to_have_attribute('data-answer-state', 'answered')
+                expect(page.locator('#answer .answer-status')).to_contain_text('Answered')
                 action('Open answer dialog',lambda:page.locator('#answer button').click())
                 action('Open answer citation',lambda:page.locator('.answer-sources button').first.click())
                 expect(page.locator('#evidence-dialog-body')).to_contain_text('SYN-MZ-00001')

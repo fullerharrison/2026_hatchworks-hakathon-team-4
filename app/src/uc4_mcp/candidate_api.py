@@ -21,7 +21,7 @@ from uc4_mcp.candidate_history import CandidateHistory, Conflict
 from uc4_mcp.candidate_server import default_history, create_candidate_server
 from uc4_mcp.llm import ChatModel, LLMError
 from uc4_mcp.models import to_json_safe
-from uc4_mcp.filter_intent import InterpretRequest, ValidateRequest, interpret, unsupported_queue
+from uc4_mcp.filter_intent import InterpretRequest, ValidateRequest, interpret, unsupported_request
 
 from uc4_mcp.api import LOCAL_ORIGINS, STATIC_DIR
 
@@ -165,7 +165,7 @@ def create_candidate_app(make_model, server: MCPServer | None = None,
         if not body.text.strip():
             raise HTTPException(422, "Enter a filter request.")
         try:
-            proposal = unsupported_queue(body.text) or await interpret(body.text, make_model())
+            proposal = unsupported_request(body.text) or await interpret(body.text, make_model())
         except LLMError as exc:
             raise HTTPException(503, str(exc)) from exc
         filter_context(body)

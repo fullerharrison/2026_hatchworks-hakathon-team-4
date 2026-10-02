@@ -22,6 +22,12 @@ Invoke-RestMethod http://127.0.0.1:8766/health
 
 The supplied baseline returns `status: ok`, `candidates: 150`, a snapshot hash and a revision ID. The `model` field reports configuration, not a successful gateway request. Browsing, manual filters, CSV export, decisions and enrichment work without model credentials.
 
+## Visual guidance
+
+Both screens use the Syngenta Vegetables palette: Plant Green headings, Air Blue actions and selected controls, and light blue information surfaces. Existing GREEN, AMBER and RED recommendation, warning and error colors retain their meanings.
+
+A completed, grounded Ask response shows a blue **Answered** label alongside the submitted question and its captured context. On mobile, the closed Ask launcher also indicates an available answered response. Submitting another question clears completion immediately. Clarification, unverified, unavailable and failed responses have their own labels and never receive the Answered cue. Answer completion is separate from a breeder decision or a GREEN recommendation.
+
 ## Question agent
 
 Ask and typed filter interpretation use the configured Portkey gateway. Each user supplies their own token and accessible model route:

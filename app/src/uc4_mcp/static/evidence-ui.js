@@ -154,8 +154,10 @@ function answerText(host,text,a){
   }
  }
 }
-function openAnswer(a){openReader(`Answer for ${a.context.candidate||"the dataset"}`,host=>{
- element("p",`Request context: ${a.context.candidate||"Dataset-wide"} / ${a.context.revision_id}`,host,"small");
+function openAnswer(a,question){openReader(`Answer for ${a.context?.candidate||"the dataset"}`,host=>{
+ answerState.set(host,answerState.classify(a));
+ if(question)answerState.question(host,question);
+ element("p",`Request context: ${a.context?.candidate||"Dataset-wide"} / ${a.context?.revision_id||"Unknown revision"}`,host,"small");
  if(a.status!=="answered")element("p",a.status==="unverified"?"This answer could not be verified. Review the source evidence.":readableLabel(a.status),host,"warn");
  const paragraphs=(a.text||"No answer returned.").split(/\n\s*\n/);
  answerText(host,paragraphs.shift(),a);

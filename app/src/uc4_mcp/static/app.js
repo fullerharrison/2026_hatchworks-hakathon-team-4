@@ -369,11 +369,14 @@ async function submitDecision(event) {
   }
 }
 
-function renderAnswer(res) {
+function renderAnswer(res, question) {
   const box = byId("answer");
   const a = res.data || {};
+  answerState.set(box, "error", false);
   if (res.status === 503) return show(box, el("p", { class: "warn", text: `Ask unavailable: ${a.text}` }));
   if (res.status !== 200) return show(box, el("p", { class: "error", text: errorMessage(res) }));
+  const responseState = answerState.classify(a);
+  if (responseState === "error") return show(box, el("p", { class: "error", text: "No usable answer returned. Please try again." }));
   const cites = a.citations || [];
   show(box,
     a.status === "unverified" ? el("p", { class: "warn" },
@@ -383,6 +386,8 @@ function renderAnswer(res) {
     cites.length ? el("ol", { class: "cites" }, cites.map((c) =>
       el("li", { text: c.found ? c.ref : `${c.ref} (not found)` }))) : null,
     a.disclaimer ? el("p", { class: "muted", text: a.disclaimer }) : null);
+  answerState.set(box, responseState);
+  answerState.question(box, question);
   if (a.status === "clarify") {
     renderCandidates(box.querySelector("#clarify"), "", a.candidates, (c) => {
       openTrial(c.id);
@@ -392,19 +397,27 @@ function renderAnswer(res) {
   highlight(cites.filter((c) => c.found).map((c) => c.ref));
 }
 
+let askSequence = 0;
 async function ask(question) {
+  const sequence = ++askSequence;
   const button = byId("ask-form").querySelector("button");
   button.disabled = true;
-  show(byId("answer"), el("p", { class: "muted", text: "Thinking..." }));
+  byId("ask-form").setAttribute("aria-busy", "true");
+  answerState.set(byId("answer"), "pending", false);
+  show(byId("answer"), el("p", { class: "muted", text: "Checking evidence…" }));
   try {
     const res = await post("/ask", { question, history: state.chat.slice(-10) });
-    renderAnswer(res);
+    if (sequence !== askSequence) return;
+    renderAnswer(res, question);
     if (res.status === 200 && res.data && res.data.text) {
       state.chat.push({ role: "user", content: question }, { role: "assistant", content: res.data.text });
       state.chat = state.chat.slice(-10);
     }
   } finally {
-    button.disabled = false;
+    if (sequence === askSequence) {
+      button.disabled = false;
+      byId("ask-form").setAttribute("aria-busy", "false");
+    }
   }
 }
 

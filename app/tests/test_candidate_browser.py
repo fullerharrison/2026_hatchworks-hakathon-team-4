@@ -651,7 +651,9 @@ def test_answer_popup_formats_text_safely_and_mobile_citation_back(screen):
     assert page.locator('#evidence-dialog-body img').count()==0
     page.locator('.answer-sources button').click()
     expect(page.locator('#evidence-dialog-body')).to_contain_text('AMBER')
+    expect(page.locator('#evidence-dialog-body [data-answer-state="answered"]')).to_have_count(0)
     page.locator('#evidence-back').click()
+    expect(page.locator('#evidence-dialog-body > section')).to_have_attribute('data-answer-state', 'answered')
     expect(page.locator('#evidence-dialog-body strong')).to_have_text('Moisture')
     page.screenshot(path=str(folder/'answer-dialog-mobile.png'))
     page.locator('#evidence-close').click()
@@ -1479,9 +1481,14 @@ def test_latest_decision_red_override_navigation_reload_and_matching_action(scre
     page.get_by_role('button', name='Browse original evidence', exact=True).click()
     expect(page.locator('#evidence-dialog-body')).to_contain_text('Original values are shown at full precision')
     page.locator('#evidence-close').click()
+    # Detail loads also refresh the table; wait before clicking a row that may
+    # otherwise be replaced between pointer down and pointer up.
+    expect(page.locator('#overview-status')).to_have_text('')
     page.locator('#rows tr').nth(1).click()
     expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder Undecided')
+    expect(page.locator('#overview-status')).to_have_text('')
     page.locator('#rows tr').filter(has_text=material).click()
+    expect(page.locator('#detail-title')).to_contain_text(material)
     expect(page.locator('#latest-decision-summary')).to_contain_text('Breeder ADVANCE \u00b7 Override')
     page.reload()
     expect(page.locator('#rows tr')).to_have_count(150)
@@ -2007,3 +2014,206 @@ def test_preferences_policy_unavailable_compatibility(screen, record):
         page.evaluate('async()=>{await loadList();}')
         assert page.evaluate('localStorage.getItem("uc4.preferences")') is None
         other.close()
+
+
+# Vegetable palette and answer completion; reuse the suite's isolated browser runtime.
+def vegetable_reply(status="answered", text="Retrieved evidence answer."):
+    return dict(status=status, text=text, context=dict(candidate="SYN-MZ-00001", revision_id="captured-revision"),
+                citations=[], tool_calls=[], disclaimer="Synthetic evidence")
+
+
+def submit_vegetable_question(page, question="Why is this candidate AMBER?"):
+    page.locator("#question").fill(question)
+    page.locator('#ask-form button[type="submit"]').click()
+
+
+def test_candidate_answer_completion_lifecycle_and_mobile(screen):
+    page, folder = screen
+    expect = playwright.expect
+    held = []
+    page.route("**/ask", lambda route: held.append(route))
+    page.locator("#rows tr").first.click()
+    expect(page.locator("#detail-title")).to_contain_text("SYN-MZ-00001")
+    submit_vegetable_question(page)
+    expect(page.locator("#answer")).to_have_attribute("data-answer-state", "pending")
+    expect(page.locator("#answer .answer-status")).to_have_count(0)
+    page.screenshot(path=str(folder / "pending-desktop.png"))
+    assert len(held) == 1
+    held.pop().fulfill(json=vegetable_reply())
+    expect(page.locator("#answer")).to_have_attribute("data-answer-state", "answered")
+    expect(page.locator("#answer .answer-status")).to_have_text("✓ Answered")
+    expect(page.locator("#answer .answer-question")).to_contain_text("Why is this candidate AMBER?")
+    assert page.locator("#answer").evaluate("el=>getComputedStyle(el).backgroundColor") == "rgb(230, 244, 248)"
+    page.screenshot(path=str(folder / "answered-desktop.png"))
+    page.locator("#rows tr").nth(1).click()
+    expect(page.locator("#ask-context")).to_contain_text("SYN-MZ-00002")
+    expect(page.locator("#answer")).to_contain_text("SYN-MZ-00001 / captured-revision")
+    page.locator("#answer button").click()
+    expect(page.locator("#evidence-dialog-body > section")).to_have_attribute("data-answer-state", "answered")
+    page.locator("#evidence-dialog").screenshot(path=str(folder / "answered-dialog-desktop.png"))
+    page.set_viewport_size(dict(width=390, height=844))
+    page.locator("#evidence-dialog").screenshot(path=str(folder / "answered-dialog-mobile.png"))
+    page.locator("#evidence-close").click()
+    expect(page.locator("#ask-launcher")).to_have_attribute("data-answer-state", "answered")
+    expect(page.locator("#ask-launcher")).to_have_accessible_name("Ask about evidence — Answered")
+    page.screenshot(path=str(folder / "answered-launcher-mobile.png"))
+    page.locator("#ask-launcher").click()
+    expect(page.locator("#ask-launcher")).to_have_attribute("data-answer-state", "idle")
+    submit_vegetable_question(page, "Another question")
+    expect(page.locator("#answer")).to_have_attribute("data-answer-state", "pending")
+    expect(page.locator("#answer .answer-status")).to_have_count(0)
+    page.screenshot(path=str(folder / "pending-mobile.png"))
+    page.locator("#ask-close").click()
+    held.pop().fulfill(json=vegetable_reply())
+    expect(page.locator("#ask-launcher")).to_have_attribute("data-answer-state", "answered")
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+
+
+@pytest.mark.parametrize("response,expected,label", [
+    (vegetable_reply("clarify"), "clarify", "More information needed"),
+    (vegetable_reply("unverified"), "unverified", "Response needs review"),
+    (vegetable_reply("error"), "error", None),
+    (vegetable_reply(text="   "), "error", None),
+    ({"status": "answered"}, "error", None),
+    (vegetable_reply("unknown"), "error", None),
+    (None, "error", None),
+])
+def test_candidate_nonanswers_never_show_completion(screen, response, expected, label):
+    page, folder = screen
+    expect = playwright.expect
+    page.route("**/ask", lambda route: route.fulfill(json=response) if response is not None
+               else route.fulfill(body="null", content_type="application/json"))
+    submit_vegetable_question(page)
+    expect(page.locator("#answer")).to_have_attribute("data-answer-state", expected)
+    expect(page.locator("#answer")).not_to_contain_text("Answered")
+    if label:
+        expect(page.locator("#answer .answer-status")).to_have_text(label)
+        page.locator("#answer button").click()
+        expect(page.locator("#evidence-dialog-body > section")).to_have_attribute("data-answer-state", expected)
+    else:
+        expect(page.locator("#answer button")).to_have_count(0)
+    page.screenshot(path=str(folder / (expected + "-desktop.png")))
+    page.set_viewport_size(dict(width=390, height=844))
+    expect(page.locator("#ask-launcher")).not_to_have_attribute("data-answer-state", "answered")
+    if label:
+        page.screenshot(path=str(folder / (expected + "-mobile.png")))
+
+
+def test_theme_status_colors_and_contrast(screen):
+    page, folder = screen
+    page.locator("#advanced-filters").evaluate("el=>el.open=false")
+    page.screenshot(path=str(folder / "dashboard-desktop.png"))
+    page.set_viewport_size(dict(width=390, height=844))
+    page.screenshot(path=str(folder / "dashboard-mobile.png"))
+    page.set_viewport_size(dict(width=1440, height=1100))
+    colors = {
+        "green": ["rgb(216, 240, 220)", "rgb(13, 61, 20)", "rgb(27, 122, 43)"],
+        "amber": ["rgb(255, 233, 168)", "rgb(74, 51, 0)", "rgb(176, 120, 0)"],
+        "red": ["rgb(251, 213, 213)", "rgb(107, 13, 13)", "rgb(179, 29, 29)"],
+    }
+    rows = page.request.get(page.url + "candidates").json()["rows"]
+    for status, expected in colors.items():
+        row = next(row for row in rows if row["rag"] == status.upper())
+        page.evaluate("id=>loadDetail(id)", row["material_id"])
+        banner = page.locator("#recommendation")
+        actual = banner.evaluate("el=>{const s=getComputedStyle(el);return [s.backgroundColor,s.color,s.borderLeftColor];}")
+        assert actual == expected
+        overview = page.locator("#rag-overview ." + status)
+        overview.click()
+        overview.hover()
+        assert overview.evaluate("el=>getComputedStyle(el).borderLeftColor") == expected[2]
+        page.screenshot(path=str(folder / (status + "-overview-desktop.png")))
+    protected = page.evaluate("""()=>{
+        const host=document.createElement('div');document.body.append(host);
+        const values={};for(const cls of ['warn','error','ok','bad','badge override','cited']){
+            const node=document.createElement('p');node.className=cls;node.textContent='Status';host.append(node);
+            const s=getComputedStyle(node);values[cls]=[s.backgroundColor,s.color,s.borderLeftColor,s.outlineColor];
+        }host.remove();return values;
+    }""")
+    assert protected["warn"][:3] == colors["amber"]
+    assert protected["error"][1] == colors["red"][1]
+    assert protected["ok"][1] == colors["green"][1]
+    assert protected["bad"][1] == colors["red"][1]
+    assert protected["badge override"][:2] == colors["amber"][:2]
+    assert protected["cited"][0] == "rgb(255, 243, 176)"
+    assert protected["cited"][3] == colors["amber"][2]
+    page.locator("#question").focus()
+    page.keyboard.press("Tab")
+    focus = page.evaluate("()=>{const s=getComputedStyle(document.activeElement);return [s.outlineStyle,s.outlineWidth,s.outlineColor];}")
+    assert focus == ["solid", "3px", "rgb(0, 103, 121)"]
+    pairs = page.evaluate("""()=>{
+        const primary=getComputedStyle(document.querySelector('#ask-form button[type=submit]'));
+        const heading=getComputedStyle(document.querySelector('h1'));
+        const root=getComputedStyle(document.documentElement);
+        return [[primary.color,primary.backgroundColor], [heading.color,getComputedStyle(document.body).backgroundColor],
+            [root.getPropertyValue('--air-strong'),root.getPropertyValue('--surface-info')],
+            [root.getPropertyValue('--air-strong'),root.getPropertyValue('--surface-selected')],
+            [root.getPropertyValue('--focus'),root.getPropertyValue('--surface-page')]];
+    }""")
+    import re
+    import json
+    def luminance(color):
+        color = color.strip()
+        values = [int(color[i:i+2], 16) for i in (1, 3, 5)] if color.startswith("#") else list(map(int, re.findall(r"\d+", color)))
+        linear = [v/255/12.92 if v/255 <= .04045 else ((v/255+.055)/1.055)**2.4 for v in values]
+        return sum(v*w for v, w in zip(linear, (.2126, .7152, .0722)))
+    ratios = []
+    for foreground, background in pairs:
+        light, dark = sorted([luminance(foreground), luminance(background)], reverse=True)
+        ratio = (light+.05)/(dark+.05)
+        assert ratio >= 4.5, (foreground, background, ratio)
+        ratios.append(dict(foreground=foreground, background=background, ratio=round(ratio, 2)))
+    (folder / "contrast.json").write_text(json.dumps(ratios, indent=2), encoding="utf-8")
+    page.set_viewport_size(dict(width=390, height=844))
+    page.screenshot(path=str(folder / "overview-mobile.png"))
+
+
+def test_trial_answer_completion_and_stale_response(screen):
+    import time
+    candidate_page, folder = screen
+    expect = playwright.expect
+    context = candidate_page.context.browser.new_context(viewport=dict(width=1366, height=900))
+    page = context.new_page()
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    held = []
+    page.route("**/trials", lambda route: route.fulfill(json=[]))
+    page.route("**/ask", lambda route: held.append(route))
+    def wait_for_held(count):
+        deadline = time.monotonic() + 10
+        while len(held) < count:
+            assert time.monotonic() < deadline, "Ask request was not intercepted"
+            page.wait_for_timeout(10)
+    try:
+        page.goto(candidate_page.url + "static/index.html")
+        page.locator("#ask-question").fill("First question")
+        page.locator("#ask-form button").click()
+        expect(page.locator("#answer")).to_have_attribute("data-answer-state", "pending")
+        page.evaluate("void ask('Newer question')")
+        page.wait_for_function("askSequence === 2")
+        # Complete the older request first: it must not change the newer pending state.
+        wait_for_held(2)
+        held.pop(0).fulfill(json=vegetable_reply())
+        expect(page.locator("#ask-form button")).to_be_disabled()
+        expect(page.locator("#answer")).to_have_attribute("data-answer-state", "pending")
+        held.pop(0).fulfill(json=vegetable_reply())
+        expect(page.locator("#answer")).to_have_attribute("data-answer-state", "answered")
+        expect(page.locator("#answer .answer-question")).to_have_text("Question: Newer question")
+        expect(page.locator("#ask-form button")).to_be_enabled()
+        page.screenshot(path=str(folder / "trial-answered-desktop.png"))
+        page.set_viewport_size(dict(width=390, height=844))
+        page.locator("#answer").scroll_into_view_if_needed()
+        page.screenshot(path=str(folder / "trial-answered-mobile.png"))
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+        for response, expected in [(vegetable_reply("unverified"), "unverified"), (vegetable_reply("clarify"), "clarify"), (vegetable_reply(text=""), "error")]:
+            response["candidates"] = []
+            page.evaluate("void ask('Follow-up')")
+            expect(page.locator("#answer")).to_have_attribute("data-answer-state", "pending")
+            page.wait_for_function("document.querySelector('#ask-form').getAttribute('aria-busy') === 'true'")
+            wait_for_held(1)
+            held.pop(0).fulfill(json=response)
+            expect(page.locator("#answer")).to_have_attribute("data-answer-state", expected)
+            expect(page.locator("#answer")).not_to_contain_text("Answered")
+        assert not errors, errors
+    finally:
+        context.close()

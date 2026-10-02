@@ -288,22 +288,36 @@ navigationObserver.observe($("ask-home"));navigationObserver.observe($("candidat
 $("ask-launcher").onclick=()=>{$("ask-dialog").showModal();$("question").focus();};
 $("ask-close").onclick=()=>{$("ask-dialog").close();$("ask-launcher").focus();};
 let askSequence=0,askBusy=false;
+function updateAskLauncher(){
+ const launcher=$("ask-launcher"),completed=$("answer").dataset.answerState==="answered"&&!$("ask-dialog").open;
+ launcher.textContent="Ask about evidence";
+ answerState.set(launcher,completed?"answered":"idle");
+ launcher.setAttribute("aria-label",completed?"Ask about evidence — Answered":"Ask about evidence");
+}
+$("ask-dialog").addEventListener("close",updateAskLauncher);
+$("ask-launcher").addEventListener("click",updateAskLauncher);
 const askUnavailable="Ask is unavailable right now. Your question has been kept. Try again shortly, or continue in Evidence.";
 $("ask-form").onsubmit=async e=>{
  e.preventDefault();if(askBusy)return;const sequence=++askSequence,r=state.detail;
  const body={question:$("question").value,history:[],candidate:r&&!$("ask-dataset").checked?r.material_guid:null,revision_id:r?.revision_id||null};
  const button=$("ask-form").querySelector('button[type="submit"]');
  askBusy=true;button.disabled=true;$("ask-form").setAttribute("aria-busy","true");
+ answerState.set($("answer"),"pending",false);updateAskLauncher();
  $("answer").textContent="Checking evidence… You can continue reviewing Evidence while waiting.";
  try{const a=await post("/ask",body);if(sequence!==askSequence)return;clear("answer");
-  if(a.status==="error"){
-   element("span",`Ask unavailable: ${a.context.candidate||"Dataset-wide"} / ${a.context.revision_id}`,$("answer"));
+  const responseState=answerState.classify(a);
+  if(responseState==="error"){
+   answerState.set($("answer"),"error",false);
+   element("span",`Ask unavailable: ${a?.context?.candidate||"Dataset-wide"} / ${a?.context?.revision_id||body.revision_id||"current revision"}`,$("answer"));
    element("p",askUnavailable,$("answer"),"warn");return;
   }
-  element("span",`${a.status==="answered"?"Answer ready":"Review response"}: ${a.context.candidate||"Dataset-wide"} / ${a.context.revision_id}`,$("answer"));
-  uiButton($("answer"),"View answer",()=>openAnswer(a));
+  element("span",`${a.status==="answered"?"Answer ready":"Review response"}: ${a.context?.candidate||"Dataset-wide"} / ${a.context?.revision_id||body.revision_id||"current revision"}`,$("answer"));
+  answerState.set($("answer"),responseState);
+  answerState.question($("answer"),body.question);
+  uiButton($("answer"),"View answer",()=>openAnswer(a,body.question));
  }catch(err){if(sequence===askSequence){
+  answerState.set($("answer"),"error",false);
   const message=[404,409,422].includes(err.status)?err.message:askUnavailable;
   $("answer").textContent=`Ask failed for ${r?.material_id||"dataset"} / ${body.revision_id||"current revision"}: ${message}`;
- }}finally{askBusy=false;button.disabled=false;$("ask-form").setAttribute("aria-busy","false");}
+ }}finally{if(sequence===askSequence){askBusy=false;button.disabled=false;$("ask-form").setAttribute("aria-busy","false");updateAskLauncher();}}
 };

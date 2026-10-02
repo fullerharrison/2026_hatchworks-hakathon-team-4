@@ -1,5 +1,6 @@
 """Typed filtering uses isolated history and never grants the model write tools."""
 import json
+import anyio
 
 import pytest
 from fastapi.testclient import TestClient
@@ -50,6 +51,35 @@ def test_new_queues_require_manual_controls_without_model_call(setup, text):
     assert result.status_code == 200 and result.json()['status'] == 'clarification'
     assert 'Review state controls' in result.json()['clarification']
     assert result.json()['filters'] is None and not model.seen and not history.decisions()
+
+
+@pytest.mark.parametrize('text', [
+    'Predict which candidates will thrive in coastal soil',
+    'Forecast candidate yield next season',
+    'Show GREEN candidates and predict which will thrive in coastal soil',
+    'Find yield improvement of three percentage points',
+    'Show GREEN candidates with a three percentage-point yield improvement',
+])
+def test_unsupported_requests_clarify_without_partial_filters_or_model(setup, text):
+    from uc4_mcp.filter_intent import interpret
+    history, model, client, context = setup
+    result = client.post('/filters/interpret', json={**context, 'text':text})
+    assert result.status_code == 200
+    assert result.json()['status'] == 'clarification' and result.json()['filters'] is None
+    assert 'No partial filters were proposed' in result.json()['clarification']
+    direct = anyio.run(interpret, text, model)
+    assert direct.status == 'clarification' and direct.filters is None
+    assert not model.seen and history.decisions() == [] and history.enrichment() == []
+
+
+def test_prediction_clarification_available_without_model_configuration(setup):
+    history, _, _, context = setup
+    def unavailable():
+        raise LLMError('Model unavailable')
+    client = TestClient(create_candidate_app(unavailable, get_history=lambda: history))
+    result = client.post('/filters/interpret', json={**context, 'text':'Predict candidate yield'})
+    assert result.status_code == 200 and result.json()['status'] == 'clarification'
+    assert result.json()['filters'] is None
 
 
 @pytest.mark.parametrize('filters', [

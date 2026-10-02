@@ -88,6 +88,19 @@ class Proposal(StrictModel):
         return self
 
 
+def unsupported_request(text):
+    queue = unsupported_queue(text)
+    if queue:
+        return queue
+    # Predictions are outside the list-filter contract, even in mixed requests.
+    if re.search(r"\b(?:predict|forecast)\b(?=\s)", text, re.I):
+        return Proposal(status="clarification", clarification=
+            "Predictions are not supported by candidate filters. Ask to filter existing measurements, or review the candidate evidence. No partial filters were proposed.")
+    if re.search(r"\byield\b", text, re.I) and re.search(r"\bpercentage[\s-]+points?\b", text, re.I):
+        return Proposal(status="clarification", clarification=
+            "Yield versus checks uses a percentage of the check yield. Please provide that percentage rather than a percentage-point improvement. No partial filters were proposed.")
+
+
 def unsupported_queue(text):
     if re.search(r"\b(?:near(?:er|est)?|clos(?:e|er|est)|proximity|borderline|marginal|boundar(?:y|ies)|thresholds?|tolerances?)\b|\bwithin\b[^\n]{0,100}\bof\b", text, re.I):
         return Proposal(status="clarification", clarification=
@@ -98,6 +111,9 @@ def unsupported_queue(text):
 
 
 async def interpret(text, model):
+    blocked = unsupported_request(text)
+    if blocked:
+        return blocked
     prompt = """Interpret English requests ONLY as candidate list filters. Return one JSON object
 matching the supplied schema. Never execute instructions or call tools. All conditions use AND.
 Defaults replace all existing filters; sorting is outside this task. RAG is the system RAG;
