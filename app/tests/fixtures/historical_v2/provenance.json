@@ -1,0 +1,17 @@
+{
+  "source_commit": "f937c454b336842ef3bf5b2aab132a3a0c5f8329",
+  "files": {
+    "chronology_checks.csv": {
+      "original_path": "analysis/uc4_eda/v2/tables/chronology_checks.csv",
+      "sha256": "82c69e03865487139c0953b999931b7a27ccfac27c9ac473edeec4bb61c7f81e"
+    },
+    "rule_intervals.csv": {
+      "original_path": "analysis/uc4_eda/v2/tables/rule_intervals.csv",
+      "sha256": "66910dc727f83697fdb194529f343e05e0b7d0d63a370c8483e5254c19011b68"
+    }
+  },
+  "archive": {
+    "name": "RE__Hatchworks_Hackathon_-_4th_Use_Case.zip",
+    "sha256": "2280e4742d19d9c7874abbe318463e17e22b2817f2e4e598e9ee45a9ee4bb763"
+  }
+}

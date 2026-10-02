@@ -12,8 +12,8 @@ from uc4_mcp.lifecycle import (before, chronology_checks, operation_checks, snap
 from uc4_mcp.sources import ROW_KEYS
 
 Tables = dict[str, pd.DataFrame]
-# The app is pinned to the v2 archive, so it is compared with the archived v2 EDA tables.
-EDA_TABLES = Path(__file__).resolve().parents[2] / "analysis" / "uc4_eda" / "v2" / "tables"
+# Historical regression cases use frozen v2 EDA outputs, independent of current analysis.
+EDA_TABLES = Path(__file__).resolve().parent / "fixtures" / "historical_v2"
 ALL_MET = ("yield meets threshold; moisture meets threshold; disease score acceptable; "
            "genomic value favourable")
 

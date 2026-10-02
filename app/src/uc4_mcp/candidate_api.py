@@ -7,11 +7,13 @@ import json
 from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from mcp.server.mcpserver import MCPServer
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictFloat, StrictStr
 
 from uc4_mcp.agent import AgentSettings, ask
 from uc4_mcp.bridge import open_bridge
@@ -19,6 +21,7 @@ from uc4_mcp.candidate_history import CandidateHistory, Conflict
 from uc4_mcp.candidate_server import default_history, create_candidate_server
 from uc4_mcp.llm import ChatModel, LLMError
 from uc4_mcp.models import to_json_safe
+from uc4_mcp.filter_intent import InterpretRequest, ValidateRequest, interpret
 
 from uc4_mcp.api import LOCAL_ORIGINS, STATIC_DIR
 
@@ -31,6 +34,8 @@ class Turn(BaseModel):
 class AskRequest(BaseModel):
     question: str = Field(min_length=1, max_length=2000)
     history: list[Turn] = Field(default_factory=list, max_length=20)
+    candidate: str | None = None
+    revision_id: str | None = None
 
 
 class DecisionRequest(BaseModel):
@@ -50,7 +55,7 @@ class EnrichmentDraft(BaseModel):
     table: str | None = None
     row_id: str | None = None
     field: str | None = None
-    value: str | float | None = None
+    value: StrictStr | StrictFloat | None = None
     unit: str | None = None
     actor: str
     reason: str
@@ -81,6 +86,15 @@ def create_candidate_app(make_model, server: MCPServer | None = None,
                          settings: AgentSettings = AgentSettings(),
                          get_history=default_history) -> FastAPI:
     app = FastAPI(title="UC4 candidate breeder assistant")
+
+    @app.exception_handler(RequestValidationError)
+    async def filter_validation_error(request, exc):
+        if request.url.path in {"/filters/interpret", "/filters/validate"}:
+            # Never echo raw inputs (including nonfinite numbers) into an error response.
+            return JSONResponse(status_code=422, content={"detail": [
+                {"loc": list(error["loc"]), "msg": error["msg"], "type": error["type"]}
+                for error in exc.errors()]})
+        return await request_validation_exception_handler(request, exc)
     server = server or create_candidate_server(get_history)
     app.add_middleware(CORSMiddleware, allow_origin_regex=LOCAL_ORIGINS,
                        allow_methods=["GET", "POST"], allow_headers=["*"])
@@ -123,6 +137,43 @@ def create_candidate_app(make_model, server: MCPServer | None = None,
             model = None
         return dict(status="ok", candidates=len(h.store().by_guid), snapshot_id=h.snapshot_id,
                     revision_id=h.active_revision(), model=model)
+
+    def filter_context(body):
+        store = history().store()
+        if (body.snapshot_id, body.revision_id) != (store.snapshot_id, store.revision_id):
+            raise HTTPException(409, "Evidence changed. Refresh the list and interpret again.")
+        return store
+
+    def validate_filters(store, filters):
+        if filters.search and not any(filters.search.lower() in
+                (r["material_id"] + r["material_guid"]).lower() for r in store.by_guid.values()):
+            raise HTTPException(422, "Unknown candidate ID or GUID. Edit the candidate filter.")
+        return len(store.query(filters.query(), history().latest()))
+
+    @app.post("/filters/interpret")
+    async def interpret_filters(body: InterpretRequest):
+        store = filter_context(body)
+        if not body.text.strip():
+            raise HTTPException(422, "Enter a filter request.")
+        try:
+            proposal = await interpret(body.text, make_model())
+        except LLMError as exc:
+            raise HTTPException(503, str(exc)) from exc
+        filter_context(body)
+        if proposal.filters is not None:
+            validate_filters(store, proposal.filters)
+        return dict(**proposal.model_dump(), snapshot_id=store.snapshot_id, revision_id=store.revision_id)
+
+    @app.post("/filters/validate")
+    def validate_filter_proposal(body: ValidateRequest):
+        store = filter_context(body)
+        count = validate_filters(store, body.filters)
+        return dict(filters=body.filters.model_dump(), total=count,
+                    snapshot_id=store.snapshot_id, revision_id=store.revision_id)
+
+    @app.get("/rule")
+    def rule():
+        return history().store().rule()
 
     @app.get("/candidates")
     def candidates(search: str | None = None, rag: str | None = None,
@@ -248,13 +299,28 @@ def create_candidate_app(make_model, server: MCPServer | None = None,
     @app.post("/ask")
     async def ask_endpoint(body: AskRequest):
         try:
+            store = history().store(body.revision_id)
+        except ValueError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        selected = result_or_http(store.resolve(body.candidate)) if body.candidate else None
+        context = dict(snapshot_id=store.snapshot_id, revision_id=store.revision_id,
+                       candidate=selected["material_id"] if selected else None)
+        question = body.question
+        if selected:
+            question = (f"Selected candidate context: {selected['material_id']}. "
+                        "Use this for 'this candidate'; explicit references to other candidates take precedence. "
+                        "Identify the candidates actually used in your answer.\nQuestion: " + question)
+        try:
             model = make_model()
         except LLMError as exc:
             raise HTTPException(503, str(exc)) from exc
-        async with open_bridge(server) as bridge:
-            answer = await ask(body.question, model=model, bridge=bridge,
+        request_server = create_candidate_server(get_history, pinned_store=store)
+        async with open_bridge(request_server) as bridge:
+            answer = await ask(question, model=model, bridge=bridge,
                                history=[t.model_dump() for t in body.history], settings=settings)
-        return to_json_safe(answer)
+        result = to_json_safe(answer)
+        result["context"] = context
+        return result
 
     @app.get("/trials/{query}")
     @app.get("/lines/{query}")

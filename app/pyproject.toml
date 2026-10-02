@@ -30,13 +30,13 @@ build-backend = "uv_build"
 testpaths = ["tests"]
 # analysis/uc4_eda/ has test modules with the same basenames and no __init__.py.
 # Live-model tests spend tokens; run them explicitly with -m live.
-# Browser tests need Chrome and the browser group; run them with -m browser.
+# Browser tests need matching Playwright Chromium (or Chrome override) and the browser group.
 addopts = "--import-mode=importlib -m \"not live and not browser\""
 # Lets test_checks reuse test_lifecycle's synthetic tables, and tests import fakes.py.
 pythonpath = ["tests"]
 markers = [
     "live: calls the real model through Portkey (needs PORTKEY_API_KEY)",
-    "browser: drives the breeder screen in Chrome with real input (needs --group browser)",
+    "browser: drives the breeder screen with real input (needs --group browser and installed browser assets)",
 ]
 
 [dependency-groups]

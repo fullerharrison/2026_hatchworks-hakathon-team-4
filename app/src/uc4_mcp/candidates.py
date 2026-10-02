@@ -15,6 +15,17 @@ METRICS = ["YIELD_VS_CHECK_PCT", "DISEASE_SCORE_MEAN", "MOISTURE_PCT_MEAN",
            "COLD_TEST_PCT", "N_TRIALS", "N_TRIALS_USED"]
 SCORING_FIELDS = METRICS + ["MARKER_DISEASE_RESISTANCE"]
 ACTIONS = {"GREEN": "ADVANCE", "AMBER": "HOLD", "RED": "DISCARD"}
+GATES = [("YIELD_VS_CHECK_PCT", ">=", 103), ("DISEASE_SCORE_MEAN", "<=", 4),
+         ("MOISTURE_PCT_MEAN", "<=", 23), ("GERMINATION_PCT", ">=", 90),
+         ("FUMONISIN_PPM", "<=", 4), ("N_TRIALS_USED", ">=", 2)]
+KNOCKOUTS = [("YIELD_VS_CHECK_PCT", "<", 95), ("DISEASE_SCORE_MEAN", ">", 6), ("FUMONISIN_PPM", ">", 4)]
+WARNINGS = [("MOISTURE_PCT_MEAN", ">", 25), ("GERMINATION_PCT", "<", 85)]
+UNITS = {"YIELD_VS_CHECK_PCT": "%", "DISEASE_SCORE_MEAN": "score", "MOISTURE_PCT_MEAN": "%",
+         "GERMINATION_PCT": "%", "FUMONISIN_PPM": "ppm", "N_TRIALS_USED": "trials"}
+
+
+def policy_tests(specs):
+    return [dict(field=f, test=op, threshold=v, unit=UNITS[f]) for f, op, v in specs]
 LABELS = {"YIELD_VS_CHECK_PCT": "Yield versus checks", "DISEASE_SCORE_MEAN": "Disease score",
           "MOISTURE_PCT_MEAN": "Moisture", "GERMINATION_PCT": "Germination", "FUMONISIN_PPM": "Fumonisin",
           "N_TRIALS_USED": "Usable trials", "MARKER_DISEASE_RESISTANCE": "Disease resistance marker"}
@@ -68,9 +79,7 @@ class CandidateStore:
 
     def _recommendation(self, row):
         metrics = {k: row.get(k) for k in SCORING_FIELDS}
-        specs = [("YIELD_VS_CHECK_PCT", ">=", 103), ("DISEASE_SCORE_MEAN", "<=", 4),
-                 ("MOISTURE_PCT_MEAN", "<=", 23), ("GERMINATION_PCT", ">=", 90),
-                 ("FUMONISIN_PPM", "<=", 4), ("N_TRIALS_USED", ">=", 2)]
+        specs = GATES
         criteria = []
         for field, op, threshold in specs:
             value = metrics[field]
@@ -80,8 +89,7 @@ class CandidateStore:
         criteria.append(dict(field="MARKER_DISEASE_RESISTANCE", value=marker,
                              test="in", threshold=["RESISTANT", "INTERMEDIATE"],
                              passed=bool(pd.notna(marker) and marker in ("RESISTANT", "INTERMEDIATE"))))
-        knockouts = [field for field, op, limit in [("YIELD_VS_CHECK_PCT", "<", 95),
-                     ("DISEASE_SCORE_MEAN", ">", 6), ("FUMONISIN_PPM", ">", 4)]
+        knockouts = [field for field, op, limit in KNOCKOUTS
                      if pd.notna(metrics[field]) and (metrics[field] < limit if op == "<" else metrics[field] > limit)]
         warnings = []
         if metrics["N_TRIALS_USED"] == 0:
@@ -148,6 +156,11 @@ class CandidateStore:
         rec["reviewed_metadata"] = {item["field"]: item for item in self.overlays
                                     if item["kind"] == "metadata" and item["material_guid"] == guid and item["field"] != "NOTE"}
         rec["metadata_note"] = "Synthetic maize-like demo. Absent pedigree, stage and trial location are unknown. Lab values have no trial key."
+        rec["assessments"] = [dict(c, unit=UNITS.get(c["field"], "category"),
+            margin=(c["value"] - c["threshold"] if c["value"] is not None and c["test"] != "in" else None),
+            status="Unknown" if c["value"] is None else "Meets gate" if c["passed"] else "Outside GREEN target")
+            for c in rec["criteria"]]
+        rec["policy"] = self.rule()
         return {"status": "ok", "result": rec}
 
     def query(self, filters: dict | None = None, latest: dict | None = None):
@@ -210,4 +223,9 @@ class CandidateStore:
     def rule(self):
         return dict(rule_version=RULE_VERSION, provisional=True, precision="Unrounded calculations; presentation only is rounded",
                     outcomes=[{"rag": rag} for rag in ACTIONS],
-                    criteria=thresholds().to_dict("records"), no_field_data_precedence="AMBER")
+                    criteria=thresholds().to_dict("records"), no_field_data_precedence="AMBER",
+                    gates=policy_tests(GATES) + [dict(field="MARKER_DISEASE_RESISTANCE", test="in",
+                        threshold=["RESISTANT", "INTERMEDIATE"], unit="category")],
+                    knockouts=policy_tests(KNOCKOUTS), warnings=policy_tests(WARNINGS),
+                    context_only=["COLD_TEST_PCT", "GENOMIC_BREEDING_VALUE"],
+                    missing_data="Missing required values do not pass GREEN gates; zero usable trials takes AMBER precedence.")

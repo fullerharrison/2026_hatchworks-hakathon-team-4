@@ -17,3 +17,35 @@ app/data/
 # pytest basetemp scratch (root and per-folder)
 .test-tmp*/
 dist/
+.tasks/**/pytest-tmp/
+.tasks/**/.test-tmp*/
+.tasks/**/test-tmp*/
+.tasks/**/__pycache__/
+.tasks/**/.pytest_cache/
+.tasks/**/evidence/
+.tasks/
+
+# Local environment variants; retain the setup template
+.env.*
+!.env.example
+
+# Python build artifacts and tool caches
+*.py[cod]
+*.egg-info/
+build/
+.ruff_cache/
+.mypy_cache/
+.pyre/
+
+# Test coverage output
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# OS-generated clutter
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+notes.md

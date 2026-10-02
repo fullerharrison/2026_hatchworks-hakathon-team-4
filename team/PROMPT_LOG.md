@@ -72,3 +72,196 @@ Implemented a shared analysis/runtime reconstruction module, candidate HTTP/MCP 
 Validation: full offline application suite **416 passed, 10 deselected**; full analysis suite **82 passed**; combined candidate/historical browser suite **9 passed**; candidate browser rerun **1 passed** after UI refinements. The final source-audit refinement was checked with **13 candidate migration tests passed** and JavaScript syntax validation. Analysis regeneration reports **150/150** matches using supplied and source precision. MCP stdio, uv client launch and HTTP transport pass. `git diff --check` passes. Live-model evaluation was not run; the candidate evaluation set and its offline tool oracles were updated and checked. Tests use isolated databases/logs and workspace temporary directories. Original archives and historical decision payloads were retained.
 
 Evidence: [current app guide](../app/README.md), [architecture](../app/ARCHITECTURE.md), [candidate migration tests](../app/tests/test_candidate_migration.py), [browser workflow](../app/tests/test_candidate_browser.py), and [current analysis](../analysis/uc4_eda/report.html).
+
+## 2026-10-01: core breeder usability implementation
+
+User selected core usability first (01/03, read-only 02, manual 06, 08), sticky
+desktop Ask/mobile launcher, and opt-in tab-session alias; then explicitly
+requested implementation. Codex inspected source/API/UI contracts, produced the
+plan, implemented the core, designed regression checks and independently
+recomputed four source cases. Human SME and breeder usability review remain
+pending. Deferred scenarios, full preferences, voice/NL, enrichment redesign and
+pilot discovery remain outside this implementation.
+
+Source comparison confirms all 150 recommendation records equal pre-change
+HEAD. Targeted checks passed (64); four usability contracts passed after final
+backend refinements. Final browser run: **5 passed**, including retry-after-lost-response and
+revision/candidate context isolation. Full offline suite: 411 passed; nine
+failures/errors reference missing historical-v2 generated CSVs. A live Ask
+retry returned a grounded answer with three resolved citations. Retained
+failures include sandbox connection failure, first-load initialization race
+(fixed), and an incorrect no-data test expectation (corrected against source).
+
+See [implementation record and evidence](../.tasks/uc4-breeder-usability/implementation.md).
+No human approval, measured time saving or vegetable policy validation is claimed.
+
+
+## 2026-10-01: AMBER workflow review, fixture repair and timed rehearsal
+
+User requested review of one AMBER candidate through source inspection, live
+Ask and HOLD; repair of missing historical test fixtures; and a seven-minute
+rehearsal using isolated history. Codex performed the browser actions against
+fresh SQLite stores, noted usability friction, recovered independent historical
+CSV oracles byte-for-byte from Git, and ran the full default and browser suites.
+No application/UI changes were bundled into this follow-up.
+
+Results: 421 offline tests passed; 13 browser tests passed. Both live AMBER
+workflows returned grounded answers and recorded exactly one HOLD per isolated
+store, retaining the original AMBER recommendation. The timed automated
+rehearsal completed at 420.00 seconds with scheduled narration pauses. This is
+not human breeder feedback, measured time savings or a spoken team rehearsal.
+
+Observed friction: dense source JSON; signed-margin direction; original versus
+display precision; tall Ask answers with literal Markdown markers; selection
+reset after reload. These remain proposals for follow-up, not implemented fixes.
+The original missing-fixture failures are retained in the earlier evidence;
+restored fixtures carry Git/source hashes rather than regenerated app outputs.
+
+See [review results and evidence](../.tasks/uc4-breeder-usability/review-and-rehearsal.md)
+and [operator script](../.tasks/uc4-breeder-usability/demo-script.md).
+
+
+## 2026-10-01: readable evidence dialogs
+
+User requested popup/page detail navigation and no pure JSON in application
+views. Codex replaced inline JSON with trait-filtered source tables and labeled
+record views, moved full Ask answers/citations into dialogs, added Back/Close
+focus restoration and clarified margin direction. Data/API/scoring behavior
+remains unchanged. The browser tests verify safe text rendering, source scope,
+full precision, preserved decision drafts and original answer context.
+
+Validation: 421 offline tests passed; 7 candidate browser tests passed. Desktop
+and mobile source dialogs were visually inspected. The existing rehearsal
+harness was adapted to the new controls without claiming another live/timed
+rehearsal. See [popup verification](../.tasks/uc4-breeder-usability/popup-update.md).
+
+
+## 2026-10-01: task 04 saved preferences
+
+The user requested explicit opt-in name/context defaults, restored filters and
+selection, Reset and Forget, while keeping decisions/reasons/scoring separate.
+After inspecting the existing tab alias and decision reset behavior, Codex
+proposed browser-local storage rather than extending the decision database.
+The user selected one browser profile, explicit Save for defaults plus a separate
+resume opt-in, and Reset of the view only, then instructed "execute plan".
+Multi-profile and policy-setting persistence from the earlier task preview were
+deferred by that choice.
+
+Codex added the preference panel, versioned local storage, source compatibility
+checks, reset/forget request invalidation and browser tests. No backend or scoring
+changes were needed. Saved preferences remain self-declared conveniences, not
+identity verification. Tests use isolated histories and synthetic evidence.
+
+Validation: 421 offline tests passed; all 22 browser scenarios passed across the
+suite and targeted reruns, including an actual browser close/reopen. Initial
+Playwright setup failures and their fixes are recorded, along with desktop/mobile
+screenshots, in [task 04 verification](../.tasks/uc4-breeder-usability/preferences-update.md).
+Human breeder timing and biological review were not performed.
+## 2026-10-01 — Task 05 typed natural-language filters
+
+The user requested typed filter interpretation before voice, with an editable
+preview and explicit Apply, excluding decision recording and scoring changes.
+After repository inspection, the user chose the existing model connection,
+replacement of active filters with sorting retained, and direct preview editing,
+then instructed “Implement the plan.”
+
+Codex added narrowly typed interpretation/validation routes and the candidate
+filter preview, preserving selected-candidate/manual drafts and opt-in view
+persistence. Tests compare the AMBER / usable-trial request with manual filtering
+and CSV, reject invalid bounds/units and stale context, and exercise desktop/mobile
+confirmation and cancellation. No source-note retrieval or write tool is exposed.
+
+AI-assisted review found and fixed a nonfinite-number error serialization issue.
+The first network-enabled model evaluation matched 13/14 cases; it exposed an
+underspecified excluded-trial field. Adding its definition produced 14/14 on the
+same set, recorded as a regression rerun rather than fresh held-out accuracy.
+Screenshot inspection led to collapsing unused range editors on mobile.
+
+Actual commands, counts, failed attempts and limitations are recorded in
+[task 05 verification](../.tasks/uc4-breeder-usability/task05-evidence/verification.md).
+Human breeder validation and independent review are pending; voice remains deferred.
+
+## 2026-10-01 - Task 07 guided manual evidence enrichment
+
+User request: implement the approved task 07 plan after a short task 05
+walkthrough. The user confirmed Interpret/edit/Apply behavior was clear and
+selected coverage of all existing evidence types plus the local self-review model.
+
+Codex traced source-row selection, review states, supersession, revision activation
+and historical decisions; implemented typed manual controls, field definitions,
+provenance validation, source/current/proposed comparisons and explicit action
+confirmations. Voice and natural-language writes remain deferred. No agents were
+delegated and no model-generated evidence was supplied as real measurements.
+
+AI-assisted verification included lifecycle/API cases, browser walkthroughs,
+mobile screenshot review, stale activation and deliberately delayed responses.
+Inspection identified a compressed mobile table, a stale-button cleanup bug and
+a response-order refresh race; these were corrected and covered by checks.
+Synthetic 92.25% and 93.25% corrections are labeled hypothetical. Human confirmation
+applies to the task 05 walkthrough and task 07 scope, not independent code review,
+biological validation or a measured breeder productivity study.
+
+See [task 07 verification and screenshots](../.tasks/uc4-breeder-usability/task07-evidence/verification.md)
+for actual commands, results, source identity, limitations and implementation details.
+
+### 2026-10-01 - Task 06 manual confirmation and history
+
+- User: manual breeder decision flow with fewer inputs, clear confirmation and
+  traceable history; keep voice and natural-language writes deferred.
+- Codex inspected the existing compact form, saved preferences and transactional
+  decision contract. User selected inline review and requested implementation.
+- Implemented an immutable confirmation snapshot, explicit final write, retry and
+  conflict handling, saved receipts, and original recommendation/evidence access.
+- Retained existing validation/defaults; rejected automatic reuse of reasons or
+  choices and any natural-language write integration for this slice.
+- Verification and limitations: [.tasks task 06 record](../.tasks/uc4-breeder-usability/task06-evidence/verification.md).
+  No human breeder measurement or biological validation is claimed.
+
+### 2026-10-01 - Demo-readiness and self-guided breeder review
+
+- User requested the updated rehearsal, full workflow, reliable browser startup
+  and breeder timing/error review; selected a self-guided pack when asked.
+- Rehearsal now reviews before writing and reopens original evidence after reload.
+  A shared isolated runtime replaces cold per-case subprocesses and verifies HTTP
+  readiness. Browser contexts and history databases remain separate per test.
+- Full candidate browser suite: 31 passed. Fresh-process repeat: six passed.
+  Lifecycle test verified three starts/stops and active-store isolation.
+- Live synthetic workflow passed with three resolved citations; offline fallback
+  passed separately. The initial connection-reset failure is retained in evidence.
+- Prepared a session launcher, blank worksheets, task cards and feedback prompts.
+  Actual human measurements remain pending; automated timings are not substituted.
+- [Verification and evidence](../.tasks/uc4-breeder-usability/demo-readiness.md).
+
+
+## P01 follow-up implementation - 2026-10-02 UTC
+
+User approved explicit Record another decision gating and candidate section tabs,
+then requested implementation. Added saved-state handling across navigation and
+reload, preserved retry/conflict semantics, shortened initial Ask presentation
+with expandable detail, and made Recorded by prominent. API/schema, scoring and
+historical events remain unchanged; voice/NL writes remain deferred.
+
+Verification: 40 candidate browser cases, 64 relevant agent/grounding/API cases,
+and six final navigation/viewport checks passed. Offline and live rehearsals
+passed; live Ask had three verified citations and no grounding problems. Original
+extra-save trigger remains unknown. A fresh targeted breeder retest is prepared,
+not claimed complete. See ../.tasks/uc4-breeder-usability/followup-evidence/verification.md.
+
+
+## 2026-10-02 - Local team handoff wrap-up
+
+User requested functional readiness and updated process, architecture and README documentation, using the saved breeder-usability handoff. Selected local team handoff, both breeder/developer process guides and fresh live AI checks; then instructed Continue with plan.
+
+Restored credential-free .env.example, consolidated README/setup guidance, updated runtime architecture/API docs and added app/PROCESS.md. Packaging now includes the process guide and historical regression fixtures/provenance. Full offline suite: 473 passed; candidate browser suite: 40 passed; live filter evaluation: 14/14 cases; live Ask walkthrough: three verified citations and no grounding/browser errors. Real browser filter interpretation/validation/application passed without history writes. A fresh extracted locked package passed checksum/manifest, static assets, documentation links and single-event restart persistence; its documented candidate subset passed 69 tests.
+
+Evidence and remaining human/domain checks are recorded in .tasks/uc4-breeder-usability/wrap-up-verification.md and handoff.md. A local dirty-working-tree ZIP was generated; no commit, deployment, publication or external distribution occurred. Human retest gaps, spoken team rehearsal and biological validation remain explicit.
+
+
+### Nontechnical breeder review launcher
+
+User asked how to run human review as a nontechnical breeder. Added Start-Breeder-Review.cmd, a plain-language app/HUMAN_REVIEW.md, and browser opening after readiness in the isolated session launcher. Smoke check passed; regenerated the package with 86 inputs and repeated clean-folder checksum/manifest, startup, assets, links and restart-persistence verification successfully. No actual human completion is claimed.
+
+
+### Gateway failure during human review
+
+User reported model HTTP 500 errors in session 20261002T140233Z-402f06. Read-only session health was OK. A tiny model call timed out; a plain-text request without tools/candidate data returned a Bedrock unexpected-error 500; the exact SYN-MZ-00099 Ask in isolated storage timed out. The current live route has not recovered in verification. Improved Ask failure presentation and prevented overlapping submissions while retaining question/context and allowing later retry. 43 browser tests and 60 offline agent/gateway tests passed. Updated package passed clean-folder manifest/checksum, assets, links, startup and persistence checks. Active review records were preserved. See .tasks/uc4-breeder-usability/gateway-issue.md for evidence and remaining external-service recovery requirement.

@@ -4,7 +4,7 @@
 
 ## Rules for every role
 
-This page records the original v2 build-role agreement. The current implemented architecture is in [app/ARCHITECTURE.md](../app/ARCHITECTURE.md), and the executed [demo review](../.tasks/uc4-demo-review/task.md) records current evidence and agent reviewers. The app remains a historical v2 demo. The [replacement candidate analysis](../analysis/uc4_eda/report.html) supersedes previous analysis assumptions; a candidate-level runtime migration is still required. Human team-owner cells remain unassigned here.
+This page preserves the original v2 build-role agreement below. The current app is the implemented 150-candidate demo over eight source tables; historical v2 is an explicit compatibility mode. See [current architecture](../app/ARCHITECTURE.md), [candidate analysis](../analysis/uc4_eda/report.html), and the [current seven-minute demo script](../.tasks/uc4-breeder-usability/demo-script.md). The historical role descriptions and interfaces below are not current runtime contracts. Human team-owner cells remain unassigned here.
 
 1. **Evidence first.** Every claim in the app, deck or one-pager cites a CSV row, a brief/handbook page or a test result. If there is no source, label it **proposal** or **inferred**.
 2. **AI does not decide.** Plain code sets red/amber/green; AI interprets the question and writes the answer *from the retrieved rows*. The breeder makes the final call. [Recommendation](../use-cases/RECOMMENDATION.md#ai-inside-the-product)

@@ -15,6 +15,7 @@ from pathlib import Path
 from uc4_mcp.candidate_core import KEYS, ZIP_PATH, load_current
 from uc4_mcp.candidates import ACTIONS, CandidateStore, validate_tables
 from uc4_mcp.decisions import log_path
+from uc4_mcp.models import to_json_safe
 
 DEFAULT_DB = Path(__file__).resolve().parents[2] / "data" / "candidate_history.sqlite3"
 ALLOWED_CORRECTIONS = {
@@ -222,8 +223,11 @@ class CandidateHistory:
         if result["status"] != "ok":
             raise ValueError(result["message"])
         guid = result["result"]["material_guid"]
-        if not actor.strip() or len(reason.strip()) < 5 or not source or not observed_at:
-            raise ValueError("Author, source, observation time and reason are required")
+        for label, text in (("Author", actor), ("Evidence source", source), ("When observed", observed_at)):
+            if not isinstance(text, str) or not text.strip():
+                raise ValueError(f"{label} is required")
+        if len(reason.strip()) < 5:
+            raise ValueError("Why change it: enter at least 5 characters")
         try:
             dt.datetime.fromisoformat(observed_at)
         except (ValueError, TypeError) as exc:
@@ -253,12 +257,14 @@ class CandidateHistory:
                 if match.iloc[0]["ATTACHED_TO_FIELD_ENTITY_ID"] not in trials:
                     raise ValueError("Operation is outside candidate trials")
             if field == "NUMBER_VALUE" or field in {"GENOMIC_BREEDING_VALUE", "DELAY_DAYS"}:
-                if not isinstance(value, (int, float)) or not math.isfinite(value):
+                if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
                     raise ValueError("Measurement must be a finite number")
                 if table in ("lab", "observation"):
                     trait = self.tables["dictionary"].set_index("TRAIT_GUID").loc[match.iloc[0]["TRAIT_GUID"]]
                     if unit != trait.UNIT:
                         raise ValueError(f"Expected unit {trait.UNIT}")
+                elif unit not in (None, "", "index" if field == "GENOMIC_BREEDING_VALUE" else "days"):
+                    raise ValueError("Expected unit " + ("index" if field == "GENOMIC_BREEDING_VALUE" else "days"))
             elif not (field == "ACTUAL_DATE" and value is None) and (not isinstance(value, str) or not value.strip()):
                 raise ValueError("Correction requires a value")
             if field == "MARKER_DISEASE_RESISTANCE" and value not in {"RESISTANT", "INTERMEDIATE", "SUSCEPTIBLE"}:
@@ -276,6 +282,12 @@ class CandidateHistory:
             table, row_id = "germplasm", guid
         else:
             raise ValueError("Choose correction or metadata")
+        current = [x for x in self.store().overlays
+                   if (x["table"], x["row_id"], x["field"]) == (table, str(row_id), field)]
+        if supersedes and (not current or supersedes != current[-1]["id"] or field == "NOTE"):
+            raise ValueError("Replace an earlier addition: choose the current addition for this field and source row")
+        if current and field != "NOTE" and supersedes != current[-1]["id"]:
+            raise ValueError("Replace an earlier addition: explicitly select the current addition")
         event = dict(id=uuid.uuid4().hex, material_guid=guid, kind=kind, table=table,
                      row_id=str(row_id), field=field, value=value, unit=unit, actor=actor.strip(),
                      reason=reason.strip(), observed_at=observed_at, source=source,
@@ -328,12 +340,39 @@ class CandidateHistory:
         before = self.store(active)
         changed = [dict(material_id=rec["material_id"], before=rec["rag"],
                         after=after.by_guid[guid]["rag"],
-                        before_metrics=rec["metrics"], after_metrics=after.by_guid[guid]["metrics"])
+                        before_metrics=rec["metrics"], after_metrics=after.by_guid[guid]["metrics"],
+                        before_reason=rec["reason"], after_reason=after.by_guid[guid]["reason"],
+                        before_warnings=rec["warnings"], after_warnings=after.by_guid[guid]["warnings"])
                    for guid, rec in before.by_guid.items()
                    if rec["metrics"] != after.by_guid[guid]["metrics"] or rec["rag"] != after.by_guid[guid]["rag"]]
         return dict(base_revision=active, item_id=item_id, affected=changed,
                     candidate_count=len(changed), overlay_count=len(overlays) + 1,
-                    source_warnings=after.source_warnings)
+                    source_warnings=after.source_warnings, snapshot_id=self.snapshot_id,
+                    source_change=self._source_change(item, before, overlays))
+
+    def _source_change(self, item, before, overlays):
+        prior = [x for x in overlays if (x["table"], x["row_id"], x["field"]) ==
+                 (item["table"], item["row_id"], item["field"])]
+        original = None
+        trait_code = None
+        unit = item["unit"]
+        if item["kind"] == "correction":
+            frame = self.tables[item["table"]]
+            row = frame[frame[KEYS[item["table"]]].astype(str) == item["row_id"]].iloc[0]
+            trait_code = row.get("TRAIT_CODE")
+            original = to_json_safe(row[item["field"]])
+            if isinstance(original, float) and not math.isfinite(original):
+                original = None
+            if item["field"] == "NUMBER_VALUE":
+                trait = self.tables["dictionary"].set_index("TRAIT_GUID").loc[row["TRAIT_GUID"]]
+                unit, trait_code = trait.UNIT, trait.TRAIT_CODE
+            elif item["field"] in {"GENOMIC_BREEDING_VALUE", "DELAY_DAYS"}:
+                unit = "index" if item["field"] == "GENOMIC_BREEDING_VALUE" else "days"
+        return dict(kind=item["kind"], material_id=before.by_guid[item["material_guid"]]["material_id"],
+                    table=item["table"], row_id=item["row_id"], field=item["field"], trait_code=trait_code,
+                    original=original, current=prior[-1]["value"] if prior and item["field"] != "NOTE" else original,
+                    proposed=item["value"], unit=unit, source=item["source"], observed_at=item["observed_at"],
+                    reason=item["reason"], supersedes=item["supersedes"])
 
     def activate(self, item_id: str, base_revision: str, actor: str, reason: str):
         if not actor.strip() or len(reason.strip()) < 5:

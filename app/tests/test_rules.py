@@ -20,8 +20,8 @@ from uc4_mcp.rules import (
 )
 
 Tables = dict[str, pd.DataFrame]
-# The app is pinned to the v2 archive, so it is compared with the archived v2 EDA tables.
-EDA_TABLES = Path(__file__).resolve().parents[2] / "analysis" / "uc4_eda" / "v2" / "tables"
+# Historical regression cases use frozen v2 EDA outputs, independent of current analysis.
+EDA_TABLES = Path(__file__).resolve().parent / "fixtures" / "historical_v2"
 
 PASSING = {"YIELD_T_HA": 10.0, "MOISTURE_PCT": 18.0, "DISEASE_SCORE": 3.0,
            "GENOMIC_BREEDING_VALUE_MEAN": 106.0, "RESISTANT_MATERIAL_PCT": 50.0}

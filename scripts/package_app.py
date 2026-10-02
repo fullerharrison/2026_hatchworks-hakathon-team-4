@@ -11,12 +11,15 @@ EXPECTED = "c195330223d0e3bb334dc9c2e1f338a37f058f5cb3b564d9d2140c7a5011da46"
 
 
 def build():
-    files = ["SHARE.md", ".env.example", "Start-Dashboard.cmd", "scripts/package_app.py", SOURCE,
+    files = ["SHARE.md", ".env.example", "Start-Dashboard.cmd", "Start-Breeder-Review.cmd",
+             "scripts/package_app.py", "scripts/review_session.py", "scripts/rehearse.py",
+             "scripts/verify_live_filters.py", "scripts/verify_package.py", SOURCE,
              "app/pyproject.toml", "app/uv.lock", "app/.python-version", "app/agent.toml",
-             "app/README.md", "app/API.md", "app/ARCHITECTURE.md",
+             "app/README.md", "app/API.md", "app/ARCHITECTURE.md", "app/PROCESS.md", "app/HUMAN_REVIEW.md", "app/RELEASE_NOTES.md",
              "app/evals/questions.json", "app/evals/questions_v2.json"]
     for directory, extensions in [("app/src", {".py", ".html", ".css", ".js"}),
-                                   ("app/tests", {".py"})]:
+                                   ("app/tests", {".py"}),
+                                   ("app/tests/fixtures", {".csv", ".json", ".md"})]:
         files.extend(p.relative_to(ROOT).as_posix() for p in (ROOT / directory).rglob("*")
                      if p.is_file() and p.suffix in extensions and "__pycache__" not in p.parts)
     payloads = {name: (ROOT / name).read_bytes() for name in sorted(set(files))}

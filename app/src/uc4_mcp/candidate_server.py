@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import functools
 import json
+import threading
 from typing import Any
 
 from mcp.server.mcpserver import MCPServer
@@ -15,18 +16,30 @@ from uc4_mcp.candidate_history import CandidateHistory
 READ_ONLY = ToolAnnotations(read_only_hint=True, idempotent_hint=True)
 
 
+_history_lock = threading.Lock()
+
+
 @functools.cache
-def default_history():
+def _cached_history():
     return CandidateHistory()
 
 
-def create_candidate_server(get_history=default_history):
+def default_history():
+    # The rule and shortlist requests can arrive together on first page load.
+    with _history_lock:
+        return _cached_history()
+
+
+def create_candidate_server(get_history=default_history, *, pinned_store=None):
     server = MCPServer("uc4-candidates")
+
+    def evidence_store():
+        return pinned_store if pinned_store is not None else get_history().store()
 
     @server.custom_route("/health", methods=["GET"])
     async def health(_request: Request) -> JSONResponse:
         try:
-            store = get_history().store()
+            store = evidence_store()
             return JSONResponse(dict(status="ok", server="uc4-candidates", candidates=len(store.by_guid),
                                      sources=len(store.tables), snapshot_id=store.snapshot_id, revision_id=store.revision_id))
         except Exception as exc:
@@ -35,27 +48,27 @@ def create_candidate_server(get_history=default_history):
     @server.tool(description="List the eight CSV source members, row counts and archive SHA-256 for the synthetic maize-like candidate dataset.", annotations=READ_ONLY)
     def list_sources() -> dict[str, Any]:
         history = get_history()
-        store = history.store()
-        return {"status": "ok", "result": {"snapshot_id": history.snapshot_id,
+        store = evidence_store()
+        return {"status": "ok", "result": {"snapshot_id": store.snapshot_id,
                 "revision_id": store.revision_id,
                 "files": [{"table": key, "source_file": frame._source_file.iloc[0], "rows": len(frame)}
                           for key, frame in store.tables.items()]}}
 
     @server.tool(description="Find a candidate by material ID or GUID, or a fragment. An ambiguous match returns candidates to choose from.", annotations=READ_ONLY)
     def find_candidate(query: str) -> dict[str, Any]:
-        return get_history().store().resolve(query)
+        return evidence_store().resolve(query)
 
     @server.tool(description="Get one candidate's provisional GREEN/AMBER/RED recommendation, raw and reconstructed evidence, trials, checks, lab and genomics. Cite evidence_row_ids or [tool:get_candidate].", annotations=READ_ONLY)
     def get_candidate(query: str) -> dict[str, Any]:
         h = get_history()
-        envelope = h.store().detail(query)
+        envelope = evidence_store().detail(query)
         if envelope["status"] == "ok":
             envelope["result"]["decisions"] = h.decisions(envelope["result"]["material_guid"])
         return envelope
 
     @server.tool(description="Score one candidate with provisional candidate rule; returns criteria, unrounded metrics, knockouts, warnings and source citation.", annotations=READ_ONLY)
     def score_candidate(query: str) -> dict[str, Any]:
-        return get_history().store().resolve(query)
+        return evidence_store().resolve(query)
 
     @server.tool(description="List all matching candidates by optional RAG or search text. Returns total and rows; the default includes every candidate. Cite [tool:query_candidates].", annotations=READ_ONLY)
     def query_candidates(rag: str | None = None, search: str | None = None,
@@ -67,7 +80,7 @@ def create_candidate_server(get_history=default_history):
         try:
             if offset < 0 or not 1 <= limit <= 500:
                 raise ValueError("Use offset >=0 and limit between 1 and 500")
-            store = history.store()
+            store = evidence_store()
             rows = store.query({k: v for k, v in dict(rag=rag, search=search,
                       marker=marker, decision=decision, ranges=ranges,
                       include_missing=include_missing, excluded=excluded).items() if v is not None}, history.latest())
@@ -81,7 +94,7 @@ def create_candidate_server(get_history=default_history):
 
     @server.tool(description="Read the complete provisional candidate scoring policy, warning thresholds, no-field-data precedence and rounding policy. Cite [tool:get_candidate_rule].", annotations=READ_ONLY)
     def get_candidate_rule() -> dict[str, Any]:
-        return {"status": "ok", "result": get_history().store().rule()}
+        return {"status": "ok", "result": evidence_store().rule()}
 
     @server.tool(description="Retired trial scoring contract. Candidate data requires score_candidate with a material ID.", annotations=READ_ONLY)
     def score_trial(query: str) -> dict[str, Any]:
@@ -93,7 +106,7 @@ def create_candidate_server(get_history=default_history):
 
     @server.tool(description="Compare provisional recommendations to the supplied RAG for every candidate, without claiming the biological rule is confirmed.", annotations=READ_ONLY)
     def baseline_check() -> dict[str, Any]:
-        rows = list(get_history().store().by_guid.values())
+        rows = list(evidence_store().by_guid.values())
         return {"status": "ok", "result": {"checked": len(rows),
                 "matched": sum(r["matches_supplied"] for r in rows),
                 "mismatches": [r["material_id"] for r in rows if not r["matches_supplied"]]}}
@@ -101,7 +114,7 @@ def create_candidate_server(get_history=default_history):
     @server.resource("uc4://candidate-rule", name="candidate-rule", mime_type="application/json",
                      description="Current provisional candidate scoring policy and thresholds.")
     def rule_resource() -> str:
-        return json.dumps(get_history().store().rule(), allow_nan=False)
+        return json.dumps(evidence_store().rule(), allow_nan=False)
 
     @server.resource("uc4://sources", name="sources", mime_type="application/json",
                      description="Current candidate archive identity and source members.")

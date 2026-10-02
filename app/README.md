@@ -1,75 +1,119 @@
 # UC4 candidate breeder assistant
 
-The default app now uses `get_started/candidate_recommendations_synthetic.zip`: 150 candidate recommendations, two check varieties and eight source tables. The synthetic baseline is **32 GREEN, 53 AMBER and 65 RED**. Scoring is provisional; the breeder records ADVANCE, HOLD or DISCARD.
+The dashboard combines field, operation, lab and genomic evidence for breeder review. The supplied archive contains **150 candidates, two check varieties and eight source tables**. Its baseline is **32 GREEN, 53 AMBER and 65 RED**. System recommendations use provisional deterministic rules; breeders independently record ADVANCE, HOLD or DISCARD.
 
-## Run
+The data are a maize-like synthetic demonstration for the vegetable-seed challenge. Crop thresholds still require biological validation.
 
-On Windows, double-click `Start-Dashboard.cmd` in the repository root to launch the app and open a browser. For group setup and packaging, see [SHARE.md](../SHARE.md).
+## Start the dashboard
 
-From the repository root, with Python 3.12+ and uv:
+On Windows, double-click **Start-Dashboard.cmd** in the repository or extracted package root. Install uv first if needed; see [team setup](../SHARE.md). The launcher installs locked dependencies, starts the server and opens the browser after startup.
 
-```powershell
-uv run --project app uc4-ask serve
-```
-
-Keep that terminal open: the command runs continuously while serving the dashboard. Open
-[the breeder dashboard](http://127.0.0.1:8766/) in your browser using **http**, or run this in a second PowerShell window:
+From that root folder:
 
 ```powershell
-Start-Process 'http://127.0.0.1:8766/'
+uv run --locked --project app uc4-ask serve --open-browser
 ```
 
-The terminal reports `Application startup complete` and logs incoming requests. To check connectivity from a second terminal, run `Invoke-RestMethod http://127.0.0.1:8766/health`; a running candidate app returns `status: ok` and `candidates: 150` for the supplied baseline. Press Ctrl+C in the server terminal to stop it.
-
-For MCP clients, use these separate commands:
+Use [http://127.0.0.1:8766/](http://127.0.0.1:8766/). Keep the terminal open; Ctrl+C stops the server. If the port is occupied, stop the previous server or add `--port 8767`. In a second terminal, check readiness:
 
 ```powershell
-uv run --project app uc4-mcp
-uv run --project app uc4-mcp --transport http --port 8765
+Invoke-RestMethod http://127.0.0.1:8766/health
 ```
 
-The screen, filtering, evidence, decisions and enrichment work without a model key. Ask and the terminal question commands use the existing Portkey configuration (`PORTKEY_API_KEY` and `app/agent.toml`). Both commands load the repository `.env`; existing shell settings win.
+The supplied baseline returns `status: ok`, `candidates: 150`, a snapshot hash and a revision ID. The `model` field reports configuration, not a successful gateway request. Browsing, manual filters, CSV export, decisions and enrichment work without model credentials.
 
-For each new user, copy the root `.env.example` to `.env`, fill in their own
-`PORTKEY_API_KEY` and an accessible `UC4_LLM_MODEL` route, then restart the server.
-Leave optional fields blank unless required by their Portkey configuration. Never
-share the completed `.env`; see [group setup instructions](../SHARE.md).
+## Question agent
 
-`UC4_ZIP` selects a compatible candidate archive. `UC4_CANDIDATE_DB` selects the SQLite history file, defaulting to `app/data/candidate_history.sqlite3`. Source archives are copied under the database directory's `snapshots/`, named by SHA-256. Keep the database and snapshot directory together when backing up or moving the app. Configuring a different compatible archive selects its baseline on restart and preserves earlier revisions and decisions.
+Ask and typed filter interpretation use the configured Portkey gateway. Each user supplies their own token and accessible model route:
+
+```powershell
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+notepad .env
+```
+
+Set `PORTKEY_API_KEY` and `UC4_LLM_MODEL`; leave optional routing fields blank unless required. Restart after editing. Both application commands load the root `.env`, and existing shell variables take precedence. Keep credentials private.
+
+```powershell
+uv run --locked --project app uc4-ask ping
+uv run --locked --project app uc4-ask ask "Why is SYN-MZ-00001 AMBER? Cite the evidence."
+```
+
+Ask stays above the desktop workspace and opens from a persistent launcher on mobile. It captures the selected candidate and evidence revision, or dataset-wide scope. **View answer** opens a short answer, **More detail** expands it, and citations open the evidence captured with that response. Back returns to the answer. Request context and verification warnings remain visible. Ask accepts one request at a time; the question remains editable and you can review evidence while waiting. A model/gateway failure shows a plain-language unavailable message, keeps your question and re-enables Ask for a later retry. A failed request is not presented as an answer.
 
 ## Breeder workflow
 
-- Start with the entire candidate list. Combine RAG, identifier, marker, breeder decision, excluded-trial and trait-range filters. Ranges use AND; missing values are included only when selected. Download CSV exports every matching result.
-- Select a candidate to inspect criteria, raw source rows, calculated trial comparisons, exclusions, lab/genomic evidence and previous decisions. Calculation precision is retained in the evidence.
-- Record a choice with name, reason, location or meeting, and source channel. Enter `unknown` when location is unavailable. Names are self-declared and unverified. A choice captures the exact recommendation and evidence revision shown; stale choices are rejected for refresh.
-- Add notes or metadata, or propose a measurement/operation correction by source row. Supply observation time, source and rationale. Submit the draft, approve or reject it, then preview all changed measurements and recommendations before activation. A reviewer may be the author in this local demo.
-- Source inconsistencies introduced by a correction are displayed in the preview and candidate evidence. For an actual-date correction, enter `unknown` to explicitly clear the date. Review records preserve each submission, approval/rejection and activation.
-- Activate an approved change to create a new evidence/recommendation revision. Changes to check observations can affect several candidates. Earlier choices remain tied to their original recommendation. A further correction must explicitly supersede the prior correction; notes can accumulate.
+For a separate practice session, double-click **Start-Breeder-Review.cmd** in the main folder. Follow the [short breeder review guide](HUMAN_REVIEW.md); the launcher opens your browser and keeps practice decisions separate from the team's records.
 
-No-data candidates stay AMBER. Moisture >25% and germination <85% are warnings, not independent RED knockouts. Genomic breeding value and cold-test vigour are contextual. Pedigree, stage and location are unknown unless separately enriched. The data remain a maize-like synthetic demonstration for the vegetable-seed challenge.
+1. Filter the list by recommendation, identifier, marker, breeder decision, exclusions or inclusive trait ranges. Filters combine with AND. Missing values are included in range results only when selected. Download CSV exports every matching candidate.
+2. Select a candidate. Use **Evidence**, **Decision**, **History** and **Enrichment** tabs. Field help is available by hover, keyboard focus or tap. Open **Provisional rules** and criterion evidence to inspect thresholds, signed margins, original source rows and trial comparisons. Displayed measurements use two decimals; calculations retain full precision.
+3. In **Decision**, enter your self-declared name, choice and reason. Check the editable review context, initially **Unknown / Breeder review**. Choose **Review decision**, inspect the proposed event and evidence revision, then **Record decision**. **Edit** returns to the form without saving.
+4. The saved receipt replaces the entry form. History identifies **Recorded by** and can reopen the original recommendation and evidence. **Record another decision** explicitly starts a later entry and shows the previous decision during review. If a response is lost, retry the same confirmation; it retains its request ID. A changed recommendation or latest decision requires fresh review.
+5. For new context or a correction, use the guided **Enrichment** form: save draft, submit, approve or reject with a review reason, preview impact, then explicitly activate with a separate name and reason. Activation creates an evidence revision; earlier decisions retain their original evidence.
+
+See [process guide](PROCESS.md) for enrichment details, persistence and maintainer checks.
+
+### Saved preferences
+
+Open **Preferences** above the filters and choose **Save preferences** to store your name and default location/meeting and source channel. Separately opt into **Remember filters and selected candidate** to restore filters, ranges, sorting and selection. Preferences are local to that browser and app address, across restarts; names are unverified.
+
+**Reset** clears the current and saved view while retaining saved identity/context. **Forget my preferences** removes both, clears the view and turns remembering off. Use it when finished on a shared browser. Recorded history remains intact. A different source dataset clears the saved view with a notice, and restored candidates load current evidence. Storage errors do not block manual review.
+
+Decision choices/reasons, trial/site context, evidence drafts, filter requests and AI previews are never saved as preferences. Unsaved decision input is not restored after reload.
+
+### Typed filters
+
+In **Find candidates**, enter a request such as "Show AMBER candidates with at least three usable trials" and choose **Interpret**. Review and optionally edit the proposal, then choose **Apply filters**. Apply replaces filters and retains sorting, selection and unsaved decision/evidence drafts; **Cancel** leaves the view unchanged.
+
+The model receives the request and filter definitions and has no tools. Unsupported or ambiguous conditions require a revised request. Strict greater/less comparisons, OR, category negation and unit conversions are outside the supported slice. Manual filters remain available after model errors. Editing the request, changing manual filters, Reset or an observed evidence revision change invalidates the pending proposal; the server also rejects stale context.
+
+## Storage and configuration
+
+| Setting | Default / purpose |
+| --- | --- |
+| `UC4_ZIP` | `get_started/candidate_recommendations_synthetic.zip`; a compatible source archive |
+| `UC4_CANDIDATE_DB` | `app/data/candidate_history.sqlite3`; decisions, enrichment, recommendations and revisions |
+| `UC4_DECISION_LOG` | `app/data/decisions.jsonl`; legacy import input, or historical-mode decision log |
+| `app/agent.toml` | Gateway defaults and question-agent limits; environment overrides model/base URL |
+
+Source copies live in `snapshots/` beside the SQLite database and are named by SHA-256. Back up the database and snapshots together while the server is stopped. Restarting with another compatible archive selects its baseline and preserves earlier revisions and decisions. See [backup and restore](PROCESS.md#backup-and-restore).
 
 ## Interfaces
 
-See the [API and MCP reference](API.md) for routes, tools, filters and pagination. The MCP interface is read-only; decisions and enrichment use explicit HTTP requests.
-
-## Historical v2
+The dashboard/API uses port 8766. Start a separate read-only MCP interface for clients:
 
 ```powershell
-uv run --project app uc4-ask serve --historical-v2 --port 8767
-uv run --project app uc4-mcp --historical-v2
+uv run --locked --project app uc4-mcp
+uv run --locked --project app uc4-mcp --transport http --port 8765
 ```
 
-Historical mode requires the original v2 archive. If `UC4_ZIP` is set, point it at `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case.zip` for that process. Original source files and JSONL logs are preserved. The current app imports `UC4_DECISION_LOG` (default `app/data/decisions.jsonl`) idempotently; it does not invent missing v2 snapshot identity or turn old trial decisions into candidate decisions.
+MCP exposes candidate lookup, policy, scoring and source evidence. Decisions and enrichment require explicit HTTP writes. See [API reference](API.md) and [runtime architecture](ARCHITECTURE.md).
 
 ## Verification
 
+Run from the repository root:
+
 ```powershell
-uv run --project app pytest -q app/tests
-uv run --project app --group browser pytest -q -m browser app/tests/test_candidate_browser.py
-python -m pytest -q analysis/uc4_eda/test_candidates.py
-python analysis/uc4_eda/uc4_eda.py
+uv run --locked --project app pytest -q app/tests -p no:cacheprovider --basetemp .test-tmp-local-offline
+uv run --locked --project app --group browser python -m playwright install chromium
+uv run --locked --project app --group browser pytest -q -m browser app/tests/test_candidate_browser.py -p no:cacheprovider --basetemp .test-tmp-local-browser
+uv run --locked --project app pytest -q -s -m live app/tests/test_filter_intent_live.py -p no:cacheprovider --basetemp .test-tmp-local-live
 ```
 
-The default app suite excludes browser and live-model tests. Analysis requires pandas and matplotlib. On Windows, pass a fresh writable `--basetemp` directory and `-p no:cacheprovider` if the shared pytest temporary directory is inaccessible. Browser checks use installed Chrome. Live-model evaluations are opt-in: `uc4-ask eval` uses the candidate questions; `app/evals/questions_v2.json` retains historical questions.
+Use a fresh writable basetemp directory for each run. The default suite excludes browser and live tests; the full suite also requires the original v2 archive for legacy regressions. The handoff ZIP contains only the current source archive. In that package, use the candidate checks described in [developer verification](PROCESS.md#developer-verification).
 
-See [current architecture](ARCHITECTURE.md), [analysis](../analysis/uc4_eda/report.html) and [SME questions](../team/SME_ANSWERS.md). Dataset reproduction confirms implementation consistency, not biological policy approval.
+Candidate browser tests use matching Playwright Chromium, a fresh browser context per test, isolated history and an independent loopback server. Set `UC4_BROWSER_CHANNEL=chrome` to check installed Chrome separately. Live tests use the configured gateway and spend model tokens; skipped tests do not establish live readiness.
+
+The repository and team ZIP provide `scripts/rehearse.py` for isolated offline/live walkthroughs. See [human review](HUMAN_REVIEW.md) and [release notes](RELEASE_NOTES.md) for review instructions and readiness limits.
+
+## Historical v2 and limitations
+
+Historical trial mode requires the original v2 source archive, available only in the full repository/source delivery:
+
+```powershell
+uv run --locked --project app uc4-ask serve --historical-v2 --port 8767
+uv run --locked --project app uc4-mcp --historical-v2
+```
+
+If `UC4_ZIP` is set, point it at `get_started/RE__Hatchworks_Hackathon_-_4th_Use_Case.zip` for that process. Legacy JSONL imports are idempotent, preserve original payloads and do not turn trial decisions into candidate decisions. Frozen historical regression oracles and provenance live in `app/tests/fixtures/historical_v2/`.
+
+No-data candidates remain AMBER. Moisture above 25% and germination below 85% are warnings; GREEN requires its separate gates. Genomic breeding value and cold-test vigour are contextual. Lab evidence remains material-level; trial geography and pedigree/stage are unknown unless separately supported. Names and reviews are self-declared; an author may review their own addition in this local demo. Voice, natural-language writes and editable scoring policy remain deferred. Automated checks do not establish breeder comprehension, team presentation readiness or biological validity.
