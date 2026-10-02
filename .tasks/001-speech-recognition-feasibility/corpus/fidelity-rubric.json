@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "scope": "fixture_specific_diagnostics_not_general_intent_or_slot_parser",
+  "equivalence_policy": "Only case-insensitive literal terms and declared number-word/digit forms; never modify transcripts",
+  "clips": {
+    "question-01": {"domain_term": ["\\bcandidate\\b", "\\bamber\\b"]},
+    "question-02": {"domain_term": ["\\btrials\\b", "\\bcandidate\\b"]},
+    "question-03": {"domain_term": ["\\bfumonisin\\b"]},
+    "filter-01": {"numeric": ["(?<![\\w.])(?:90|ninety)(?!\\w|\\.\\d)"], "unit": ["(?:\\bpercent\\b|%)"], "domain_term": ["\\bgermination\\b"]},
+    "filter-02": {"numeric": ["(?<![\\w.])(?:87\\.5|eighty[ -]+seven[ -]+point[ -]+five)(?!\\w|\\.\\d)"], "unit": ["(?:\\bpercent\\b|%)"], "domain_term": ["\\bcold[ -]+test\\b"]},
+    "filter-03": {"numeric": ["(?<![\\w.])(?:17|seventeen)(?!\\w|\\.\\d)", "(?<![\\w.])(?:70|seventy)(?!\\w|\\.\\d)"], "unit": ["\\btrials\\b"], "domain_term": ["\\btrials\\b"], "negation": ["\\bat[ -]+least[ -]+(?:17|seventeen)[ -]+trials[\\s,.;:!]*not[ -]+(?:70|seventy)(?!\\w|\\.\\d)"]},
+    "preference-01": {"domain_term": ["\\breview[ -]+location\\b", "\\bstation[ -]+a\\b"]},
+    "preference-02": {"domain_term": ["\\bfilters\\b"]},
+    "preference-03": {"numeric": ["(?<![\\w.])(?:90|ninety)(?!\\w|\\.\\d)"], "unit": ["(?:\\bpercent\\b|%)"], "domain_term": ["\\bminimum\\b", "\\bgreen\\b"]},
+    "value-01": {"numeric": ["(?<![\\w.])(?:87\\.5|eighty[ -]+seven[ -]+point[ -]+five)(?!\\w|\\.\\d)"], "unit": ["(?:\\bpercent\\b|%)"], "domain_term": ["\\bcold[ -]+test\\b"]},
+    "value-02": {"numeric": ["(?<![\\w.])(?:0\\.8|zero[ -]+point[ -]+eight)(?!\\w|\\.\\d)"], "unit": ["\\bppm\\b"], "domain_term": ["\\bfumonisin\\b"]},
+    "value-03": {"numeric": ["\\bchange[ -]+(?:85|eighty[ -]+five)[ -]+to[ -]+(?:90|ninety)(?!\\w|\\.\\d)"], "unit": ["(?:\\bpercent\\b|%)"]}
+  }
+}

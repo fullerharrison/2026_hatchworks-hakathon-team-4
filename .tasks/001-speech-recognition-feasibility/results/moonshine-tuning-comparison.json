@@ -1,0 +1,1504 @@
+{
+  "schema_version": 1,
+  "started_at_utc": "2026-10-02T00:24:50.832263+00:00",
+  "finished_at_utc": "2026-10-02T00:43:55.994541+00:00",
+  "comparison_wall_seconds": 1145.0693279999978,
+  "budget_seconds": 2400,
+  "settings": "SDK update interval only; no thread flags",
+  "rubric_path": "corpus/fidelity-rubric.json",
+  "rubric_sha256": "26be1c0ced2fa46874d1178ae63de7fd802b71be12fbc51467886abf722ecd4f",
+  "historical_baseline": {
+    "path": "results/moonshine-synthetic-3x.json",
+    "summary": {
+      "utterance": {
+        "successful_runs": 66,
+        "failed_runs": 0,
+        "first_repetition_speech_clips": 12,
+        "reference_words": 76,
+        "word_errors": 19,
+        "synthetic_wer": 0.25,
+        "stop_to_final_seconds": {
+          "count": 36,
+          "p50": 3.4225368999977945,
+          "p95": 4.598371400003089
+        },
+        "realtime_factor": {
+          "count": 36,
+          "p50": 1.1251755692311025,
+          "p95": 1.3497287366167559
+        },
+        "silence_runs": 30,
+        "nonempty_silence_runs": 0
+      },
+      "native_streaming": {
+        "successful_runs": 66,
+        "failed_runs": 0,
+        "first_repetition_speech_clips": 12,
+        "reference_words": 76,
+        "word_errors": 19,
+        "synthetic_wer": 0.25,
+        "stop_to_final_seconds": {
+          "count": 36,
+          "p50": 2.5487590999982785,
+          "p95": 4.521160399999644
+        },
+        "realtime_factor": {
+          "count": 36,
+          "p50": 1.9703754146391244,
+          "p95": 2.6801329684959434
+        },
+        "silence_runs": 30,
+        "nonempty_silence_runs": 0
+      }
+    },
+    "fidelity": {
+      "utterance": {
+        "components": {
+          "domain_term": {
+            "passed": 9,
+            "total": 11
+          },
+          "numeric": {
+            "passed": 6,
+            "total": 7
+          },
+          "unit": {
+            "passed": 7,
+            "total": 7
+          },
+          "negation": {
+            "passed": 0,
+            "total": 1
+          }
+        },
+        "cases": [
+          {
+            "clip_id": "question-01",
+            "reference": "Why is this candidate amber?",
+            "hypothesis": "Why is this candidate amber?",
+            "components": {
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "question-02",
+            "reference": "How many trials support this candidate?",
+            "hypothesis": "How many trials support this candidate?",
+            "components": {
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "question-03",
+            "reference": "What is the fumonisin level?",
+            "hypothesis": "What is the few menace in level?",
+            "components": {
+              "domain_term": false
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "filter-01",
+            "reference": "Show germination at least ninety percent.",
+            "hypothesis": "Show germination at least ninety percent.",
+            "components": {
+              "numeric": true,
+              "unit": true,
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "filter-02",
+            "reference": "Show cold test at least eighty seven point five percent.",
+            "hypothesis": "Show cold test at least 87.5 percent",
+            "components": {
+              "numeric": true,
+              "unit": true,
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "filter-03",
+            "reference": "Show at least seventeen trials, not seventy.",
+            "hypothesis": "Show at least seventeen trials. Not seventeen.",
+            "components": {
+              "numeric": false,
+              "unit": true,
+              "domain_term": true,
+              "negation": false
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "preference-01",
+            "reference": "Set my review location to Station A.",
+            "hypothesis": "Set my review location to station a.",
+            "components": {
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "preference-02",
+            "reference": "Remember these filters.",
+            "hypothesis": "Remember these filters.",
+            "components": {
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "preference-03",
+            "reference": "Make ninety percent my minimum for green.",
+            "hypothesis": "Make ninety percent my minimum for green.",
+            "components": {
+              "numeric": true,
+              "unit": true,
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "value-01",
+            "reference": "Enter cold test eighty seven point five percent.",
+            "hypothesis": "Enter cold test 87.5 percent",
+            "components": {
+              "numeric": true,
+              "unit": true,
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "value-02",
+            "reference": "Enter fumonisin zero point eight ppm.",
+            "hypothesis": "Enter few minutes and 0.8 ppm.",
+            "components": {
+              "numeric": true,
+              "unit": true,
+              "domain_term": false
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "value-03",
+            "reference": "Change eighty five to ninety percent.",
+            "hypothesis": "Change 85 to 90 percent.",
+            "components": {
+              "numeric": true,
+              "unit": true
+            },
+            "status": "ok"
+          }
+        ]
+      },
+      "native_streaming": {
+        "components": {
+          "domain_term": {
+            "passed": 9,
+            "total": 11
+          },
+          "numeric": {
+            "passed": 6,
+            "total": 7
+          },
+          "unit": {
+            "passed": 7,
+            "total": 7
+          },
+          "negation": {
+            "passed": 0,
+            "total": 1
+          }
+        },
+        "cases": [
+          {
+            "clip_id": "question-01",
+            "reference": "Why is this candidate amber?",
+            "hypothesis": "Why is this candidate amber?",
+            "components": {
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "question-02",
+            "reference": "How many trials support this candidate?",
+            "hypothesis": "How many trials support this candidate?",
+            "components": {
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "question-03",
+            "reference": "What is the fumonisin level?",
+            "hypothesis": "What is the few menace in level?",
+            "components": {
+              "domain_term": false
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "filter-01",
+            "reference": "Show germination at least ninety percent.",
+            "hypothesis": "Show germination at least ninety percent.",
+            "components": {
+              "numeric": true,
+              "unit": true,
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "filter-02",
+            "reference": "Show cold test at least eighty seven point five percent.",
+            "hypothesis": "Show cold test at least 87.5 percent",
+            "components": {
+              "numeric": true,
+              "unit": true,
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "filter-03",
+            "reference": "Show at least seventeen trials, not seventy.",
+            "hypothesis": "Show at least seventeen trials. Not seventeen.",
+            "components": {
+              "numeric": false,
+              "unit": true,
+              "domain_term": true,
+              "negation": false
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "preference-01",
+            "reference": "Set my review location to Station A.",
+            "hypothesis": "Set my review location to station A.",
+            "components": {
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "preference-02",
+            "reference": "Remember these filters.",
+            "hypothesis": "Remember these filters.",
+            "components": {
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "preference-03",
+            "reference": "Make ninety percent my minimum for green.",
+            "hypothesis": "Make ninety percent my minimum for green.",
+            "components": {
+              "numeric": true,
+              "unit": true,
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "value-01",
+            "reference": "Enter cold test eighty seven point five percent.",
+            "hypothesis": "Enter cold test 87.5 percent",
+            "components": {
+              "numeric": true,
+              "unit": true,
+              "domain_term": true
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "value-02",
+            "reference": "Enter fumonisin zero point eight ppm.",
+            "hypothesis": "Enter few minutes and 0.8 ppm.",
+            "components": {
+              "numeric": true,
+              "unit": true,
+              "domain_term": false
+            },
+            "status": "ok"
+          },
+          {
+            "clip_id": "value-03",
+            "reference": "Change eighty five to ninety percent.",
+            "hypothesis": "Change 85 to 90 percent.",
+            "components": {
+              "numeric": true,
+              "unit": true
+            },
+            "status": "ok"
+          }
+        ]
+      }
+    }
+  },
+  "preserved_file_hashes": {
+    "corpus\\fidelity-rubric.json": "26be1c0ced2fa46874d1178ae63de7fd802b71be12fbc51467886abf722ecd4f",
+    "corpus\\filter-01.wav": "cd950bf2a34ab07535f1f9ec6161411219efeb9aa2d7124853fc24eb245944da",
+    "corpus\\filter-02.wav": "305babba2c124d941fdbf68f282353ada6f3c52d685bf8027c10b124abe2a537",
+    "corpus\\filter-03.wav": "5a46bfe03df9e03bfb521247269212969b39b3a51e2f7454e72d96624340f593",
+    "corpus\\preference-01.wav": "06ce56cbd196373533f000409feb4209a61d18f086da41464fd790252d894274",
+    "corpus\\preference-02.wav": "c373c6f8d8d1c8f19175b0dc20f7b991459d4eb0b13370b2b3e5b5f5eb9301a6",
+    "corpus\\preference-03.wav": "ab130d437e3bab6f510fb376cbb20f366536600ff3199ba5dbb45d525e84d675",
+    "corpus\\question-01.wav": "4efc6d07f658c80f2af86d05eb197c9a46e3885cbaf26ae4368bfb2900d900f4",
+    "corpus\\question-02.wav": "0c481410c6430842c5a812301ca59979bb14ff0d0d7a9c6d252c25e1244e9681",
+    "corpus\\question-03.wav": "137eff57559d078c27959be604305f36483218c9d6551e4f1c8393f5d866a005",
+    "corpus\\silence-01.wav": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+    "corpus\\silence-02.wav": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+    "corpus\\silence-03.wav": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+    "corpus\\silence-04.wav": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+    "corpus\\silence-05.wav": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+    "corpus\\silence-06.wav": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+    "corpus\\silence-07.wav": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+    "corpus\\silence-08.wav": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+    "corpus\\silence-09.wav": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+    "corpus\\silence-10.wav": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+    "corpus\\synthetic.json": "0fd77e579d8123ae349aa57c57bfe61913013555e270fef26f3d2b171920e831",
+    "corpus\\value-01.wav": "822c8ea71f738403c8827fc51ad1593c06274587bce21e0836379834b6402cc9",
+    "corpus\\value-02.wav": "e4a23f9c57eb60aa99ef95e03e870bbac2d549f5f43ff2ac7dffbdea0f1e6f7a",
+    "corpus\\value-03.wav": "f0e427a413dc7dd5142df739a3bb11ea3d4091333566797c3c3e01af9a06aca1",
+    "requirements.lock.txt": "5a0a98a3af6419faf748b83b9a0507f52715c3ee3a3ba0d86c972434ac01a490",
+    "results\\machine-2026-10-01.json": "04a7f2e6b6c33afad7609c96fb956a6073edc441aac29df76f2d30e7fb12a374",
+    "results\\moonshine-runtime.json": "d8b4123bfc18c3540c70aca909ea5c97a325756ef218282c927d6ad26a797d12",
+    "results\\moonshine-synthetic-3x.json": "9b8f4667c10bf03d7cb6e2699b4b459f57df7c5b29a0a9df196bcac52278cd26",
+    "results\\phase-1-2026-10-01.md": "f24cbd341f5af3d186ecc1ee74ad727d95a186c0123d98990af1257bfc112a06",
+    "results\\phase-2-synthetic-2026-10-01.md": "e93b748aa0633ef974475bcc809c47edb16dea95b61d3c9c00ac911123c23f10"
+  },
+  "prior_evidence_and_inputs_unchanged": true,
+  "outside_tracked_changes_unchanged": false,
+  "outside_state_before": {
+    ".env.example": "credential_related_path_not_read",
+    ".gitignore": "dacdf0626d0185c1445b4d9b964212be014df3cb0dd5acf5823198e99b25fe73",
+    "app/API.md": "a1a6b89540dcd5e63cfbd1f5f8a1c472f760c4f3b681c41fe89782daa45b2fbc",
+    "app/README.md": "31cd059ddaa0846c46b53c9aee42026d56f164dab2ea0361cf450d44cee2eeeb",
+    "app/src/uc4_mcp/candidate_api.py": "2bd095b27ab814e00fc97b4cf0de003fc62ecd563869657577688c7fb4c1888d",
+    "app/src/uc4_mcp/candidate_history.py": "4c70cc89516f1c8123087f4ebf327a7318b187c0e3ea3acca6eddb827e36819e",
+    "app/src/uc4_mcp/candidate_server.py": "6f2428d8e22f99365e97ff1b06ffdb590fc07e66bfc5dc41088433cc1b53347f",
+    "app/src/uc4_mcp/candidates.py": "4a3e0a47e5f136e67d03e7c1f2b99e26d0e57a353b538ae8a1c3d7d0ad7bf948",
+    "app/src/uc4_mcp/static/candidate.css": "4b2c105feda576e5e11adfcb8c80f5cfd8b35e02c5c451f5768a89ef34db15f1",
+    "app/src/uc4_mcp/static/candidate.html": "77fec8e5dce5716aa92d02cf6fe858a449f829dc180c1c461615858d15caa0cc",
+    "app/src/uc4_mcp/static/candidate.js": "4abeb2c9ae728526898d403787836027ef6afb89ed9651581e3248777d685d01",
+    "app/tests/test_candidate_browser.py": "799d90135026012f4bb33b80385829feed980622b510f33475d8ce7c5544fafa",
+    "app/tests/test_lifecycle.py": "4450e344b6b2a18f7857a9c76f9eb0dc52adb4282360ffcc0aed6e69511c248f",
+    "app/tests/test_rules.py": "db659de4e334110a9fe366c0a92e03cb1e08246cb601204cf5425dcee6ffc71b",
+    "team/PROMPT_LOG.md": "d10ca577642d61e8dec5fecd03a4cff2055ec0a07556bec7bd7e934753ec9447",
+    "team/ROLES.md": "3c84155639f9f0ffb82747872d503b35841883aa0afa60aaf93c1e36b9864f99"
+  },
+  "outside_state_after": {
+    ".env.example": "credential_related_path_not_read",
+    ".gitignore": "dacdf0626d0185c1445b4d9b964212be014df3cb0dd5acf5823198e99b25fe73",
+    "app/API.md": "a1a6b89540dcd5e63cfbd1f5f8a1c472f760c4f3b681c41fe89782daa45b2fbc",
+    "app/README.md": "07bd860a874175dda2d43f510bbef30303dcba7f21809b12398590b1fb6f93d1",
+    "app/pyproject.toml": "d98079e2c6240d8d55c1127086405927686fed1050b5c877c06696baee95f68f",
+    "app/src/uc4_mcp/candidate_api.py": "2bd095b27ab814e00fc97b4cf0de003fc62ecd563869657577688c7fb4c1888d",
+    "app/src/uc4_mcp/candidate_history.py": "4c70cc89516f1c8123087f4ebf327a7318b187c0e3ea3acca6eddb827e36819e",
+    "app/src/uc4_mcp/candidate_server.py": "6f2428d8e22f99365e97ff1b06ffdb590fc07e66bfc5dc41088433cc1b53347f",
+    "app/src/uc4_mcp/candidates.py": "4a3e0a47e5f136e67d03e7c1f2b99e26d0e57a353b538ae8a1c3d7d0ad7bf948",
+    "app/src/uc4_mcp/static/candidate.css": "4b2c105feda576e5e11adfcb8c80f5cfd8b35e02c5c451f5768a89ef34db15f1",
+    "app/src/uc4_mcp/static/candidate.html": "77fec8e5dce5716aa92d02cf6fe858a449f829dc180c1c461615858d15caa0cc",
+    "app/src/uc4_mcp/static/candidate.js": "4abeb2c9ae728526898d403787836027ef6afb89ed9651581e3248777d685d01",
+    "app/tests/test_candidate_browser.py": "cf4fbcd8274cf77842f5bac547e0b2e281895590b817e89c27e40193c36fdf15",
+    "app/tests/test_lifecycle.py": "4450e344b6b2a18f7857a9c76f9eb0dc52adb4282360ffcc0aed6e69511c248f",
+    "app/tests/test_rules.py": "db659de4e334110a9fe366c0a92e03cb1e08246cb601204cf5425dcee6ffc71b",
+    "team/PROMPT_LOG.md": "d10ca577642d61e8dec5fecd03a4cff2055ec0a07556bec7bd7e934753ec9447",
+    "team/ROLES.md": "3c84155639f9f0ffb82747872d503b35841883aa0afa60aaf93c1e36b9864f99"
+  },
+  "configurations": [
+    {
+      "name": "control-0500ms",
+      "update_interval_seconds": 0.5,
+      "status": "completed",
+      "returncode": 0,
+      "wall_seconds": 364.0336680000037,
+      "result_path": "results\\moonshine-tuning-control-0500ms.json",
+      "trials": 132,
+      "summary": {
+        "utterance": {
+          "successful_runs": 66,
+          "failed_runs": 0,
+          "first_repetition_speech_clips": 12,
+          "reference_words": 76,
+          "word_errors": 19,
+          "synthetic_wer": 0.25,
+          "stop_to_final_seconds": {
+            "count": 36,
+            "p50": 2.756034999998519,
+            "p95": 4.0228913000028115
+          },
+          "realtime_factor": {
+            "count": 36,
+            "p50": 0.8378360171306767,
+            "p95": 1.2142338149549223
+          },
+          "silence_runs": 30,
+          "nonempty_silence_runs": 0
+        },
+        "native_streaming": {
+          "successful_runs": 66,
+          "failed_runs": 0,
+          "first_repetition_speech_clips": 12,
+          "reference_words": 76,
+          "word_errors": 20,
+          "synthetic_wer": 0.2631578947368421,
+          "stop_to_final_seconds": {
+            "count": 36,
+            "p50": 0.9007595999937621,
+            "p95": 1.8151696999993874
+          },
+          "realtime_factor": {
+            "count": 36,
+            "p50": 1.4541604227530276,
+            "p95": 1.7963628265469502
+          },
+          "silence_runs": 30,
+          "nonempty_silence_runs": 0,
+          "live_interim": {
+            "speech_runs": 36,
+            "runs_without_live_partial": 0,
+            "first_partial_from_replay_start_seconds": {
+              "count": 36,
+              "p50": 1.2002014000026975,
+              "p95": 1.4137160999962362
+            },
+            "update_gaps_seconds": {
+              "count": 67,
+              "p50": 1.6259156999949482,
+              "p95": 2.959870699996827
+            },
+            "maximum_backlog_seconds": {
+              "count": 36,
+              "p50": 1.780403099997784,
+              "p95": 3.30605910000304
+            }
+          }
+        }
+      },
+      "fidelity": {
+        "utterance": {
+          "components": {
+            "domain_term": {
+              "passed": 9,
+              "total": 11
+            },
+            "numeric": {
+              "passed": 6,
+              "total": 7
+            },
+            "unit": {
+              "passed": 7,
+              "total": 7
+            },
+            "negation": {
+              "passed": 0,
+              "total": 1
+            }
+          },
+          "cases": [
+            {
+              "clip_id": "question-01",
+              "reference": "Why is this candidate amber?",
+              "hypothesis": "Why is this candidate amber?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-02",
+              "reference": "How many trials support this candidate?",
+              "hypothesis": "How many trials support this candidate?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-03",
+              "reference": "What is the fumonisin level?",
+              "hypothesis": "What is the few menace in level?",
+              "components": {
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-01",
+              "reference": "Show germination at least ninety percent.",
+              "hypothesis": "Show germination at least ninety percent.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-02",
+              "reference": "Show cold test at least eighty seven point five percent.",
+              "hypothesis": "Show cold test at least 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-03",
+              "reference": "Show at least seventeen trials, not seventy.",
+              "hypothesis": "Show at least seventeen trials. Not seventeen.",
+              "components": {
+                "numeric": false,
+                "unit": true,
+                "domain_term": true,
+                "negation": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-01",
+              "reference": "Set my review location to Station A.",
+              "hypothesis": "Set my review location to station a.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-02",
+              "reference": "Remember these filters.",
+              "hypothesis": "Remember these filters.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-03",
+              "reference": "Make ninety percent my minimum for green.",
+              "hypothesis": "Make ninety percent my minimum for green.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-01",
+              "reference": "Enter cold test eighty seven point five percent.",
+              "hypothesis": "Enter cold test 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-02",
+              "reference": "Enter fumonisin zero point eight ppm.",
+              "hypothesis": "Enter few minutes and 0.8 ppm.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-03",
+              "reference": "Change eighty five to ninety percent.",
+              "hypothesis": "Change 85 to 90 percent.",
+              "components": {
+                "numeric": true,
+                "unit": true
+              },
+              "status": "ok"
+            }
+          ]
+        },
+        "native_streaming": {
+          "components": {
+            "domain_term": {
+              "passed": 9,
+              "total": 11
+            },
+            "numeric": {
+              "passed": 6,
+              "total": 7
+            },
+            "unit": {
+              "passed": 7,
+              "total": 7
+            },
+            "negation": {
+              "passed": 0,
+              "total": 1
+            }
+          },
+          "cases": [
+            {
+              "clip_id": "question-01",
+              "reference": "Why is this candidate amber?",
+              "hypothesis": "Why is this candidate amber?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-02",
+              "reference": "How many trials support this candidate?",
+              "hypothesis": "How many trials support this candidate?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-03",
+              "reference": "What is the fumonisin level?",
+              "hypothesis": "What is the few menace in level?",
+              "components": {
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-01",
+              "reference": "Show germination at least ninety percent.",
+              "hypothesis": "Show germination at least 90 percent.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-02",
+              "reference": "Show cold test at least eighty seven point five percent.",
+              "hypothesis": "Show cold test at least 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-03",
+              "reference": "Show at least seventeen trials, not seventy.",
+              "hypothesis": "Show at least seventeen trials. Not seventeen.",
+              "components": {
+                "numeric": false,
+                "unit": true,
+                "domain_term": true,
+                "negation": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-01",
+              "reference": "Set my review location to Station A.",
+              "hypothesis": "Set my review location to station a.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-02",
+              "reference": "Remember these filters.",
+              "hypothesis": "Remember these filters.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-03",
+              "reference": "Make ninety percent my minimum for green.",
+              "hypothesis": "Make ninety percent my minimum for green.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-01",
+              "reference": "Enter cold test eighty seven point five percent.",
+              "hypothesis": "Enter cold test 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-02",
+              "reference": "Enter fumonisin zero point eight ppm.",
+              "hypothesis": "Enter few minutes and 0.8 ppm.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-03",
+              "reference": "Change eighty five to ninety percent.",
+              "hypothesis": "Change 85 to 90 percent.",
+              "components": {
+                "numeric": true,
+                "unit": true
+              },
+              "status": "ok"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "floor-1000ms",
+      "update_interval_seconds": 1.0,
+      "status": "completed",
+      "returncode": 0,
+      "wall_seconds": 393.0831423000054,
+      "result_path": "results\\moonshine-tuning-floor-1000ms.json",
+      "trials": 132,
+      "summary": {
+        "utterance": {
+          "successful_runs": 66,
+          "failed_runs": 0,
+          "first_repetition_speech_clips": 12,
+          "reference_words": 76,
+          "word_errors": 19,
+          "synthetic_wer": 0.25,
+          "stop_to_final_seconds": {
+            "count": 36,
+            "p50": 3.429194299998926,
+            "p95": 4.719645199998922
+          },
+          "realtime_factor": {
+            "count": 36,
+            "p50": 1.0469213276226532,
+            "p95": 1.748750406853746
+          },
+          "silence_runs": 30,
+          "nonempty_silence_runs": 0
+        },
+        "native_streaming": {
+          "successful_runs": 66,
+          "failed_runs": 0,
+          "first_repetition_speech_clips": 12,
+          "reference_words": 76,
+          "word_errors": 20,
+          "synthetic_wer": 0.2631578947368421,
+          "stop_to_final_seconds": {
+            "count": 36,
+            "p50": 1.1928534000035143,
+            "p95": 2.7544634000005317
+          },
+          "realtime_factor": {
+            "count": 36,
+            "p50": 1.35072830189112,
+            "p95": 1.6082925151843737
+          },
+          "silence_runs": 30,
+          "nonempty_silence_runs": 0,
+          "live_interim": {
+            "speech_runs": 36,
+            "runs_without_live_partial": 0,
+            "first_partial_from_replay_start_seconds": {
+              "count": 36,
+              "p50": 2.47628459999396,
+              "p95": 3.2713593000007677
+            },
+            "update_gaps_seconds": {
+              "count": 30,
+              "p50": 2.2138875000018743,
+              "p95": 2.952183800000057
+            },
+            "maximum_backlog_seconds": {
+              "count": 36,
+              "p50": 2.0626190999973915,
+              "p95": 2.7860845000031986
+            }
+          }
+        }
+      },
+      "fidelity": {
+        "utterance": {
+          "components": {
+            "domain_term": {
+              "passed": 9,
+              "total": 11
+            },
+            "numeric": {
+              "passed": 6,
+              "total": 7
+            },
+            "unit": {
+              "passed": 7,
+              "total": 7
+            },
+            "negation": {
+              "passed": 0,
+              "total": 1
+            }
+          },
+          "cases": [
+            {
+              "clip_id": "question-01",
+              "reference": "Why is this candidate amber?",
+              "hypothesis": "Why is this candidate amber?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-02",
+              "reference": "How many trials support this candidate?",
+              "hypothesis": "How many trials support this candidate?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-03",
+              "reference": "What is the fumonisin level?",
+              "hypothesis": "What is the few menace in level?",
+              "components": {
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-01",
+              "reference": "Show germination at least ninety percent.",
+              "hypothesis": "Show germination at least ninety percent.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-02",
+              "reference": "Show cold test at least eighty seven point five percent.",
+              "hypothesis": "Show cold test at least 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-03",
+              "reference": "Show at least seventeen trials, not seventy.",
+              "hypothesis": "Show at least seventeen trials. Not seventeen.",
+              "components": {
+                "numeric": false,
+                "unit": true,
+                "domain_term": true,
+                "negation": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-01",
+              "reference": "Set my review location to Station A.",
+              "hypothesis": "Set my review location to station a.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-02",
+              "reference": "Remember these filters.",
+              "hypothesis": "Remember these filters.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-03",
+              "reference": "Make ninety percent my minimum for green.",
+              "hypothesis": "Make ninety percent my minimum for green.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-01",
+              "reference": "Enter cold test eighty seven point five percent.",
+              "hypothesis": "Enter cold test 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-02",
+              "reference": "Enter fumonisin zero point eight ppm.",
+              "hypothesis": "Enter few minutes and 0.8 ppm.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-03",
+              "reference": "Change eighty five to ninety percent.",
+              "hypothesis": "Change 85 to 90 percent.",
+              "components": {
+                "numeric": true,
+                "unit": true
+              },
+              "status": "ok"
+            }
+          ]
+        },
+        "native_streaming": {
+          "components": {
+            "domain_term": {
+              "passed": 9,
+              "total": 11
+            },
+            "numeric": {
+              "passed": 6,
+              "total": 7
+            },
+            "unit": {
+              "passed": 7,
+              "total": 7
+            },
+            "negation": {
+              "passed": 0,
+              "total": 1
+            }
+          },
+          "cases": [
+            {
+              "clip_id": "question-01",
+              "reference": "Why is this candidate amber?",
+              "hypothesis": "Why is this candidate amber?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-02",
+              "reference": "How many trials support this candidate?",
+              "hypothesis": "How many trials support this candidate?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-03",
+              "reference": "What is the fumonisin level?",
+              "hypothesis": "What is the few menace in level?",
+              "components": {
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-01",
+              "reference": "Show germination at least ninety percent.",
+              "hypothesis": "Show germination at least 90 percent.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-02",
+              "reference": "Show cold test at least eighty seven point five percent.",
+              "hypothesis": "Show cold test at least 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-03",
+              "reference": "Show at least seventeen trials, not seventy.",
+              "hypothesis": "Show at least seventeen trials. Not seventeen.",
+              "components": {
+                "numeric": false,
+                "unit": true,
+                "domain_term": true,
+                "negation": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-01",
+              "reference": "Set my review location to Station A.",
+              "hypothesis": "Set my review location to station a.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-02",
+              "reference": "Remember these filters.",
+              "hypothesis": "Remember these filters.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-03",
+              "reference": "Make ninety percent my minimum for green.",
+              "hypothesis": "Make ninety percent my minimum for green.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-01",
+              "reference": "Enter cold test eighty seven point five percent.",
+              "hypothesis": "Enter cold test 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-02",
+              "reference": "Enter fumonisin zero point eight ppm.",
+              "hypothesis": "Enter few minutes and 0.8 ppm.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-03",
+              "reference": "Change eighty five to ninety percent.",
+              "hypothesis": "Change 85 to 90 percent.",
+              "components": {
+                "numeric": true,
+                "unit": true
+              },
+              "status": "ok"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "floor-2000ms",
+      "update_interval_seconds": 2.0,
+      "status": "completed",
+      "returncode": 0,
+      "wall_seconds": 387.1667732999995,
+      "result_path": "results\\moonshine-tuning-floor-2000ms.json",
+      "trials": 132,
+      "summary": {
+        "utterance": {
+          "successful_runs": 66,
+          "failed_runs": 0,
+          "first_repetition_speech_clips": 12,
+          "reference_words": 76,
+          "word_errors": 19,
+          "synthetic_wer": 0.25,
+          "stop_to_final_seconds": {
+            "count": 36,
+            "p50": 2.872160500002792,
+            "p95": 3.6165870999975596
+          },
+          "realtime_factor": {
+            "count": 36,
+            "p50": 0.8382980801934039,
+            "p95": 1.2187192291207063
+          },
+          "silence_runs": 30,
+          "nonempty_silence_runs": 0
+        },
+        "native_streaming": {
+          "successful_runs": 66,
+          "failed_runs": 0,
+          "first_repetition_speech_clips": 12,
+          "reference_words": 76,
+          "word_errors": 20,
+          "synthetic_wer": 0.2631578947368421,
+          "stop_to_final_seconds": {
+            "count": 36,
+            "p50": 1.7248632999981055,
+            "p95": 3.016776199998276
+          },
+          "realtime_factor": {
+            "count": 36,
+            "p50": 1.2117536244491147,
+            "p95": 1.7945838805996028
+          },
+          "silence_runs": 30,
+          "nonempty_silence_runs": 0,
+          "live_interim": {
+            "speech_runs": 36,
+            "runs_without_live_partial": 0,
+            "first_partial_from_replay_start_seconds": {
+              "count": 36,
+              "p50": 4.321026199999324,
+              "p95": 4.960019199999806
+            },
+            "update_gaps_seconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "maximum_backlog_seconds": {
+              "count": 36,
+              "p50": 2.2213757000063197,
+              "p95": 2.860325699999521
+            }
+          }
+        }
+      },
+      "fidelity": {
+        "utterance": {
+          "components": {
+            "domain_term": {
+              "passed": 9,
+              "total": 11
+            },
+            "numeric": {
+              "passed": 6,
+              "total": 7
+            },
+            "unit": {
+              "passed": 7,
+              "total": 7
+            },
+            "negation": {
+              "passed": 0,
+              "total": 1
+            }
+          },
+          "cases": [
+            {
+              "clip_id": "question-01",
+              "reference": "Why is this candidate amber?",
+              "hypothesis": "Why is this candidate amber?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-02",
+              "reference": "How many trials support this candidate?",
+              "hypothesis": "How many trials support this candidate?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-03",
+              "reference": "What is the fumonisin level?",
+              "hypothesis": "What is the few menace in level?",
+              "components": {
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-01",
+              "reference": "Show germination at least ninety percent.",
+              "hypothesis": "Show germination at least ninety percent.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-02",
+              "reference": "Show cold test at least eighty seven point five percent.",
+              "hypothesis": "Show cold test at least 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-03",
+              "reference": "Show at least seventeen trials, not seventy.",
+              "hypothesis": "Show at least seventeen trials. Not seventeen.",
+              "components": {
+                "numeric": false,
+                "unit": true,
+                "domain_term": true,
+                "negation": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-01",
+              "reference": "Set my review location to Station A.",
+              "hypothesis": "Set my review location to station a.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-02",
+              "reference": "Remember these filters.",
+              "hypothesis": "Remember these filters.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-03",
+              "reference": "Make ninety percent my minimum for green.",
+              "hypothesis": "Make ninety percent my minimum for green.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-01",
+              "reference": "Enter cold test eighty seven point five percent.",
+              "hypothesis": "Enter cold test 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-02",
+              "reference": "Enter fumonisin zero point eight ppm.",
+              "hypothesis": "Enter few minutes and 0.8 ppm.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-03",
+              "reference": "Change eighty five to ninety percent.",
+              "hypothesis": "Change 85 to 90 percent.",
+              "components": {
+                "numeric": true,
+                "unit": true
+              },
+              "status": "ok"
+            }
+          ]
+        },
+        "native_streaming": {
+          "components": {
+            "domain_term": {
+              "passed": 9,
+              "total": 11
+            },
+            "numeric": {
+              "passed": 6,
+              "total": 7
+            },
+            "unit": {
+              "passed": 7,
+              "total": 7
+            },
+            "negation": {
+              "passed": 0,
+              "total": 1
+            }
+          },
+          "cases": [
+            {
+              "clip_id": "question-01",
+              "reference": "Why is this candidate amber?",
+              "hypothesis": "Why is this candidate amber?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-02",
+              "reference": "How many trials support this candidate?",
+              "hypothesis": "How many trials support this candidate?",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "question-03",
+              "reference": "What is the fumonisin level?",
+              "hypothesis": "What is the few menace in level?",
+              "components": {
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-01",
+              "reference": "Show germination at least ninety percent.",
+              "hypothesis": "Show germination at least 90 percent.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-02",
+              "reference": "Show cold test at least eighty seven point five percent.",
+              "hypothesis": "Show cold test at least 87.5 percent.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "filter-03",
+              "reference": "Show at least seventeen trials, not seventy.",
+              "hypothesis": "Show at least seventeen trials. Not seventeen.",
+              "components": {
+                "numeric": false,
+                "unit": true,
+                "domain_term": true,
+                "negation": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-01",
+              "reference": "Set my review location to Station A.",
+              "hypothesis": "Set my review location to station A.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-02",
+              "reference": "Remember these filters.",
+              "hypothesis": "Remember these filters.",
+              "components": {
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "preference-03",
+              "reference": "Make ninety percent my minimum for green.",
+              "hypothesis": "Make ninety percent my minimum for green.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-01",
+              "reference": "Enter cold test eighty seven point five percent.",
+              "hypothesis": "Enter cold test 87.5 percent",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": true
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-02",
+              "reference": "Enter fumonisin zero point eight ppm.",
+              "hypothesis": "Enter few minutes and 0.8 ppm.",
+              "components": {
+                "numeric": true,
+                "unit": true,
+                "domain_term": false
+              },
+              "status": "ok"
+            },
+            {
+              "clip_id": "value-03",
+              "reference": "Change eighty five to ninety percent.",
+              "hypothesis": "Change 85 to 90 percent.",
+              "components": {
+                "numeric": true,
+                "unit": true
+              },
+              "status": "ok"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "fixed_order_not_counterbalanced",
+    "one_synthetic_voice",
+    "fixture_specific_diagnostics_not_general_semantic_accuracy",
+    "no_browser_no_microphone_no_writes"
+  ]
+}

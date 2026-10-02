@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-01T23:08:34.563461+00:00",
+  "evidence_type": "local_inventory_not_asr_benchmark",
+  "machine_role": "developer_probe_demo_target_unconfirmed",
+  "os": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26300",
+    "architecture": "AMD64"
+  },
+  "python": {
+    "version": "3.12.11",
+    "implementation": "CPython"
+  },
+  "logical_cpu_count": 12,
+  "hardware": {
+    "cpu": {
+      "status": "unknown",
+      "reason": "Inventory probe unavailable"
+    },
+    "memory": {
+      "status": "unknown",
+      "reason": "Inventory probe unavailable"
+    },
+    "gpu": {
+      "status": "locally_verified_inventory",
+      "value": {
+        "Name": "Intel(R) UHD Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7088"
+      }
+    },
+    "browser": {
+      "status": "locally_verified_inventory",
+      "value": [
+        {
+          "ProductName": "Microsoft Edge",
+          "ProductVersion": "154.0.4258.48"
+        },
+        {
+          "ProductName": "Google Chrome",
+          "ProductVersion": "151.0.7922.174"
+        }
+      ]
+    }
+  },
+  "gpu_memory_caveat": "Win32 AdapterRAM is not reliable VRAM evidence",
+  "task_volume": {
+    "total_bytes": 510448889856,
+    "free_bytes": 48263929856
+  },
+  "installed_asr_distributions": {
+    "moonshine-voice": null,
+    "transformers": null,
+    "torch": null,
+    "nemo_toolkit": null,
+    "onnxruntime": null
+  },
+  "unknowns": [
+    "microphone",
+    "demo_machine",
+    "language_and_accents",
+    "noise_environment",
+    "approved_disk_and_network_budget",
+    "verified_gpu_vram_and_compute_provider"
+  ],
+  "approvals": {
+    "researcher_and_time_cap": "pending",
+    "downloads_and_runtime_install": "pending",
+    "recording_and_retention": "pending",
+    "hosted_audio": "pending",
+    "workflow_spike": "pending"
+  }
+}

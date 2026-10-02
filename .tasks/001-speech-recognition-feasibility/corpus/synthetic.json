@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "evidence_type": "synthetic_engineering_smoke_only",
+  "language": "en-US",
+  "voice": "Microsoft David Desktop",
+  "condition": "synthetic_quiet",
+  "split": "smoke_not_tuning_or_held_out",
+  "clips": [
+    {"id": "question-01", "outcome": "question", "text": "Why is this candidate amber?", "expected_slots": {}, "clarification": false},
+    {"id": "question-02", "outcome": "question", "text": "How many trials support this candidate?", "expected_slots": {"field": "N_TRIALS_USED"}, "clarification": false},
+    {"id": "question-03", "outcome": "question", "text": "What is the fumonisin level?", "expected_slots": {"field": "FUMONISIN_PPM"}, "clarification": false},
+    {"id": "filter-01", "outcome": "current_filter", "text": "Show germination at least ninety percent.", "expected_slots": {"field": "GERMINATION_PCT", "comparator": "min_inclusive", "value": 90, "unit": "%"}, "clarification": false},
+    {"id": "filter-02", "outcome": "current_filter", "text": "Show cold test at least eighty seven point five percent.", "expected_slots": {"field": "COLD_TEST_PCT", "comparator": "min_inclusive", "value": 87.5, "unit": "%"}, "clarification": false},
+    {"id": "filter-03", "outcome": "current_filter", "text": "Show at least seventeen trials, not seventy.", "expected_slots": {"field": "N_TRIALS_USED", "value": 17, "unit": "trials", "rejected_value": 70}, "clarification": true},
+    {"id": "preference-01", "outcome": "personal_default", "text": "Set my review location to Station A.", "expected_slots": {"location": "Station A"}, "clarification": false},
+    {"id": "preference-02", "outcome": "personal_default", "text": "Remember these filters.", "expected_slots": {"scope": "browser_view"}, "clarification": false},
+    {"id": "preference-03", "outcome": "personal_default", "text": "Make ninety percent my minimum for green.", "expected_slots": {"unsupported": "policy_change"}, "clarification": true},
+    {"id": "value-01", "outcome": "value_entry", "text": "Enter cold test eighty seven point five percent.", "expected_slots": {"field": "COLD_TEST_PCT", "value": 87.5, "unit": "%"}, "clarification": false},
+    {"id": "value-02", "outcome": "value_entry", "text": "Enter fumonisin zero point eight ppm.", "expected_slots": {"field": "FUMONISIN_PPM", "value": 0.8, "unit": "ppm"}, "clarification": false},
+    {"id": "value-03", "outcome": "value_entry", "text": "Change eighty five to ninety percent.", "expected_slots": {"original": 85, "value": 90, "unit": "%", "missing_field": true}, "clarification": true},
+    {"id": "silence-01", "outcome": "no_speech", "text": "", "duration_seconds": 2},
+    {"id": "silence-02", "outcome": "no_speech", "text": "", "duration_seconds": 2},
+    {"id": "silence-03", "outcome": "no_speech", "text": "", "duration_seconds": 2},
+    {"id": "silence-04", "outcome": "no_speech", "text": "", "duration_seconds": 2},
+    {"id": "silence-05", "outcome": "no_speech", "text": "", "duration_seconds": 2},
+    {"id": "silence-06", "outcome": "no_speech", "text": "", "duration_seconds": 2},
+    {"id": "silence-07", "outcome": "no_speech", "text": "", "duration_seconds": 2},
+    {"id": "silence-08", "outcome": "no_speech", "text": "", "duration_seconds": 2},
+    {"id": "silence-09", "outcome": "no_speech", "text": "", "duration_seconds": 2},
+    {"id": "silence-10", "outcome": "no_speech", "text": "", "duration_seconds": 2}
+  ]
+}

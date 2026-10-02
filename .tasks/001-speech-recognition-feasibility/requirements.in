@@ -1,0 +1,4 @@
+moonshine-voice==0.1.5
+jiwer==4.0.0
+pytest==9.1.1
+truststore==0.10.4

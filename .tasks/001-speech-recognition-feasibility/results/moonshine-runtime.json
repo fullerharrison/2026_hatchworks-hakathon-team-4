@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-01T23:41:52.360167+00:00",
+  "evidence_type": "local_asset_preparation_not_accuracy_result",
+  "runtime": "moonshine-voice",
+  "version": "0.1.5",
+  "language": "en",
+  "architecture": "TINY_STREAMING",
+  "model_path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21",
+  "artifacts": [
+    {
+      "path": "assets\\moonshine\\download.moonshine.ai\\model\\spelling-en\\spelling_cnn.ort",
+      "bytes": 1664920,
+      "sha256": "79abb40b6849cf7c013e83a3f276a0d822bb94c3edcc9ad003d38815c2cf37d4"
+    },
+    {
+      "path": "assets\\moonshine\\download.moonshine.ai\\model\\spelling-en\\spelling_cnn_meta.json",
+      "bytes": 622,
+      "sha256": "1d297cb4801652ccea6cecfd2973338f7cfdf99b7b77a5f5988548cb77ff11f4"
+    },
+    {
+      "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\adapter.ort",
+      "bytes": 1319664,
+      "sha256": "22ecc949e146c49667fda28d102d4e30749a107dc88a396292aa8f277ef1347c"
+    },
+    {
+      "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\cross_kv.ort",
+      "bytes": 1287544,
+      "sha256": "143a36667b8d05fd9d04e8c337b7ee121f37ef299aea6b3d82bdb3d3401950b4"
+    },
+    {
+      "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\decoder_kv.ort",
+      "bytes": 32583720,
+      "sha256": "8852553f312adb6c9aa4d17418015049b30f412209ee569d336548c0044627de"
+    },
+    {
+      "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\encoder.ort",
+      "bytes": 7675440,
+      "sha256": "a8414e1a5dedf9f2093d7680601dd8a9b0433e7020260eafe0e370ead91134ca"
+    },
+    {
+      "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\frontend.model.ort",
+      "bytes": 23344,
+      "sha256": "5121b561417b638afce0c6c31b760e37c93cf97f80d9b0031aad1fe7b6f25d61"
+    },
+    {
+      "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\frontend.weights.ort",
+      "bytes": 2093464,
+      "sha256": "217da24ac6f522ebf02da8ef288e77d1ac68d50d4a6821433182e4fbf4204bbd"
+    },
+    {
+      "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\streaming_config.json",
+      "bytes": 509,
+      "sha256": "74fe5ddebd63b17caf59e8a3b18c17547ff7bce1642050edbb1c3962674f8950"
+    },
+    {
+      "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\tokenizer.bin",
+      "bytes": 249974,
+      "sha256": "6884b35fd6377d4c4d32336a0bc152f36b64d1e45b6503683cdc238250a8472d"
+    }
+  ]
+}

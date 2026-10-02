@@ -1,0 +1,4912 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-02T00:37:27.721160+00:00",
+  "evidence_type": "synthetic_engineering_smoke_only",
+  "runtime": {
+    "schema_version": 1,
+    "recorded_at_utc": "2026-10-01T23:41:52.360167+00:00",
+    "evidence_type": "local_asset_preparation_not_accuracy_result",
+    "runtime": "moonshine-voice",
+    "version": "0.1.5",
+    "language": "en",
+    "architecture": "TINY_STREAMING",
+    "model_path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21",
+    "artifacts": [
+      {
+        "path": "assets\\moonshine\\download.moonshine.ai\\model\\spelling-en\\spelling_cnn.ort",
+        "bytes": 1664920,
+        "sha256": "79abb40b6849cf7c013e83a3f276a0d822bb94c3edcc9ad003d38815c2cf37d4"
+      },
+      {
+        "path": "assets\\moonshine\\download.moonshine.ai\\model\\spelling-en\\spelling_cnn_meta.json",
+        "bytes": 622,
+        "sha256": "1d297cb4801652ccea6cecfd2973338f7cfdf99b7b77a5f5988548cb77ff11f4"
+      },
+      {
+        "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\adapter.ort",
+        "bytes": 1319664,
+        "sha256": "22ecc949e146c49667fda28d102d4e30749a107dc88a396292aa8f277ef1347c"
+      },
+      {
+        "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\cross_kv.ort",
+        "bytes": 1287544,
+        "sha256": "143a36667b8d05fd9d04e8c337b7ee121f37ef299aea6b3d82bdb3d3401950b4"
+      },
+      {
+        "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\decoder_kv.ort",
+        "bytes": 32583720,
+        "sha256": "8852553f312adb6c9aa4d17418015049b30f412209ee569d336548c0044627de"
+      },
+      {
+        "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\encoder.ort",
+        "bytes": 7675440,
+        "sha256": "a8414e1a5dedf9f2093d7680601dd8a9b0433e7020260eafe0e370ead91134ca"
+      },
+      {
+        "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\frontend.model.ort",
+        "bytes": 23344,
+        "sha256": "5121b561417b638afce0c6c31b760e37c93cf97f80d9b0031aad1fe7b6f25d61"
+      },
+      {
+        "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\frontend.weights.ort",
+        "bytes": 2093464,
+        "sha256": "217da24ac6f522ebf02da8ef288e77d1ac68d50d4a6821433182e4fbf4204bbd"
+      },
+      {
+        "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\streaming_config.json",
+        "bytes": 509,
+        "sha256": "74fe5ddebd63b17caf59e8a3b18c17547ff7bce1642050edbb1c3962674f8950"
+      },
+      {
+        "path": "assets\\moonshine\\download.moonshine.ai\\model\\tiny-streaming-en\\quantized_26_08_21\\tokenizer.bin",
+        "bytes": 249974,
+        "sha256": "6884b35fd6377d4c4d32336a0bc152f36b64d1e45b6503683cdc238250a8472d"
+      }
+    ]
+  },
+  "python": "3.12.11",
+  "os": "win32",
+  "configuration": {
+    "update_interval_seconds": 1.0,
+    "ingress_chunk_seconds": 0.1,
+    "transcriber_options": {
+      "identify_speakers": "false"
+    },
+    "thread_count": "not_exposed_by_inspected_public_option_parser"
+  },
+  "voice": "Microsoft David Desktop",
+  "repetitions": 3,
+  "model_load_seconds_os_cache_uncontrolled": 4.549111599997559,
+  "accuracy_denominator": "first repetition only; one synthetic voice; no held-out speakers",
+  "unmeasured": [
+    "word_aligned_lag",
+    "speech_onset_and_last_sound_latency",
+    "peak_ram_vram",
+    "browser_render",
+    "domain_slot_accuracy",
+    "breeder_usability",
+    "five_minute_sustainability"
+  ],
+  "runs": [
+    {
+      "clip_id": "question-01",
+      "outcome": "question",
+      "reference": "Why is this candidate amber?",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "4efc6d07f658c80f2af86d05eb197c9a46e3885cbaf26ae4368bfb2900d900f4",
+      "duration_seconds": 2.4,
+      "status": "ok",
+      "measurement": {
+        "text": "Why is this candidate amber?",
+        "stop_to_final_seconds": 1.8591285000002244,
+        "processing_seconds": 1.8591285000002244,
+        "realtime_factor": 0.7746368750000936
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-02",
+      "outcome": "question",
+      "reference": "How many trials support this candidate?",
+      "expected_slots": {
+        "field": "N_TRIALS_USED"
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "0c481410c6430842c5a812301ca59979bb14ff0d0d7a9c6d252c25e1244e9681",
+      "duration_seconds": 3.01,
+      "status": "ok",
+      "measurement": {
+        "text": "How many trials support this candidate?",
+        "stop_to_final_seconds": 2.5996487000011257,
+        "processing_seconds": 2.5996487000011257,
+        "realtime_factor": 0.8636706644522013
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-03",
+      "outcome": "question",
+      "reference": "What is the fumonisin level?",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM"
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "137eff57559d078c27959be604305f36483218c9d6551e4f1c8393f5d866a005",
+      "duration_seconds": 2.335,
+      "status": "ok",
+      "measurement": {
+        "text": "What is the few menace in level?",
+        "stop_to_final_seconds": 2.4445612999988953,
+        "processing_seconds": 2.4445612999988953,
+        "realtime_factor": 1.0469213276226532
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 2,
+        "wer": 0.6
+      }
+    },
+    {
+      "clip_id": "filter-01",
+      "outcome": "current_filter",
+      "reference": "Show germination at least ninety percent.",
+      "expected_slots": {
+        "field": "GERMINATION_PCT",
+        "comparator": "min_inclusive",
+        "value": 90,
+        "unit": "%"
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "cd950bf2a34ab07535f1f9ec6161411219efeb9aa2d7124853fc24eb245944da",
+      "duration_seconds": 3.25,
+      "status": "ok",
+      "measurement": {
+        "text": "Show germination at least ninety percent.",
+        "stop_to_final_seconds": 2.4520061000002897,
+        "processing_seconds": 2.4520061000002897,
+        "realtime_factor": 0.7544634153847045
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "filter-02",
+      "outcome": "current_filter",
+      "reference": "Show cold test at least eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "comparator": "min_inclusive",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "305babba2c124d941fdbf68f282353ada6f3c52d685bf8027c10b124abe2a537",
+      "duration_seconds": 4.115,
+      "status": "ok",
+      "measurement": {
+        "text": "Show cold test at least 87.5 percent",
+        "stop_to_final_seconds": 3.344576799994684,
+        "processing_seconds": 3.344576799994684,
+        "realtime_factor": 0.8127768651262901
+      },
+      "word_score": {
+        "reference_words": 10,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.4
+      }
+    },
+    {
+      "clip_id": "filter-03",
+      "outcome": "current_filter",
+      "reference": "Show at least seventeen trials, not seventy.",
+      "expected_slots": {
+        "field": "N_TRIALS_USED",
+        "value": 17,
+        "unit": "trials",
+        "rejected_value": 70
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "5a46bfe03df9e03bfb521247269212969b39b3a51e2f7454e72d96624340f593",
+      "duration_seconds": 3.945,
+      "status": "ok",
+      "measurement": {
+        "text": "Show at least seventeen trials. Not seventeen.",
+        "stop_to_final_seconds": 4.719645199998922,
+        "processing_seconds": 4.719645199998922,
+        "realtime_factor": 1.1963612674268498
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.14285714285714285
+      }
+    },
+    {
+      "clip_id": "preference-01",
+      "outcome": "personal_default",
+      "reference": "Set my review location to Station A.",
+      "expected_slots": {
+        "location": "Station A"
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "06ce56cbd196373533f000409feb4209a61d18f086da41464fd790252d894274",
+      "duration_seconds": 3.075,
+      "status": "ok",
+      "measurement": {
+        "text": "Set my review location to station a.",
+        "stop_to_final_seconds": 2.786815599996771,
+        "processing_seconds": 2.786815599996771,
+        "realtime_factor": 0.9062814959339093
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-02",
+      "outcome": "personal_default",
+      "reference": "Remember these filters.",
+      "expected_slots": {
+        "scope": "browser_view"
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "c373c6f8d8d1c8f19175b0dc20f7b991459d4eb0b13370b2b3e5b5f5eb9301a6",
+      "duration_seconds": 2.1,
+      "status": "ok",
+      "measurement": {
+        "text": "Remember these filters.",
+        "stop_to_final_seconds": 1.1449885999973048,
+        "processing_seconds": 1.1449885999973048,
+        "realtime_factor": 0.5452326666653833
+      },
+      "word_score": {
+        "reference_words": 3,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-03",
+      "outcome": "personal_default",
+      "reference": "Make ninety percent my minimum for green.",
+      "expected_slots": {
+        "unsupported": "policy_change"
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "ab130d437e3bab6f510fb376cbb20f366536600ff3199ba5dbb45d525e84d675",
+      "duration_seconds": 3.105,
+      "status": "ok",
+      "measurement": {
+        "text": "Make ninety percent my minimum for green.",
+        "stop_to_final_seconds": 4.18096610000066,
+        "processing_seconds": 4.18096610000066,
+        "realtime_factor": 1.3465269243158324
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "value-01",
+      "outcome": "value_entry",
+      "reference": "Enter cold test eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "822c8ea71f738403c8827fc51ad1593c06274587bce21e0836379834b6402cc9",
+      "duration_seconds": 3.71,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter cold test 87.5 percent",
+        "stop_to_final_seconds": 3.9403994000022067,
+        "processing_seconds": 3.9403994000022067,
+        "realtime_factor": 1.0621022641515383
+      },
+      "word_score": {
+        "reference_words": 8,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "value-02",
+      "outcome": "value_entry",
+      "reference": "Enter fumonisin zero point eight ppm.",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM",
+        "value": 0.8,
+        "unit": "ppm"
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "e4a23f9c57eb60aa99ef95e03e870bbac2d549f5f43ff2ac7dffbdea0f1e6f7a",
+      "duration_seconds": 3.435,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter few minutes and 0.8 ppm.",
+        "stop_to_final_seconds": 3.8601105000052485,
+        "processing_seconds": 3.8601105000052485,
+        "realtime_factor": 1.1237585152853706
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 4,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.6666666666666666
+      }
+    },
+    {
+      "clip_id": "value-03",
+      "outcome": "value_entry",
+      "reference": "Change eighty five to ninety percent.",
+      "expected_slots": {
+        "original": 85,
+        "value": 90,
+        "unit": "%",
+        "missing_field": true
+      },
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "f0e427a413dc7dd5142df739a3bb11ea3d4091333566797c3c3e01af9a06aca1",
+      "duration_seconds": 3.015,
+      "status": "ok",
+      "measurement": {
+        "text": "Change 85 to 90 percent.",
+        "stop_to_final_seconds": 4.57255509999959,
+        "processing_seconds": 4.57255509999959,
+        "realtime_factor": 1.5166020232171111
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 2,
+        "deletions": 1,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "silence-01",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.17355499999393942,
+        "processing_seconds": 0.17355499999393942,
+        "realtime_factor": 0.08677749999696971
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-02",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.15543590000015683,
+        "processing_seconds": 0.15543590000015683,
+        "realtime_factor": 0.07771795000007842
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-03",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.09938010000041686,
+        "processing_seconds": 0.09938010000041686,
+        "realtime_factor": 0.04969005000020843
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-04",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.06583979999413714,
+        "processing_seconds": 0.06583979999413714,
+        "realtime_factor": 0.03291989999706857
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-05",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.055409500004316214,
+        "processing_seconds": 0.055409500004316214,
+        "realtime_factor": 0.027704750002158107
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-06",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.17904099999577738,
+        "processing_seconds": 0.17904099999577738,
+        "realtime_factor": 0.08952049999788869
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-07",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.11423719999584137,
+        "processing_seconds": 0.11423719999584137,
+        "realtime_factor": 0.05711859999792068
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-08",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.06515719999879366,
+        "processing_seconds": 0.06515719999879366,
+        "realtime_factor": 0.03257859999939683
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-09",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.09418049999658251,
+        "processing_seconds": 0.09418049999658251,
+        "realtime_factor": 0.047090249998291256
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-10",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.08734790000016801,
+        "processing_seconds": 0.08734790000016801,
+        "realtime_factor": 0.043673950000084005
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "question-01",
+      "outcome": "question",
+      "reference": "Why is this candidate amber?",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "4efc6d07f658c80f2af86d05eb197c9a46e3885cbaf26ae4368bfb2900d900f4",
+      "duration_seconds": 2.4,
+      "status": "ok",
+      "measurement": {
+        "text": "Why is this candidate amber?",
+        "stop_to_final_seconds": 3.429194299998926,
+        "processing_seconds": 3.429194299998926,
+        "realtime_factor": 1.428830958332886
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-02",
+      "outcome": "question",
+      "reference": "How many trials support this candidate?",
+      "expected_slots": {
+        "field": "N_TRIALS_USED"
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "0c481410c6430842c5a812301ca59979bb14ff0d0d7a9c6d252c25e1244e9681",
+      "duration_seconds": 3.01,
+      "status": "ok",
+      "measurement": {
+        "text": "How many trials support this candidate?",
+        "stop_to_final_seconds": 3.9697649000008823,
+        "processing_seconds": 3.9697649000008823,
+        "realtime_factor": 1.3188587707644128
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-03",
+      "outcome": "question",
+      "reference": "What is the fumonisin level?",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM"
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "137eff57559d078c27959be604305f36483218c9d6551e4f1c8393f5d866a005",
+      "duration_seconds": 2.335,
+      "status": "ok",
+      "measurement": {
+        "text": "What is the few menace in level?",
+        "stop_to_final_seconds": 4.360641999999643,
+        "processing_seconds": 4.360641999999643,
+        "realtime_factor": 1.8675126338328236
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 2,
+        "wer": 0.6
+      }
+    },
+    {
+      "clip_id": "filter-01",
+      "outcome": "current_filter",
+      "reference": "Show germination at least ninety percent.",
+      "expected_slots": {
+        "field": "GERMINATION_PCT",
+        "comparator": "min_inclusive",
+        "value": 90,
+        "unit": "%"
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "cd950bf2a34ab07535f1f9ec6161411219efeb9aa2d7124853fc24eb245944da",
+      "duration_seconds": 3.25,
+      "status": "ok",
+      "measurement": {
+        "text": "Show germination at least 90 percent.",
+        "stop_to_final_seconds": 4.153497400002379,
+        "processing_seconds": 4.153497400002379,
+        "realtime_factor": 1.277999200000732
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.16666666666666666
+      }
+    },
+    {
+      "clip_id": "filter-02",
+      "outcome": "current_filter",
+      "reference": "Show cold test at least eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "comparator": "min_inclusive",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "305babba2c124d941fdbf68f282353ada6f3c52d685bf8027c10b124abe2a537",
+      "duration_seconds": 4.115,
+      "status": "ok",
+      "measurement": {
+        "text": "Show cold test at least 87.5 percent",
+        "stop_to_final_seconds": 4.582570799997484,
+        "processing_seconds": 4.582570799997484,
+        "realtime_factor": 1.113625953826849
+      },
+      "word_score": {
+        "reference_words": 10,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.4
+      }
+    },
+    {
+      "clip_id": "filter-03",
+      "outcome": "current_filter",
+      "reference": "Show at least seventeen trials, not seventy.",
+      "expected_slots": {
+        "field": "N_TRIALS_USED",
+        "value": 17,
+        "unit": "trials",
+        "rejected_value": 70
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "5a46bfe03df9e03bfb521247269212969b39b3a51e2f7454e72d96624340f593",
+      "duration_seconds": 3.945,
+      "status": "ok",
+      "measurement": {
+        "text": "Show at least seventeen trials. Not seventeen.",
+        "stop_to_final_seconds": 5.385700200000429,
+        "processing_seconds": 5.385700200000429,
+        "realtime_factor": 1.3651965019012493
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.14285714285714285
+      }
+    },
+    {
+      "clip_id": "preference-01",
+      "outcome": "personal_default",
+      "reference": "Set my review location to Station A.",
+      "expected_slots": {
+        "location": "Station A"
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "06ce56cbd196373533f000409feb4209a61d18f086da41464fd790252d894274",
+      "duration_seconds": 3.075,
+      "status": "ok",
+      "measurement": {
+        "text": "Set my review location to station a.",
+        "stop_to_final_seconds": 3.4158381999950507,
+        "processing_seconds": 3.4158381999950507,
+        "realtime_factor": 1.110841691055301
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-02",
+      "outcome": "personal_default",
+      "reference": "Remember these filters.",
+      "expected_slots": {
+        "scope": "browser_view"
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "c373c6f8d8d1c8f19175b0dc20f7b991459d4eb0b13370b2b3e5b5f5eb9301a6",
+      "duration_seconds": 2.1,
+      "status": "ok",
+      "measurement": {
+        "text": "Remember these filters.",
+        "stop_to_final_seconds": 1.265567499998724,
+        "processing_seconds": 1.265567499998724,
+        "realtime_factor": 0.6026511904755829
+      },
+      "word_score": {
+        "reference_words": 3,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-03",
+      "outcome": "personal_default",
+      "reference": "Make ninety percent my minimum for green.",
+      "expected_slots": {
+        "unsupported": "policy_change"
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "ab130d437e3bab6f510fb376cbb20f366536600ff3199ba5dbb45d525e84d675",
+      "duration_seconds": 3.105,
+      "status": "ok",
+      "measurement": {
+        "text": "Make ninety percent my minimum for green.",
+        "stop_to_final_seconds": 2.969370999999228,
+        "processing_seconds": 2.969370999999228,
+        "realtime_factor": 0.9563191626406531
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "value-01",
+      "outcome": "value_entry",
+      "reference": "Enter cold test eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "822c8ea71f738403c8827fc51ad1593c06274587bce21e0836379834b6402cc9",
+      "duration_seconds": 3.71,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter cold test 87.5 percent",
+        "stop_to_final_seconds": 3.2130878000025405,
+        "processing_seconds": 3.2130878000025405,
+        "realtime_factor": 0.8660614016179354
+      },
+      "word_score": {
+        "reference_words": 8,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "value-02",
+      "outcome": "value_entry",
+      "reference": "Enter fumonisin zero point eight ppm.",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM",
+        "value": 0.8,
+        "unit": "ppm"
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "e4a23f9c57eb60aa99ef95e03e870bbac2d549f5f43ff2ac7dffbdea0f1e6f7a",
+      "duration_seconds": 3.435,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter few minutes and 0.8 ppm.",
+        "stop_to_final_seconds": 3.4478123000008054,
+        "processing_seconds": 3.4478123000008054,
+        "realtime_factor": 1.0037299272200306
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 4,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.6666666666666666
+      }
+    },
+    {
+      "clip_id": "value-03",
+      "outcome": "value_entry",
+      "reference": "Change eighty five to ninety percent.",
+      "expected_slots": {
+        "original": 85,
+        "value": 90,
+        "unit": "%",
+        "missing_field": true
+      },
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "f0e427a413dc7dd5142df739a3bb11ea3d4091333566797c3c3e01af9a06aca1",
+      "duration_seconds": 3.015,
+      "status": "ok",
+      "measurement": {
+        "text": "Change 85 to 90 percent.",
+        "stop_to_final_seconds": 3.1329038000039873,
+        "processing_seconds": 3.1329038000039873,
+        "realtime_factor": 1.0391057379781052
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 2,
+        "deletions": 1,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "silence-01",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.20413349999580532,
+        "processing_seconds": 0.20413349999580532,
+        "realtime_factor": 0.10206674999790266
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-02",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.14653109999926528,
+        "processing_seconds": 0.14653109999926528,
+        "realtime_factor": 0.07326554999963264
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-03",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.08400619999883929,
+        "processing_seconds": 0.08400619999883929,
+        "realtime_factor": 0.042003099999419646
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-04",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.05664719999913359,
+        "processing_seconds": 0.05664719999913359,
+        "realtime_factor": 0.028323599999566795
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-05",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.05505240000638878,
+        "processing_seconds": 0.05505240000638878,
+        "realtime_factor": 0.02752620000319439
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-06",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.050599999995029066,
+        "processing_seconds": 0.050599999995029066,
+        "realtime_factor": 0.025299999997514533
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-07",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.12950090000231285,
+        "processing_seconds": 0.12950090000231285,
+        "realtime_factor": 0.06475045000115642
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-08",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.08294640000531217,
+        "processing_seconds": 0.08294640000531217,
+        "realtime_factor": 0.041473200002656085
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-09",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.06192430000373861,
+        "processing_seconds": 0.06192430000373861,
+        "realtime_factor": 0.030962150001869304
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-10",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.06749679999484215,
+        "processing_seconds": 0.06749679999484215,
+        "realtime_factor": 0.033748399997421075
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "question-01",
+      "outcome": "question",
+      "reference": "Why is this candidate amber?",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "4efc6d07f658c80f2af86d05eb197c9a46e3885cbaf26ae4368bfb2900d900f4",
+      "duration_seconds": 2.4,
+      "status": "ok",
+      "measurement": {
+        "text": "Why is this candidate amber?",
+        "stop_to_final_seconds": 2.5044199000039953,
+        "processing_seconds": 2.5044199000039953,
+        "realtime_factor": 1.0435082916683314
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-02",
+      "outcome": "question",
+      "reference": "How many trials support this candidate?",
+      "expected_slots": {
+        "field": "N_TRIALS_USED"
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "0c481410c6430842c5a812301ca59979bb14ff0d0d7a9c6d252c25e1244e9681",
+      "duration_seconds": 3.01,
+      "status": "ok",
+      "measurement": {
+        "text": "How many trials support this candidate?",
+        "stop_to_final_seconds": 3.5288101000041934,
+        "processing_seconds": 3.5288101000041934,
+        "realtime_factor": 1.1723621594698317
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-03",
+      "outcome": "question",
+      "reference": "What is the fumonisin level?",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM"
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "137eff57559d078c27959be604305f36483218c9d6551e4f1c8393f5d866a005",
+      "duration_seconds": 2.335,
+      "status": "ok",
+      "measurement": {
+        "text": "What is the few menace in level?",
+        "stop_to_final_seconds": 4.083332200003497,
+        "processing_seconds": 4.083332200003497,
+        "realtime_factor": 1.748750406853746
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 2,
+        "wer": 0.6
+      }
+    },
+    {
+      "clip_id": "filter-01",
+      "outcome": "current_filter",
+      "reference": "Show germination at least ninety percent.",
+      "expected_slots": {
+        "field": "GERMINATION_PCT",
+        "comparator": "min_inclusive",
+        "value": 90,
+        "unit": "%"
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "cd950bf2a34ab07535f1f9ec6161411219efeb9aa2d7124853fc24eb245944da",
+      "duration_seconds": 3.25,
+      "status": "ok",
+      "measurement": {
+        "text": "Show germination at least 90 percent.",
+        "stop_to_final_seconds": 2.8267540999950143,
+        "processing_seconds": 2.8267540999950143,
+        "realtime_factor": 0.8697704923061582
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.16666666666666666
+      }
+    },
+    {
+      "clip_id": "filter-02",
+      "outcome": "current_filter",
+      "reference": "Show cold test at least eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "comparator": "min_inclusive",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "305babba2c124d941fdbf68f282353ada6f3c52d685bf8027c10b124abe2a537",
+      "duration_seconds": 4.115,
+      "status": "ok",
+      "measurement": {
+        "text": "Show cold test at least 87.5 percent",
+        "stop_to_final_seconds": 3.7107298000046285,
+        "processing_seconds": 3.7107298000046285,
+        "realtime_factor": 0.9017569380327165
+      },
+      "word_score": {
+        "reference_words": 10,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.4
+      }
+    },
+    {
+      "clip_id": "filter-03",
+      "outcome": "current_filter",
+      "reference": "Show at least seventeen trials, not seventy.",
+      "expected_slots": {
+        "field": "N_TRIALS_USED",
+        "value": 17,
+        "unit": "trials",
+        "rejected_value": 70
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "5a46bfe03df9e03bfb521247269212969b39b3a51e2f7454e72d96624340f593",
+      "duration_seconds": 3.945,
+      "status": "ok",
+      "measurement": {
+        "text": "Show at least seventeen trials. Not seventeen.",
+        "stop_to_final_seconds": 3.061202899996715,
+        "processing_seconds": 3.061202899996715,
+        "realtime_factor": 0.7759703168559481
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.14285714285714285
+      }
+    },
+    {
+      "clip_id": "preference-01",
+      "outcome": "personal_default",
+      "reference": "Set my review location to Station A.",
+      "expected_slots": {
+        "location": "Station A"
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "06ce56cbd196373533f000409feb4209a61d18f086da41464fd790252d894274",
+      "duration_seconds": 3.075,
+      "status": "ok",
+      "measurement": {
+        "text": "Set my review location to station a.",
+        "stop_to_final_seconds": 3.4875460999974166,
+        "processing_seconds": 3.4875460999974166,
+        "realtime_factor": 1.1341613333324931
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-02",
+      "outcome": "personal_default",
+      "reference": "Remember these filters.",
+      "expected_slots": {
+        "scope": "browser_view"
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "c373c6f8d8d1c8f19175b0dc20f7b991459d4eb0b13370b2b3e5b5f5eb9301a6",
+      "duration_seconds": 2.1,
+      "status": "ok",
+      "measurement": {
+        "text": "Remember these filters.",
+        "stop_to_final_seconds": 2.2381662000043434,
+        "processing_seconds": 2.2381662000043434,
+        "realtime_factor": 1.065793428573497
+      },
+      "word_score": {
+        "reference_words": 3,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-03",
+      "outcome": "personal_default",
+      "reference": "Make ninety percent my minimum for green.",
+      "expected_slots": {
+        "unsupported": "policy_change"
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "ab130d437e3bab6f510fb376cbb20f366536600ff3199ba5dbb45d525e84d675",
+      "duration_seconds": 3.105,
+      "status": "ok",
+      "measurement": {
+        "text": "Make ninety percent my minimum for green.",
+        "stop_to_final_seconds": 3.8645749000061187,
+        "processing_seconds": 3.8645749000061187,
+        "realtime_factor": 1.244629597425481
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "value-01",
+      "outcome": "value_entry",
+      "reference": "Enter cold test eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "822c8ea71f738403c8827fc51ad1593c06274587bce21e0836379834b6402cc9",
+      "duration_seconds": 3.71,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter cold test 87.5 percent",
+        "stop_to_final_seconds": 2.1018953999955556,
+        "processing_seconds": 2.1018953999955556,
+        "realtime_factor": 0.5665486253357293
+      },
+      "word_score": {
+        "reference_words": 8,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "value-02",
+      "outcome": "value_entry",
+      "reference": "Enter fumonisin zero point eight ppm.",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM",
+        "value": 0.8,
+        "unit": "ppm"
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "e4a23f9c57eb60aa99ef95e03e870bbac2d549f5f43ff2ac7dffbdea0f1e6f7a",
+      "duration_seconds": 3.435,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter few minutes and 0.8 ppm.",
+        "stop_to_final_seconds": 3.5714502000046195,
+        "processing_seconds": 3.5714502000046195,
+        "realtime_factor": 1.0397234934511266
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 4,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.6666666666666666
+      }
+    },
+    {
+      "clip_id": "value-03",
+      "outcome": "value_entry",
+      "reference": "Change eighty five to ninety percent.",
+      "expected_slots": {
+        "original": 85,
+        "value": 90,
+        "unit": "%",
+        "missing_field": true
+      },
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "f0e427a413dc7dd5142df739a3bb11ea3d4091333566797c3c3e01af9a06aca1",
+      "duration_seconds": 3.015,
+      "status": "ok",
+      "measurement": {
+        "text": "Change 85 to 90 percent.",
+        "stop_to_final_seconds": 3.5041739999942365,
+        "processing_seconds": 3.5041739999942365,
+        "realtime_factor": 1.1622467661672427
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 2,
+        "deletions": 1,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "silence-01",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.13464559999556514,
+        "processing_seconds": 0.13464559999556514,
+        "realtime_factor": 0.06732279999778257
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-02",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.10744800000247778,
+        "processing_seconds": 0.10744800000247778,
+        "realtime_factor": 0.05372400000123889
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-03",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.10967259999597445,
+        "processing_seconds": 0.10967259999597445,
+        "realtime_factor": 0.054836299997987226
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-04",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.09859510000387672,
+        "processing_seconds": 0.09859510000387672,
+        "realtime_factor": 0.04929755000193836
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-05",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.05968310000025667,
+        "processing_seconds": 0.05968310000025667,
+        "realtime_factor": 0.029841550000128336
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-06",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.07318680000025779,
+        "processing_seconds": 0.07318680000025779,
+        "realtime_factor": 0.036593400000128895
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-07",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.06135210000502411,
+        "processing_seconds": 0.06135210000502411,
+        "realtime_factor": 0.030676050002512056
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-08",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.0636028000008082,
+        "processing_seconds": 0.0636028000008082,
+        "realtime_factor": 0.0318014000004041
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-09",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.043261300001177005,
+        "processing_seconds": 0.043261300001177005,
+        "realtime_factor": 0.021630650000588503
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-10",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "utterance",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_to_final_seconds": 0.050430600000254344,
+        "processing_seconds": 0.050430600000254344,
+        "realtime_factor": 0.025215300000127172
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "question-01",
+      "outcome": "question",
+      "reference": "Why is this candidate amber?",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "4efc6d07f658c80f2af86d05eb197c9a46e3885cbaf26ae4368bfb2900d900f4",
+      "duration_seconds": 2.4,
+      "status": "ok",
+      "measurement": {
+        "text": "Why is this candidate amber?",
+        "stop_elapsed_seconds": 2.7246631999951205,
+        "stop_to_final_seconds": 1.738117200002307,
+        "processing_seconds": 3.3516535999879125,
+        "realtime_factor": 1.396522333328297,
+        "maximum_replay_backlog_seconds": 1.519634700001916,
+        "replay_wall_seconds": 4.462780399997428,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.7194297999958508,
+            "text": "Why is this happening?"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.7194447000001674,
+            "text": "Why is this happening?"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.46276499999658,
+            "text": "Why is this candidate amber?"
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 4.462776699998358,
+            "text": "Why is this candidate amber?"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.7194297999958508
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-02",
+      "outcome": "question",
+      "reference": "How many trials support this candidate?",
+      "expected_slots": {
+        "field": "N_TRIALS_USED"
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "0c481410c6430842c5a812301ca59979bb14ff0d0d7a9c6d252c25e1244e9681",
+      "duration_seconds": 3.01,
+      "status": "ok",
+      "measurement": {
+        "text": "How many trials support this candidate?",
+        "stop_elapsed_seconds": 3.7920065999933286,
+        "stop_to_final_seconds": 1.1928534000035143,
+        "processing_seconds": 3.592875499991351,
+        "realtime_factor": 1.1936463455120767,
+        "maximum_replay_backlog_seconds": 1.5864213000022573,
+        "replay_wall_seconds": 4.984859999996843,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 1.9258150999958161,
+            "text": "How many children?"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 1.92582169999514,
+            "text": "How many children?"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 3.7860414999959175,
+            "text": "How many trials support this campus?"
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 4.984846499995911,
+            "text": "How many trials support this candidate?"
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 4.984856199997012,
+            "text": "How many trials support this candidate?"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 1.9258150999958161
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-03",
+      "outcome": "question",
+      "reference": "What is the fumonisin level?",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM"
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "137eff57559d078c27959be604305f36483218c9d6551e4f1c8393f5d866a005",
+      "duration_seconds": 2.335,
+      "status": "ok",
+      "measurement": {
+        "text": "What is the few menace in level?",
+        "stop_elapsed_seconds": 4.186722500002361,
+        "stop_to_final_seconds": 0.11565510000218637,
+        "processing_seconds": 3.0099522000091383,
+        "realtime_factor": 1.2890587580338921,
+        "maximum_replay_backlog_seconds": 1.9856439000068349,
+        "replay_wall_seconds": 4.302377600004547,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 1.9769760000053793,
+            "text": "What is the fuel?"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 1.976983400003519,
+            "text": "What is the fuel?"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.185359500006598,
+            "text": "What is the few menace in level?"
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 4.18536529999983,
+            "text": "What is the few menace in level?"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 1.9769760000053793
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 2,
+        "wer": 0.6
+      }
+    },
+    {
+      "clip_id": "filter-01",
+      "outcome": "current_filter",
+      "reference": "Show germination at least ninety percent.",
+      "expected_slots": {
+        "field": "GERMINATION_PCT",
+        "comparator": "min_inclusive",
+        "value": 90,
+        "unit": "%"
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "cd950bf2a34ab07535f1f9ec6161411219efeb9aa2d7124853fc24eb245944da",
+      "duration_seconds": 3.25,
+      "status": "ok",
+      "measurement": {
+        "text": "Show germination at least 90 percent.",
+        "stop_elapsed_seconds": 5.177581600000849,
+        "stop_to_final_seconds": 0.487852499994915,
+        "processing_seconds": 4.299544900022738,
+        "realtime_factor": 1.3229368923146887,
+        "maximum_replay_backlog_seconds": 2.475779699998384,
+        "replay_wall_seconds": 5.665434099995764,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.526814099997864,
+            "text": "Show German."
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.5268214999960037,
+            "text": "Show German."
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 5.175438899997971,
+            "text": "Show germination at least 90 percent."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 5.665429900000163,
+            "text": "Show germination at least 90 percent."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.526814099997864
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.16666666666666666
+      }
+    },
+    {
+      "clip_id": "filter-02",
+      "outcome": "current_filter",
+      "reference": "Show cold test at least eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "comparator": "min_inclusive",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "305babba2c124d941fdbf68f282353ada6f3c52d685bf8027c10b124abe2a537",
+      "duration_seconds": 4.115,
+      "status": "ok",
+      "measurement": {
+        "text": "Show cold test at least 87.5 percent",
+        "stop_elapsed_seconds": 4.686099999998987,
+        "stop_to_final_seconds": 2.702675900000031,
+        "processing_seconds": 6.071024500008207,
+        "realtime_factor": 1.4753400972073405,
+        "maximum_replay_backlog_seconds": 2.4762231999993674,
+        "replay_wall_seconds": 7.388775899999018,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.0374807999978657,
+            "text": "Show cold,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.0374924999996438,
+            "text": "Show cold,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.675926299998537,
+            "text": "Show cold test at least eighty eighty."
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 7.3887668999959715,
+            "text": "Show cold test at least 87.5 percent"
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 7.388772899998003,
+            "text": "Show cold test at least 87.5 percent"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.0374807999978657
+      },
+      "word_score": {
+        "reference_words": 10,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.4
+      }
+    },
+    {
+      "clip_id": "filter-03",
+      "outcome": "current_filter",
+      "reference": "Show at least seventeen trials, not seventy.",
+      "expected_slots": {
+        "field": "N_TRIALS_USED",
+        "value": 17,
+        "unit": "trials",
+        "rejected_value": 70
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "5a46bfe03df9e03bfb521247269212969b39b3a51e2f7454e72d96624340f593",
+      "duration_seconds": 3.945,
+      "status": "ok",
+      "measurement": {
+        "text": "Show at least seventeen trials. Not seventeen.",
+        "stop_elapsed_seconds": 4.2401746999967145,
+        "stop_to_final_seconds": 1.1517181000017445,
+        "processing_seconds": 4.124012900007074,
+        "realtime_factor": 1.0453771609650377,
+        "maximum_replay_backlog_seconds": 1.6358665000007022,
+        "replay_wall_seconds": 5.391892799998459,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.4548164999941946,
+            "text": "Show at least,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.4548236999980872,
+            "text": "Show at least,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.2355064999937895,
+            "text": "Show at least seventeen trials."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 4.235512699997344,
+            "text": "Show at least seventeen trials."
+          },
+          {
+            "sequence": 5,
+            "kind": "started",
+            "elapsed_seconds": 5.39188060000015,
+            "text": "Not seventeen."
+          },
+          {
+            "sequence": 6,
+            "kind": "partial",
+            "elapsed_seconds": 5.391887699996005,
+            "text": "Not seventeen."
+          },
+          {
+            "sequence": 7,
+            "kind": "completed",
+            "elapsed_seconds": 5.391891199993552,
+            "text": "Not seventeen."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.4548164999941946
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.14285714285714285
+      }
+    },
+    {
+      "clip_id": "preference-01",
+      "outcome": "personal_default",
+      "reference": "Set my review location to Station A.",
+      "expected_slots": {
+        "location": "Station A"
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "06ce56cbd196373533f000409feb4209a61d18f086da41464fd790252d894274",
+      "duration_seconds": 3.075,
+      "status": "ok",
+      "measurement": {
+        "text": "Set my review location to station a.",
+        "stop_elapsed_seconds": 3.277466600004118,
+        "stop_to_final_seconds": 2.1524967000004835,
+        "processing_seconds": 4.3048560000097496,
+        "realtime_factor": 1.3999531707348778,
+        "maximum_replay_backlog_seconds": 2.0718495000037365,
+        "replay_wall_seconds": 5.4299633000046015,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 3.271328499999072,
+            "text": "Said my ripple,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 3.2713593000007677,
+            "text": "Said my ripple,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 5.429954400002316,
+            "text": "Set my review location to station a."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 5.429960400004347,
+            "text": "Set my review location to station a."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 3.271328499999072
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-02",
+      "outcome": "personal_default",
+      "reference": "Remember these filters.",
+      "expected_slots": {
+        "scope": "browser_view"
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "c373c6f8d8d1c8f19175b0dc20f7b991459d4eb0b13370b2b3e5b5f5eb9301a6",
+      "duration_seconds": 2.1,
+      "status": "ok",
+      "measurement": {
+        "text": "Remember these filters.",
+        "stop_elapsed_seconds": 3.2023010999982944,
+        "stop_to_final_seconds": 0.003860199998598546,
+        "processing_seconds": 1.9120485999956145,
+        "realtime_factor": 0.910499333331245,
+        "maximum_replay_backlog_seconds": 0.7690125000008265,
+        "replay_wall_seconds": 3.206161299996893,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 1.968834399995103,
+            "text": "Remember these"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 1.96884080000018,
+            "text": "Remember these"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 3.2020762999964063,
+            "text": "Remember these filters."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 3.2020815999931074,
+            "text": "Remember these filters."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 1.968834399995103
+      },
+      "word_score": {
+        "reference_words": 3,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-03",
+      "outcome": "personal_default",
+      "reference": "Make ninety percent my minimum for green.",
+      "expected_slots": {
+        "unsupported": "policy_change"
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "ab130d437e3bab6f510fb376cbb20f366536600ff3199ba5dbb45d525e84d675",
+      "duration_seconds": 3.105,
+      "status": "ok",
+      "measurement": {
+        "text": "Make ninety percent my minimum for green.",
+        "stop_elapsed_seconds": 4.2962650999979815,
+        "stop_to_final_seconds": 0.4479581999985385,
+        "processing_seconds": 3.6299552000200492,
+        "realtime_factor": 1.169067697268937,
+        "maximum_replay_backlog_seconds": 1.6941735000000335,
+        "replay_wall_seconds": 4.74422329999652,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.497375299994019,
+            "text": "Make 90."
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.4973824999979115,
+            "text": "Make 90."
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.29368699999759,
+            "text": "Make ninety percent my minimum for green."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 4.74421849999635,
+            "text": "Make ninety percent my minimum for green."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.497375299994019
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "value-01",
+      "outcome": "value_entry",
+      "reference": "Enter cold test eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "822c8ea71f738403c8827fc51ad1593c06274587bce21e0836379834b6402cc9",
+      "duration_seconds": 3.71,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter cold test 87.5 percent",
+        "stop_elapsed_seconds": 4.248700499992992,
+        "stop_to_final_seconds": 1.91163310000411,
+        "processing_seconds": 5.0112020000160555,
+        "realtime_factor": 1.35072830189112,
+        "maximum_replay_backlog_seconds": 1.932847899995977,
+        "replay_wall_seconds": 6.160333599997102,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.2504300999935367,
+            "text": "Enter Cold,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.250436599999375,
+            "text": "Enter Cold,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.23251529999834,
+            "text": "Enter cold test 87.7."
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 6.160322999996424,
+            "text": "Enter cold test 87.5 percent"
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 6.160330099999555,
+            "text": "Enter cold test 87.5 percent"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.2504300999935367
+      },
+      "word_score": {
+        "reference_words": 8,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "value-02",
+      "outcome": "value_entry",
+      "reference": "Enter fumonisin zero point eight ppm.",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM",
+        "value": 0.8,
+        "unit": "ppm"
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "e4a23f9c57eb60aa99ef95e03e870bbac2d549f5f43ff2ac7dffbdea0f1e6f7a",
+      "duration_seconds": 3.435,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter few minutes and 0.8 ppm.",
+        "stop_elapsed_seconds": 4.951711000001524,
+        "stop_to_final_seconds": 1.6700465000030817,
+        "processing_seconds": 5.5078933000186225,
+        "realtime_factor": 1.6034623871961056,
+        "maximum_replay_backlog_seconds": 2.2492273000098066,
+        "replay_wall_seconds": 6.621757500004605,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.599091000003682,
+            "text": "Enter Fuel Moment."
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.599099200000637,
+            "text": "Enter Fuel Moment."
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.948835800001689,
+            "text": "Enter few minutes and 0.8 ppp."
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 6.621749500001897,
+            "text": "Enter few minutes and 0.8 ppm."
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 6.621754700005113,
+            "text": "Enter few minutes and 0.8 ppm."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.599091000003682
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 4,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.6666666666666666
+      }
+    },
+    {
+      "clip_id": "value-03",
+      "outcome": "value_entry",
+      "reference": "Change eighty five to ninety percent.",
+      "expected_slots": {
+        "original": 85,
+        "value": 90,
+        "unit": "%",
+        "missing_field": true
+      },
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "f0e427a413dc7dd5142df739a3bb11ea3d4091333566797c3c3e01af9a06aca1",
+      "duration_seconds": 3.015,
+      "status": "ok",
+      "measurement": {
+        "text": "Change 85 to 90 percent.",
+        "stop_elapsed_seconds": 5.085005399996589,
+        "stop_to_final_seconds": 1.232290700005251,
+        "processing_seconds": 5.040076900004351,
+        "realtime_factor": 1.671667296850531,
+        "maximum_replay_backlog_seconds": 2.483507600001758,
+        "replay_wall_seconds": 6.31729610000184,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.4818986999962362,
+            "text": "Change, e, d, e,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.481922699997085,
+            "text": "Change, e, d, e,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 5.08314309999696,
+            "text": "Change 85 to 90 percent"
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 6.3172698999987915,
+            "text": "Change 85 to 90 percent."
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 6.317287999998371,
+            "text": "Change 85 to 90 percent."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.4818986999962362
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 2,
+        "deletions": 1,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "silence-01",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.002626900000905,
+        "stop_to_final_seconds": 0.02130409999517724,
+        "processing_seconds": 0.04282170000078622,
+        "realtime_factor": 0.02141085000039311,
+        "maximum_replay_backlog_seconds": 0.12545209999370854,
+        "replay_wall_seconds": 2.0239309999960824,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-02",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0096245000022464,
+        "stop_to_final_seconds": 0.026393599997390993,
+        "processing_seconds": 0.057171799991920125,
+        "realtime_factor": 0.028585899995960062,
+        "maximum_replay_backlog_seconds": 0.015542100001766812,
+        "replay_wall_seconds": 2.0360180999996373,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-03",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.004356799996458,
+        "stop_to_final_seconds": 0.03520090000529308,
+        "processing_seconds": 0.10614429999986896,
+        "realtime_factor": 0.05307214999993448,
+        "maximum_replay_backlog_seconds": 0.05544229999941308,
+        "replay_wall_seconds": 2.039557700001751,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-04",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0224735000010696,
+        "stop_to_final_seconds": 0.038772700005210936,
+        "processing_seconds": 0.07731630000489531,
+        "realtime_factor": 0.038658150002447655,
+        "maximum_replay_backlog_seconds": 0.04301349999877857,
+        "replay_wall_seconds": 2.0612462000062806,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-05",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.015654800001357,
+        "stop_to_final_seconds": 0.022072200001275633,
+        "processing_seconds": 0.07885750000423286,
+        "realtime_factor": 0.03942875000211643,
+        "maximum_replay_backlog_seconds": 0.03854520000459161,
+        "replay_wall_seconds": 2.037727000002633,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-06",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0072104999999283,
+        "stop_to_final_seconds": 0.02221599999757018,
+        "processing_seconds": 0.0603904000017792,
+        "realtime_factor": 0.0301952000008896,
+        "maximum_replay_backlog_seconds": 0.02094859999488108,
+        "replay_wall_seconds": 2.0294264999974985,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-07",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.010563700001512,
+        "stop_to_final_seconds": 0.022679999994579703,
+        "processing_seconds": 0.05845630000112578,
+        "realtime_factor": 0.02922815000056289,
+        "maximum_replay_backlog_seconds": 0.0175944000002346,
+        "replay_wall_seconds": 2.033243699996092,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-08",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0086034999985714,
+        "stop_to_final_seconds": 0.0180158000002848,
+        "processing_seconds": 0.05106210000667488,
+        "realtime_factor": 0.02553105000333744,
+        "maximum_replay_backlog_seconds": 0.03277410000009695,
+        "replay_wall_seconds": 2.026619299998856,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-09",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0142311999952653,
+        "stop_to_final_seconds": 0.02236050000647083,
+        "processing_seconds": 0.06776239998725941,
+        "realtime_factor": 0.03388119999362971,
+        "maximum_replay_backlog_seconds": 0.021018600004026666,
+        "replay_wall_seconds": 2.036591700001736,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-10",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 1,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.001652999999351,
+        "stop_to_final_seconds": 0.014911400001437869,
+        "processing_seconds": 0.04858969998167595,
+        "realtime_factor": 0.024294849990837974,
+        "maximum_replay_backlog_seconds": 0.025190399996063206,
+        "replay_wall_seconds": 2.0165644000007887,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "question-01",
+      "outcome": "question",
+      "reference": "Why is this candidate amber?",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "4efc6d07f658c80f2af86d05eb197c9a46e3885cbaf26ae4368bfb2900d900f4",
+      "duration_seconds": 2.4,
+      "status": "ok",
+      "measurement": {
+        "text": "Why is this candidate amber?",
+        "stop_elapsed_seconds": 2.7012311999933445,
+        "stop_to_final_seconds": 1.285248700005468,
+        "processing_seconds": 2.8778503999928944,
+        "realtime_factor": 1.1991043333303728,
+        "maximum_replay_backlog_seconds": 1.4978240999989794,
+        "replay_wall_seconds": 3.9864798999988125,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.6975660999960382,
+            "text": "Why is this happening?"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.697573099998408,
+            "text": "Why is this happening?"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 3.98647229999915,
+            "text": "Why is this candidate amber?"
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 3.9864774999950896,
+            "text": "Why is this candidate amber?"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.6975660999960382
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-02",
+      "outcome": "question",
+      "reference": "How many trials support this candidate?",
+      "expected_slots": {
+        "field": "N_TRIALS_USED"
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "0c481410c6430842c5a812301ca59979bb14ff0d0d7a9c6d252c25e1244e9681",
+      "duration_seconds": 3.01,
+      "status": "ok",
+      "measurement": {
+        "text": "How many trials support this candidate?",
+        "stop_elapsed_seconds": 4.206713400002627,
+        "stop_to_final_seconds": 0.8790130999987014,
+        "processing_seconds": 3.965119300009974,
+        "realtime_factor": 1.3173153820631143,
+        "maximum_replay_backlog_seconds": 1.7399781999993138,
+        "replay_wall_seconds": 5.0857265000013285,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.3692327000026125,
+            "text": "How many children?"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.3692556000023615,
+            "text": "How many children?"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.13955469999928,
+            "text": "How many trials support this cannabis?"
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 5.0857179000013275,
+            "text": "How many trials support this candidate?"
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 5.085723500000313,
+            "text": "How many trials support this candidate?"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.3692327000026125
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-03",
+      "outcome": "question",
+      "reference": "What is the fumonisin level?",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM"
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "137eff57559d078c27959be604305f36483218c9d6551e4f1c8393f5d866a005",
+      "duration_seconds": 2.335,
+      "status": "ok",
+      "measurement": {
+        "text": "What is the few menace in level?",
+        "stop_elapsed_seconds": 2.380516600002011,
+        "stop_to_final_seconds": 1.5045057000024826,
+        "processing_seconds": 2.774459200009005,
+        "realtime_factor": 1.188205224843257,
+        "maximum_replay_backlog_seconds": 1.175213900009112,
+        "replay_wall_seconds": 3.8850223000044934,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.3746398000002955,
+            "text": "What is the fuel?"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.3746469000034267,
+            "text": "What is the fuel?"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 3.884984300006181,
+            "text": "What is the few menace in level?"
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 3.885010100006184,
+            "text": "What is the few menace in level?"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.3746398000002955
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 2,
+        "wer": 0.6
+      }
+    },
+    {
+      "clip_id": "filter-01",
+      "outcome": "current_filter",
+      "reference": "Show germination at least ninety percent.",
+      "expected_slots": {
+        "field": "GERMINATION_PCT",
+        "comparator": "min_inclusive",
+        "value": 90,
+        "unit": "%"
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "cd950bf2a34ab07535f1f9ec6161411219efeb9aa2d7124853fc24eb245944da",
+      "duration_seconds": 3.25,
+      "status": "ok",
+      "measurement": {
+        "text": "Show germination at least ninety percent.",
+        "stop_elapsed_seconds": 5.2910980000015115,
+        "stop_to_final_seconds": 0.5911836000013864,
+        "processing_seconds": 4.5690418999729445,
+        "realtime_factor": 1.4058590461455214,
+        "maximum_replay_backlog_seconds": 2.7860845000031986,
+        "replay_wall_seconds": 5.882281600002898,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.333487800002331,
+            "text": "Show German."
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.333494899998186,
+            "text": "Show German."
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 5.285678699998243,
+            "text": "Show germination at least ninety percent."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 5.882277400000021,
+            "text": "Show germination at least ninety percent."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.333487800002331
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "filter-02",
+      "outcome": "current_filter",
+      "reference": "Show cold test at least eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "comparator": "min_inclusive",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "305babba2c124d941fdbf68f282353ada6f3c52d685bf8027c10b124abe2a537",
+      "duration_seconds": 4.115,
+      "status": "ok",
+      "measurement": {
+        "text": "Show cold test at least 87.5 percent",
+        "stop_elapsed_seconds": 4.490980999995372,
+        "stop_to_final_seconds": 3.4885354000070947,
+        "processing_seconds": 6.618123699983698,
+        "realtime_factor": 1.6082925151843737,
+        "maximum_replay_backlog_seconds": 2.285378100001253,
+        "replay_wall_seconds": 7.979516400002467,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 1.8707531999971252,
+            "text": "Show cold,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 1.8707845999961137,
+            "text": "Show cold,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.485070099995937,
+            "text": "Show cold test at least eighty eighty."
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 7.979504499999166,
+            "text": "Show cold test at least 87.5 percent"
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 7.979511600002297,
+            "text": "Show cold test at least 87.5 percent"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 1.8707531999971252
+      },
+      "word_score": {
+        "reference_words": 10,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.4
+      }
+    },
+    {
+      "clip_id": "filter-03",
+      "outcome": "current_filter",
+      "reference": "Show at least seventeen trials, not seventy.",
+      "expected_slots": {
+        "field": "N_TRIALS_USED",
+        "value": 17,
+        "unit": "trials",
+        "rejected_value": 70
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "5a46bfe03df9e03bfb521247269212969b39b3a51e2f7454e72d96624340f593",
+      "duration_seconds": 3.945,
+      "status": "ok",
+      "measurement": {
+        "text": "Show at least seventeen trials. Not seventeen.",
+        "stop_elapsed_seconds": 6.99188100000174,
+        "stop_to_final_seconds": 0.6052997000006144,
+        "processing_seconds": 6.340114800019364,
+        "realtime_factor": 1.6071266920201177,
+        "maximum_replay_backlog_seconds": 3.4231518000015058,
+        "replay_wall_seconds": 7.597180700002355,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 3.3606113999994704,
+            "text": "Show at least,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 3.36061879999761,
+            "text": "Show at least,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 6.922341999998025,
+            "text": "Show at least seventeen trials."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 6.922349300002679,
+            "text": "Show at least seventeen trials."
+          },
+          {
+            "sequence": 5,
+            "kind": "started",
+            "elapsed_seconds": 6.922354100002849,
+            "text": "Not seventeen."
+          },
+          {
+            "sequence": 6,
+            "kind": "partial",
+            "elapsed_seconds": 6.9223583999992115,
+            "text": "Not seventeen."
+          },
+          {
+            "sequence": 7,
+            "kind": "completed",
+            "elapsed_seconds": 7.597174599999562,
+            "text": "Not seventeen."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 3.3606113999994704
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.14285714285714285
+      }
+    },
+    {
+      "clip_id": "preference-01",
+      "outcome": "personal_default",
+      "reference": "Set my review location to Station A.",
+      "expected_slots": {
+        "location": "Station A"
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "06ce56cbd196373533f000409feb4209a61d18f086da41464fd790252d894274",
+      "duration_seconds": 3.075,
+      "status": "ok",
+      "measurement": {
+        "text": "Set my review location to station a.",
+        "stop_elapsed_seconds": 4.961289300001226,
+        "stop_to_final_seconds": 0.02809479999996256,
+        "processing_seconds": 3.7765111999979126,
+        "realtime_factor": 1.2281337235765568,
+        "maximum_replay_backlog_seconds": 2.0604450999962864,
+        "replay_wall_seconds": 4.989384100001189,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.758744500002649,
+            "text": "Said my ripple,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.758765200000198,
+            "text": "Said my ripple,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.959948899995652,
+            "text": "Set my review location to station a."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 4.959970999996585,
+            "text": "Set my review location to station a."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.758744500002649
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-02",
+      "outcome": "personal_default",
+      "reference": "Remember these filters.",
+      "expected_slots": {
+        "scope": "browser_view"
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "c373c6f8d8d1c8f19175b0dc20f7b991459d4eb0b13370b2b3e5b5f5eb9301a6",
+      "duration_seconds": 2.1,
+      "status": "ok",
+      "measurement": {
+        "text": "Remember these filters.",
+        "stop_elapsed_seconds": 2.195917199998803,
+        "stop_to_final_seconds": 1.2498384999998962,
+        "processing_seconds": 2.326785400015069,
+        "realtime_factor": 1.1079930476262234,
+        "maximum_replay_backlog_seconds": 0.9912791000024299,
+        "replay_wall_seconds": 3.445755699998699,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.190958099999989,
+            "text": "Remember these"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.1909671000030357,
+            "text": "Remember these"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 3.4457456000018283,
+            "text": "Remember these filters."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 3.445752600004198,
+            "text": "Remember these filters."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.190958099999989
+      },
+      "word_score": {
+        "reference_words": 3,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-03",
+      "outcome": "personal_default",
+      "reference": "Make ninety percent my minimum for green.",
+      "expected_slots": {
+        "unsupported": "policy_change"
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "ab130d437e3bab6f510fb376cbb20f366536600ff3199ba5dbb45d525e84d675",
+      "duration_seconds": 3.105,
+      "status": "ok",
+      "measurement": {
+        "text": "Make ninety percent my minimum for green.",
+        "stop_elapsed_seconds": 4.934474299996509,
+        "stop_to_final_seconds": 0.3632906999991974,
+        "processing_seconds": 4.116550100014138,
+        "realtime_factor": 1.3257810306003663,
+        "maximum_replay_backlog_seconds": 2.2329911999986507,
+        "replay_wall_seconds": 5.297764999995707,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.6332683000000543,
+            "text": "Make 90."
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.633275899999717,
+            "text": "Make 90."
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.932621399995696,
+            "text": "Make ninety percent my minimum for green."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 5.29776000000129,
+            "text": "Make ninety percent my minimum for green."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.6332683000000543
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "value-01",
+      "outcome": "value_entry",
+      "reference": "Enter cold test eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "822c8ea71f738403c8827fc51ad1593c06274587bce21e0836379834b6402cc9",
+      "duration_seconds": 3.71,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter cold test 87.5 percent",
+        "stop_elapsed_seconds": 5.008017899999686,
+        "stop_to_final_seconds": 1.4733537000065553,
+        "processing_seconds": 5.2640328999987105,
+        "realtime_factor": 1.4188767924524825,
+        "maximum_replay_backlog_seconds": 2.448967600001197,
+        "replay_wall_seconds": 6.481371600006241,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.3413386000029277,
+            "text": "Enter Cold,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.341345500004536,
+            "text": "Enter Cold,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.946009700004652,
+            "text": "Enter cold test 87.5."
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 6.481362900005479,
+            "text": "Enter cold test 87.5 percent"
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 6.481368799999473,
+            "text": "Enter cold test 87.5 percent"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.3413386000029277
+      },
+      "word_score": {
+        "reference_words": 8,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "value-02",
+      "outcome": "value_entry",
+      "reference": "Enter fumonisin zero point eight ppm.",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM",
+        "value": 0.8,
+        "unit": "ppm"
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "e4a23f9c57eb60aa99ef95e03e870bbac2d549f5f43ff2ac7dffbdea0f1e6f7a",
+      "duration_seconds": 3.435,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter few minutes and 0.8 ppm.",
+        "stop_elapsed_seconds": 4.576126699997985,
+        "stop_to_final_seconds": 1.5674424000026193,
+        "processing_seconds": 4.980959399988933,
+        "realtime_factor": 1.4500609606954682,
+        "maximum_replay_backlog_seconds": 2.172528600000078,
+        "replay_wall_seconds": 6.1435691000006045,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.3580732999980683,
+            "text": "Enter Fuel Moment."
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.3580814999950235,
+            "text": "Enter Fuel Moment."
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.571968999996898,
+            "text": "Enter few minutes and 0.88"
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 6.143560099997558,
+            "text": "Enter few minutes and 0.8 ppm."
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 6.14356620000035,
+            "text": "Enter few minutes and 0.8 ppm."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.3580732999980683
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 4,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.6666666666666666
+      }
+    },
+    {
+      "clip_id": "value-03",
+      "outcome": "value_entry",
+      "reference": "Change eighty five to ninety percent.",
+      "expected_slots": {
+        "original": 85,
+        "value": 90,
+        "unit": "%",
+        "missing_field": true
+      },
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "f0e427a413dc7dd5142df739a3bb11ea3d4091333566797c3c3e01af9a06aca1",
+      "duration_seconds": 3.015,
+      "status": "ok",
+      "measurement": {
+        "text": "Change 85 to 90 percent.",
+        "stop_elapsed_seconds": 4.699735400005011,
+        "stop_to_final_seconds": 0.013095299997075927,
+        "processing_seconds": 3.553229399956763,
+        "realtime_factor": 1.1785172139160076,
+        "maximum_replay_backlog_seconds": 1.9985709000029601,
+        "replay_wall_seconds": 4.712830700002087,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.591052800002217,
+            "text": "Change, e, d, e,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.591059900005348,
+            "text": "Change, e, d, e,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.698201200000767,
+            "text": "Change 85 to 90 percent."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 4.698210900001868,
+            "text": "Change 85 to 90 percent."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.591052800002217
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 2,
+        "deletions": 1,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "silence-01",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.017631700000493,
+        "stop_to_final_seconds": 0.037036799993074965,
+        "processing_seconds": 0.07517149996419903,
+        "realtime_factor": 0.037585749982099514,
+        "maximum_replay_backlog_seconds": 0.021786899997096043,
+        "replay_wall_seconds": 2.054668499993568,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-02",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0106873999975505,
+        "stop_to_final_seconds": 0.027588300006755162,
+        "processing_seconds": 0.09105789998284308,
+        "realtime_factor": 0.04552894999142154,
+        "maximum_replay_backlog_seconds": 0.0194435999947018,
+        "replay_wall_seconds": 2.0382757000043057,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-03",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.013006300003326,
+        "stop_to_final_seconds": 0.020608200000424404,
+        "processing_seconds": 0.0615471999917645,
+        "realtime_factor": 0.03077359999588225,
+        "maximum_replay_backlog_seconds": 0.02409770000667777,
+        "replay_wall_seconds": 2.0336145000037504,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-04",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.01614129999507,
+        "stop_to_final_seconds": 0.028066400001989678,
+        "processing_seconds": 0.08794739998120349,
+        "realtime_factor": 0.043973699990601745,
+        "maximum_replay_backlog_seconds": 0.033710399991832674,
+        "replay_wall_seconds": 2.0442076999970595,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-05",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.001399200002197,
+        "stop_to_final_seconds": 0.03246799999760697,
+        "processing_seconds": 0.11199789999227505,
+        "realtime_factor": 0.055998949996137526,
+        "maximum_replay_backlog_seconds": 0.04504659999656724,
+        "replay_wall_seconds": 2.033867199999804,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-06",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0111106999975163,
+        "stop_to_final_seconds": 0.02259090000006836,
+        "processing_seconds": 0.08920399999624351,
+        "realtime_factor": 0.044601999998121755,
+        "maximum_replay_backlog_seconds": 0.03818909999972675,
+        "replay_wall_seconds": 2.0337015999975847,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-07",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.016772499999206,
+        "stop_to_final_seconds": 0.04729829999996582,
+        "processing_seconds": 0.12974129999929573,
+        "realtime_factor": 0.06487064999964787,
+        "maximum_replay_backlog_seconds": 0.02606700000615092,
+        "replay_wall_seconds": 2.064070799999172,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-08",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0082857000015792,
+        "stop_to_final_seconds": 0.02183350000268547,
+        "processing_seconds": 0.0714047999936156,
+        "realtime_factor": 0.0357023999968078,
+        "maximum_replay_backlog_seconds": 0.014787300002353732,
+        "replay_wall_seconds": 2.0301192000042647,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-09",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0107256999981473,
+        "stop_to_final_seconds": 0.036009900002682116,
+        "processing_seconds": 0.0864644999965094,
+        "realtime_factor": 0.0432322499982547,
+        "maximum_replay_backlog_seconds": 0.02190649999829475,
+        "replay_wall_seconds": 2.0467356000008294,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-10",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 2,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.018650700003491,
+        "stop_to_final_seconds": 0.030118800001218915,
+        "processing_seconds": 0.07948770002258243,
+        "realtime_factor": 0.039743850011291215,
+        "maximum_replay_backlog_seconds": 0.018548400003055576,
+        "replay_wall_seconds": 2.0487695000047097,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "question-01",
+      "outcome": "question",
+      "reference": "Why is this candidate amber?",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "4efc6d07f658c80f2af86d05eb197c9a46e3885cbaf26ae4368bfb2900d900f4",
+      "duration_seconds": 2.4,
+      "status": "ok",
+      "measurement": {
+        "text": "Why is this candidate amber?",
+        "stop_elapsed_seconds": 2.540890299998864,
+        "stop_to_final_seconds": 1.5026265999986208,
+        "processing_seconds": 2.947572000004584,
+        "realtime_factor": 1.2281550000019101,
+        "maximum_replay_backlog_seconds": 1.3360950000060257,
+        "replay_wall_seconds": 4.043516899997485,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.5358345999993617,
+            "text": "Why is this happening?"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.535842800003593,
+            "text": "Why is this happening?"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.0435058000002755,
+            "text": "Why is this candidate amber?"
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 4.043512900003407,
+            "text": "Why is this candidate amber?"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.5358345999993617
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-02",
+      "outcome": "question",
+      "reference": "How many trials support this candidate?",
+      "expected_slots": {
+        "field": "N_TRIALS_USED"
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "0c481410c6430842c5a812301ca59979bb14ff0d0d7a9c6d252c25e1244e9681",
+      "duration_seconds": 3.01,
+      "status": "ok",
+      "measurement": {
+        "text": "How many trials support this candidate?",
+        "stop_elapsed_seconds": 4.639428499998758,
+        "stop_to_final_seconds": 0.5499590999970678,
+        "processing_seconds": 4.0766260999807855,
+        "realtime_factor": 1.3543608305584005,
+        "maximum_replay_backlog_seconds": 2.0376485000015236,
+        "replay_wall_seconds": 5.189387599995825,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.519963099999586,
+            "text": "How many children?"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.51996969999891,
+            "text": "How many children?"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.637303299998166,
+            "text": "How many trials support this candidate?"
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 5.189383899996756,
+            "text": "How many trials support this candidate?"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.519963099999586
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "question-03",
+      "outcome": "question",
+      "reference": "What is the fumonisin level?",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM"
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "137eff57559d078c27959be604305f36483218c9d6551e4f1c8393f5d866a005",
+      "duration_seconds": 2.335,
+      "status": "ok",
+      "measurement": {
+        "text": "What is the few menace in level?",
+        "stop_elapsed_seconds": 2.481549599993741,
+        "stop_to_final_seconds": 1.630751800003054,
+        "processing_seconds": 2.9649308000080055,
+        "realtime_factor": 1.269777644543043,
+        "maximum_replay_backlog_seconds": 1.2765357000025688,
+        "replay_wall_seconds": 4.112301399996795,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.476275999993959,
+            "text": "What is the fuel?"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.47628459999396,
+            "text": "What is the fuel?"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.112292999998317,
+            "text": "What is the few menace in level?"
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 4.112299000000348,
+            "text": "What is the few menace in level?"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.476275999993959
+      },
+      "word_score": {
+        "reference_words": 5,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 2,
+        "wer": 0.6
+      }
+    },
+    {
+      "clip_id": "filter-01",
+      "outcome": "current_filter",
+      "reference": "Show germination at least ninety percent.",
+      "expected_slots": {
+        "field": "GERMINATION_PCT",
+        "comparator": "min_inclusive",
+        "value": 90,
+        "unit": "%"
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "cd950bf2a34ab07535f1f9ec6161411219efeb9aa2d7124853fc24eb245944da",
+      "duration_seconds": 3.25,
+      "status": "ok",
+      "measurement": {
+        "text": "Show germination at least ninety percent.",
+        "stop_elapsed_seconds": 5.333094699999492,
+        "stop_to_final_seconds": 0.6289342000018223,
+        "processing_seconds": 4.854585100023542,
+        "realtime_factor": 1.4937184923149358,
+        "maximum_replay_backlog_seconds": 2.730819000003976,
+        "replay_wall_seconds": 5.9620289000013145,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.5196146000016597,
+            "text": "Show German."
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.5196228999993764,
+            "text": "Show German."
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 5.329928300001484,
+            "text": "Show germination at least ninety percent."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 5.9620255999980145,
+            "text": "Show germination at least ninety percent."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.5196146000016597
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "filter-02",
+      "outcome": "current_filter",
+      "reference": "Show cold test at least eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "comparator": "min_inclusive",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "305babba2c124d941fdbf68f282353ada6f3c52d685bf8027c10b124abe2a537",
+      "duration_seconds": 4.115,
+      "status": "ok",
+      "measurement": {
+        "text": "Show cold test at least 87.5 percent",
+        "stop_elapsed_seconds": 4.788399599994591,
+        "stop_to_final_seconds": 2.3198663000002853,
+        "processing_seconds": 5.807773900021857,
+        "realtime_factor": 1.4113666828728693,
+        "maximum_replay_backlog_seconds": 2.5378229999987525,
+        "replay_wall_seconds": 7.108265899994876,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 1.9811737999989418,
+            "text": "Show cold,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 1.9811811999970814,
+            "text": "Show cold,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.736759200000961,
+            "text": "Show cold test at least eighty eighty."
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 7.108256200001051,
+            "text": "Show cold test at least 87.5 percent"
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 7.1082630999953835,
+            "text": "Show cold test at least 87.5 percent"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 1.9811737999989418
+      },
+      "word_score": {
+        "reference_words": 10,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.4
+      }
+    },
+    {
+      "clip_id": "filter-03",
+      "outcome": "current_filter",
+      "reference": "Show at least seventeen trials, not seventy.",
+      "expected_slots": {
+        "field": "N_TRIALS_USED",
+        "value": 17,
+        "unit": "trials",
+        "rejected_value": 70
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "5a46bfe03df9e03bfb521247269212969b39b3a51e2f7454e72d96624340f593",
+      "duration_seconds": 3.945,
+      "status": "ok",
+      "measurement": {
+        "text": "Show at least seventeen trials. Not seventeen.",
+        "stop_elapsed_seconds": 4.367239600003813,
+        "stop_to_final_seconds": 2.7544634000005317,
+        "processing_seconds": 6.012566799989145,
+        "realtime_factor": 1.524098048159479,
+        "maximum_replay_backlog_seconds": 2.0626190999973915,
+        "replay_wall_seconds": 7.121703000004345,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.26152120000188,
+            "text": "Show at least,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.261559800004761,
+            "text": "Show at least,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.299376700000721,
+            "text": "Show at least seventeen trials,"
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 7.121675599999435,
+            "text": "Show at least seventeen trials."
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 7.121686600003159,
+            "text": "Show at least seventeen trials."
+          },
+          {
+            "sequence": 6,
+            "kind": "started",
+            "elapsed_seconds": 7.121695500005444,
+            "text": "Not seventeen."
+          },
+          {
+            "sequence": 7,
+            "kind": "partial",
+            "elapsed_seconds": 7.121698599999945,
+            "text": "Not seventeen."
+          },
+          {
+            "sequence": 8,
+            "kind": "completed",
+            "elapsed_seconds": 7.121700700001384,
+            "text": "Not seventeen."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.26152120000188
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 1,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.14285714285714285
+      }
+    },
+    {
+      "clip_id": "preference-01",
+      "outcome": "personal_default",
+      "reference": "Set my review location to Station A.",
+      "expected_slots": {
+        "location": "Station A"
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "06ce56cbd196373533f000409feb4209a61d18f086da41464fd790252d894274",
+      "duration_seconds": 3.075,
+      "status": "ok",
+      "measurement": {
+        "text": "Set my review location to station a.",
+        "stop_elapsed_seconds": 5.522321399999782,
+        "stop_to_final_seconds": 0.062143399998603854,
+        "processing_seconds": 4.429533799971978,
+        "realtime_factor": 1.4404987967388545,
+        "maximum_replay_backlog_seconds": 2.621007199995802,
+        "replay_wall_seconds": 5.584464799998386,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.9130575000017416,
+            "text": "Said my ripple,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.913083799998276,
+            "text": "Said my ripple,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 5.520471399999224,
+            "text": "Set my review location to station a."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 5.520479200000409,
+            "text": "Set my review location to station a."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.9130575000017416
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-02",
+      "outcome": "personal_default",
+      "reference": "Remember these filters.",
+      "expected_slots": {
+        "scope": "browser_view"
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "c373c6f8d8d1c8f19175b0dc20f7b991459d4eb0b13370b2b3e5b5f5eb9301a6",
+      "duration_seconds": 2.1,
+      "status": "ok",
+      "measurement": {
+        "text": "Remember these filters.",
+        "stop_elapsed_seconds": 3.168936300004134,
+        "stop_to_final_seconds": 0.003544399995007552,
+        "processing_seconds": 1.9454387999940081,
+        "realtime_factor": 0.9263994285685753,
+        "maximum_replay_backlog_seconds": 0.8877112000045599,
+        "replay_wall_seconds": 3.1724806999991415,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.0875488000019686,
+            "text": "Remember these"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.0875550999990082,
+            "text": "Remember these"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 3.168704900002922,
+            "text": "Remember these filters."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 3.168710199999623,
+            "text": "Remember these filters."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.0875488000019686
+      },
+      "word_score": {
+        "reference_words": 3,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "preference-03",
+      "outcome": "personal_default",
+      "reference": "Make ninety percent my minimum for green.",
+      "expected_slots": {
+        "unsupported": "policy_change"
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "ab130d437e3bab6f510fb376cbb20f366536600ff3199ba5dbb45d525e84d675",
+      "duration_seconds": 3.105,
+      "status": "ok",
+      "measurement": {
+        "text": "Make ninety percent my minimum for green.",
+        "stop_elapsed_seconds": 5.028158000000985,
+        "stop_to_final_seconds": 0.35207619999710005,
+        "processing_seconds": 4.266373699952965,
+        "realtime_factor": 1.3740333977304233,
+        "maximum_replay_backlog_seconds": 2.3255916999987676,
+        "replay_wall_seconds": 5.380234199998085,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.6293898000003537,
+            "text": "Make 90."
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.629395600000862,
+            "text": "Make 90."
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 5.024841999998898,
+            "text": "Make ninety percent my minimum for green."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 5.380230799994024,
+            "text": "Make ninety percent my minimum for green."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.6293898000003537
+      },
+      "word_score": {
+        "reference_words": 7,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.0
+      }
+    },
+    {
+      "clip_id": "value-01",
+      "outcome": "value_entry",
+      "reference": "Enter cold test eighty seven point five percent.",
+      "expected_slots": {
+        "field": "COLD_TEST_PCT",
+        "value": 87.5,
+        "unit": "%"
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "822c8ea71f738403c8827fc51ad1593c06274587bce21e0836379834b6402cc9",
+      "duration_seconds": 3.71,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter cold test 87.5 percent",
+        "stop_elapsed_seconds": 4.32913230000122,
+        "stop_to_final_seconds": 1.6158240999939153,
+        "processing_seconds": 4.829002900005435,
+        "realtime_factor": 1.3016180323464783,
+        "maximum_replay_backlog_seconds": 2.1248199000037857,
+        "replay_wall_seconds": 5.944956399995135,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.1387965999965672,
+            "text": "Enter Cold,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.142494399995485,
+            "text": "Enter Cold,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.324502999996184,
+            "text": "Enter cold test 8775"
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 5.94494670000131,
+            "text": "Enter cold test 87.5 percent"
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 5.944953899997927,
+            "text": "Enter cold test 87.5 percent"
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.1387965999965672
+      },
+      "word_score": {
+        "reference_words": 8,
+        "substitutions": 1,
+        "deletions": 3,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "value-02",
+      "outcome": "value_entry",
+      "reference": "Enter fumonisin zero point eight ppm.",
+      "expected_slots": {
+        "field": "FUMONISIN_PPM",
+        "value": 0.8,
+        "unit": "ppm"
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "e4a23f9c57eb60aa99ef95e03e870bbac2d549f5f43ff2ac7dffbdea0f1e6f7a",
+      "duration_seconds": 3.435,
+      "status": "ok",
+      "measurement": {
+        "text": "Enter few minutes and 0.8 ppm.",
+        "stop_elapsed_seconds": 4.993853699997999,
+        "stop_to_final_seconds": 1.3438116000033915,
+        "processing_seconds": 5.089437500020722,
+        "realtime_factor": 1.4816411936013747,
+        "maximum_replay_backlog_seconds": 2.289700500004983,
+        "replay_wall_seconds": 6.33766530000139,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.5057108999972115,
+            "text": "Enter Fuel Moment."
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.505718299995351,
+            "text": "Enter Fuel Moment."
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 4.9891492999959155,
+            "text": "Enter few minutes and 0.8 ppp."
+          },
+          {
+            "sequence": 4,
+            "kind": "partial",
+            "elapsed_seconds": 6.337656399999105,
+            "text": "Enter few minutes and 0.8 ppm."
+          },
+          {
+            "sequence": 5,
+            "kind": "completed",
+            "elapsed_seconds": 6.337662799996906,
+            "text": "Enter few minutes and 0.8 ppm."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.5057108999972115
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 4,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": 0.6666666666666666
+      }
+    },
+    {
+      "clip_id": "value-03",
+      "outcome": "value_entry",
+      "reference": "Change eighty five to ninety percent.",
+      "expected_slots": {
+        "original": 85,
+        "value": 90,
+        "unit": "%",
+        "missing_field": true
+      },
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "f0e427a413dc7dd5142df739a3bb11ea3d4091333566797c3c3e01af9a06aca1",
+      "duration_seconds": 3.015,
+      "status": "ok",
+      "measurement": {
+        "text": "Change 85 to 90 percent.",
+        "stop_elapsed_seconds": 5.490917700000864,
+        "stop_to_final_seconds": 0.03496630000154255,
+        "processing_seconds": 4.3871455999906175,
+        "realtime_factor": 1.4551063349885962,
+        "maximum_replay_backlog_seconds": 2.590274900001532,
+        "replay_wall_seconds": 5.5258840000024065,
+        "events": [
+          {
+            "sequence": 1,
+            "kind": "started",
+            "elapsed_seconds": 2.8092665000003763,
+            "text": "Change, e, d, e,"
+          },
+          {
+            "sequence": 2,
+            "kind": "partial",
+            "elapsed_seconds": 2.809272799997416,
+            "text": "Change, e, d, e,"
+          },
+          {
+            "sequence": 3,
+            "kind": "partial",
+            "elapsed_seconds": 5.489870500001416,
+            "text": "Change 85 to 90 percent."
+          },
+          {
+            "sequence": 4,
+            "kind": "completed",
+            "elapsed_seconds": 5.489876999999979,
+            "text": "Change 85 to 90 percent."
+          }
+        ],
+        "first_nonempty_event_from_replay_start_seconds": 2.8092665000003763
+      },
+      "word_score": {
+        "reference_words": 6,
+        "substitutions": 2,
+        "deletions": 1,
+        "insertions": 0,
+        "wer": 0.5
+      }
+    },
+    {
+      "clip_id": "silence-01",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0059631999974954,
+        "stop_to_final_seconds": 0.012213800000608899,
+        "processing_seconds": 0.04098610000801273,
+        "realtime_factor": 0.020493050004006363,
+        "maximum_replay_backlog_seconds": 0.02246430000377586,
+        "replay_wall_seconds": 2.0181769999981043,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-02",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0157900000049267,
+        "stop_to_final_seconds": 0.04772149999917019,
+        "processing_seconds": 0.09905159997288138,
+        "realtime_factor": 0.04952579998644069,
+        "maximum_replay_backlog_seconds": 0.01532250000309432,
+        "replay_wall_seconds": 2.063511500004097,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-03",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0147237999990466,
+        "stop_to_final_seconds": 0.023961000006238464,
+        "processing_seconds": 0.07960250003816327,
+        "realtime_factor": 0.039801250019081635,
+        "maximum_replay_backlog_seconds": 0.03864449999673525,
+        "replay_wall_seconds": 2.038684800005285,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-04",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0157607000001008,
+        "stop_to_final_seconds": 0.05228229999920586,
+        "processing_seconds": 0.11809589999029413,
+        "realtime_factor": 0.059047949995147064,
+        "maximum_replay_backlog_seconds": 0.028020400000968948,
+        "replay_wall_seconds": 2.0680429999993066,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-05",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0143645999996806,
+        "stop_to_final_seconds": 0.027718800003640354,
+        "processing_seconds": 0.10833399999683024,
+        "realtime_factor": 0.05416699999841512,
+        "maximum_replay_backlog_seconds": 0.0295613999987836,
+        "replay_wall_seconds": 2.042083400003321,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-06",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0050448999973014,
+        "stop_to_final_seconds": 0.02656109999952605,
+        "processing_seconds": 0.09380110000347486,
+        "realtime_factor": 0.04690055000173743,
+        "maximum_replay_backlog_seconds": 0.014813999994657934,
+        "replay_wall_seconds": 2.0316059999968274,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-07",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.009082300006412,
+        "stop_to_final_seconds": 0.030945999998948537,
+        "processing_seconds": 0.06526429997757077,
+        "realtime_factor": 0.032632149988785386,
+        "maximum_replay_backlog_seconds": 0.026779400002851617,
+        "replay_wall_seconds": 2.0400283000053605,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-08",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0013733000014327,
+        "stop_to_final_seconds": 0.028844499996921513,
+        "processing_seconds": 0.07310709997545928,
+        "realtime_factor": 0.03655354998772964,
+        "maximum_replay_backlog_seconds": 0.01396270000259392,
+        "replay_wall_seconds": 2.030217799998354,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-09",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0189615999988746,
+        "stop_to_final_seconds": 0.042804400000022724,
+        "processing_seconds": 0.10440639998705592,
+        "realtime_factor": 0.05220319999352796,
+        "maximum_replay_backlog_seconds": 0.01797679999435786,
+        "replay_wall_seconds": 2.0617659999988973,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    },
+    {
+      "clip_id": "silence-10",
+      "outcome": "no_speech",
+      "reference": "",
+      "expected_slots": {},
+      "mode": "native_streaming",
+      "repetition": 3,
+      "audio_sha256": "20eaebffe1816e0ffa6f7f854f5ef4ea80d5349faaf0ce1fec1b713e7fde58fa",
+      "duration_seconds": 2.0,
+      "status": "ok",
+      "measurement": {
+        "text": "",
+        "stop_elapsed_seconds": 2.0078743999984,
+        "stop_to_final_seconds": 0.038294400001177564,
+        "processing_seconds": 0.09757680000620894,
+        "realtime_factor": 0.04878840000310447,
+        "maximum_replay_backlog_seconds": 0.02772999999433523,
+        "replay_wall_seconds": 2.0461687999995775,
+        "events": [],
+        "first_nonempty_event_from_replay_start_seconds": null
+      },
+      "word_score": {
+        "reference_words": 0,
+        "substitutions": 0,
+        "deletions": 0,
+        "insertions": 0,
+        "wer": null
+      }
+    }
+  ],
+  "summary": {
+    "utterance": {
+      "successful_runs": 66,
+      "failed_runs": 0,
+      "first_repetition_speech_clips": 12,
+      "reference_words": 76,
+      "word_errors": 19,
+      "synthetic_wer": 0.25,
+      "stop_to_final_seconds": {
+        "count": 36,
+        "p50": 3.429194299998926,
+        "p95": 4.719645199998922
+      },
+      "realtime_factor": {
+        "count": 36,
+        "p50": 1.0469213276226532,
+        "p95": 1.748750406853746
+      },
+      "silence_runs": 30,
+      "nonempty_silence_runs": 0
+    },
+    "native_streaming": {
+      "successful_runs": 66,
+      "failed_runs": 0,
+      "first_repetition_speech_clips": 12,
+      "reference_words": 76,
+      "word_errors": 20,
+      "synthetic_wer": 0.2631578947368421,
+      "stop_to_final_seconds": {
+        "count": 36,
+        "p50": 1.1928534000035143,
+        "p95": 2.7544634000005317
+      },
+      "realtime_factor": {
+        "count": 36,
+        "p50": 1.35072830189112,
+        "p95": 1.6082925151843737
+      },
+      "silence_runs": 30,
+      "nonempty_silence_runs": 0,
+      "live_interim": {
+        "speech_runs": 36,
+        "runs_without_live_partial": 0,
+        "first_partial_from_replay_start_seconds": {
+          "count": 36,
+          "p50": 2.47628459999396,
+          "p95": 3.2713593000007677
+        },
+        "update_gaps_seconds": {
+          "count": 30,
+          "p50": 2.2138875000018743,
+          "p95": 2.952183800000057
+        },
+        "maximum_backlog_seconds": {
+          "count": 36,
+          "p50": 2.0626190999973915,
+          "p95": 2.7860845000031986
+        }
+      }
+    }
+  },
+  "actions_submitted": 0
+}

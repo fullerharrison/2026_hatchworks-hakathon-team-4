@@ -1,0 +1,7 @@
+__pycache__/
+.pytest_cache/
+.venv/
+.cache/
+assets/
+pytest-tmp*/
+results/pytest-tmp*/
